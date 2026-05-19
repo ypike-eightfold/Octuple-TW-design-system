@@ -1,7 +1,10 @@
 {
-  "buildCommand": "npm run build && cd demo && npm install && npm run build",
-  "outputDirectory": "demo/dist",
-  "framework": null,
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "buildCommand": "npm run build && cd web && npm install && npm run build",
+  "outputDirectory": "web/.next",
+  "framework": "nextjs",
   "installCommand": "npm install",
-  "rewrites": [{ "source": "/((?!assets/|examples/).*)", "destination": "/index.html" }]
+  "redirects": [
+    { "source": "/examples/:path*", "destination": "/components/examples/:path*", "permanent": false }
+  ]
 }

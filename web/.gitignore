@@ -1,0 +1,18 @@
+node_modules
+.next
+.env
+.env.local
+.env*.local
+*.tsbuildinfo
+next-env.d.ts
+.DS_Store
+.vercel
+
+# Copied from repo-root /public by scripts/copy-public-to-web.mjs at build/dev time.
+# Canonical source is /public in the repo root.
+public/fonts/
+public/product-logos/
+public/object-card-backgrounds/
+public/eightfold-logo.svg
+public/ai-agent.svg
+public/copilot.svg

@@ -110,7 +110,7 @@ Claude will ask you for:
 Then Claude will:
 
 1. Create a feature branch
-2. Save the design files into `gallery/public/content/designs/<category>/<slug>/`
+2. Save the design files into `web/public/content/designs/<category>/<slug>/`
 3. Push the branch to GitHub
 4. Open a pull request using the design template
 
@@ -212,7 +212,7 @@ Claude will confirm before doing anything destructive.
 
 - `.claude/skills/` — the instructions Claude uses to know how to design Eightfold UI properly. You don't edit these unless you want to improve them; if you find Claude making the same mistake repeatedly, tell Claude *"add this to your learnings"* and it'll record the fix.
 - `gallery/` — the website that shows all the approved designs. Runs locally with `npm run dev`; deploys to Vercel.
-- `gallery/public/content/designs/<category>/<slug>/` — where every published design lives (one folder each).
+- `web/public/content/designs/<category>/<slug>/` — where every published design lives (one folder each).
 - `src/` — the actual Tailwind components. You don't need to touch this.
 - `CLAUDE.md` — Claude's own playbook for this repo. Tells Claude how to behave.
 

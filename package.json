@@ -3,7 +3,7 @@
   "version": "1.0.4",
   "type": "module",
   "workspaces": [
-    "demo"
+    "web"
   ],
   "main": "./dist/index.js",
   "module": "./dist/index.js",
