@@ -3,7 +3,7 @@
   "installCommand": "npm install",
   "buildCommand": "npm run build && cd web && npm install && npm run build",
   "outputDirectory": "web/.next",
-  "framework": null,
+  "framework": "nextjs",
   "redirects": [
     { "source": "/examples/:path*", "destination": "/components/examples/:path*", "permanent": false }
   ]
