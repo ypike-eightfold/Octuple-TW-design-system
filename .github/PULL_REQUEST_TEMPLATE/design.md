@@ -20,7 +20,7 @@ For code changes (components, build, gallery infrastructure), use the default PR
 
 ## Design review checklist
 
-- [ ] Files are under `gallery/public/content/designs/<category>/<slug>/`
+- [ ] Files are under `web/public/content/designs/<category>/<slug>/`
 - [ ] `meta.json` is present and validates against the schema
 - [ ] `thumbnail.png` is at least 800 × 500
 - [ ] `index.html` (or React route output) renders standalone — no broken asset paths

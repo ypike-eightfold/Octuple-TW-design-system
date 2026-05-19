@@ -80,13 +80,24 @@ Both `design-tw-ux-designer` and `design-og-ux-designer` reference these. If you
 
 ---
 
-## Design gallery
+## Unified web app — landing, components, gallery, docs
 
-A Next.js 15 app under `gallery/` browses all approved designs. Google SSO restricted to `@eightfold.ai` via Auth.js v5. Deploys as a **separate Vercel project** from the component-showcase site at `ef-design-system.vercel.app`.
+A single Next.js 15 app under `web/` powers everything served at `ef-design-system.vercel.app`:
 
-For local development the gallery runs with `NEXT_PUBLIC_AUTH_BYPASS=true` (auth disabled) until you wire OAuth credentials — see `gallery/docs/google-oauth-setup.md` for the setup walkthrough. Don't set `NEXT_PUBLIC_AUTH_BYPASS` in production.
+| Route | Content |
+|---|---|
+| `/` | Landing page — hero + 3 cards (Components / Gallery / How to use) |
+| `/components` | Component catalog ported from the old `demo/` Vite app — tokens, shadcn primitives, Eightfold-specific components |
+| `/gallery` | Approved designs, browsable by product area |
+| `/gallery/<category>/<slug>` | Design detail — thumbnail + sandboxed iframe of the design |
+| `/docs/workflow` | Renders `docs/DESIGNER-WORKFLOW.md` |
+| `/signin` | Google SSO via Auth.js v5, restricted to `@eightfold.ai` |
 
-Categories:
+The catalog uses Next.js route groups (`app/(site)/`) so /components renders full-width while landing/gallery/docs stay constrained.
+
+For local development the site runs with `NEXT_PUBLIC_AUTH_BYPASS=true` (auth disabled) until OAuth credentials are wired — see `web/docs/google-oauth-setup.md`. Don't set `NEXT_PUBLIC_AUTH_BYPASS` in production.
+
+Gallery categories:
 
 ```
 Talent Management        Personal Career Site
@@ -97,7 +108,7 @@ Workforce Exchange       Admin Console
                          Analytics
 ```
 
-Designs live in `gallery/public/content/designs/<category-slug>/<design-slug>/` as `index.html` + `meta.json` + `thumbnail.png`. **Designs only appear in the gallery after a PR merges into `main`** — the `publish-design` skill handles the PR flow.
+Designs live in `web/public/content/designs/<category-slug>/<design-slug>/` as `index.html` + `meta.json` + `thumbnail.png`. **Designs only appear in the gallery after a PR merges into `main`** — the `publish-design` skill handles the PR flow.
 
 ---
 

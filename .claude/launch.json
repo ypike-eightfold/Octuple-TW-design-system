@@ -4,7 +4,7 @@
     {
       "name": "gallery",
       "runtimeExecutable": "npm",
-      "runtimeArgs": ["--prefix", "gallery", "run", "dev"],
+      "runtimeArgs": ["--prefix", "web", "run", "dev"],
       "port": 3000
     }
   ]

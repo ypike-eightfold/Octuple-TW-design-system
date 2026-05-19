@@ -2,7 +2,7 @@
 name: publish-design
 description: >
   Publishes a finished design into the ef-design-system gallery via a pull request. Use this skill after a designer has built and reviewed a mock screen (with design-tw-ux-designer or design-og-ux-designer) and is ready to share it with the team.
-  Creates the gallery file layout (index.html, meta.json, thumbnail.png) under gallery/public/content/designs/<category>/<slug>/, opens a feature branch, commits, pushes, and opens a PR using the design pull-request template.
+  Creates the gallery file layout (index.html, meta.json, thumbnail.png) under web/public/content/designs/<category>/<slug>/, opens a feature branch, commits, pushes, and opens a PR using the design pull-request template.
   Trigger when the user says "publish this design", "submit my design", "open a PR for this design", "add this to the gallery", or "I want to share this with the team".
 ---
 
@@ -81,7 +81,7 @@ If a branch with that name already exists locally or remotely, append `-2`, `-3`
 ### 3. Scaffold gallery files
 
 ```
-gallery/public/content/designs/<category>/<slug>/
+web/public/content/designs/<category>/<slug>/
   index.html           # the design itself (copied from source_path)
   meta.json            # see schema below
   thumbnail.png        # copied from thumbnail_path
@@ -108,7 +108,7 @@ Write `meta.json` last so any partial copy can be detected.
 ### 4. Commit
 
 ```bash
-git add gallery/public/content/designs/<category>/<slug>/
+git add web/public/content/designs/<category>/<slug>/
 git commit -m "design(<category>): <title>"
 ```
 
@@ -141,7 +141,7 @@ PR body (rendered into the design.md template's `## Summary` section):
 <description>
 
 Built with: <design-tw-ux-designer | design-og-ux-designer>
-Thumbnail: ![thumbnail](../../gallery/public/content/designs/<category>/<slug>/thumbnail.png)
+Thumbnail: ![thumbnail](../../web/public/content/designs/<category>/<slug>/thumbnail.png)
 ```
 
 ### 7. Report
@@ -176,7 +176,7 @@ Never use `--force` flags. Never amend commits on shared branches. Never delete 
 - It does not generate the thumbnail. The designer captures it manually (screenshot of the rendered design).
 - It does not modify the gallery's index, routing, or styling. The Next.js gallery app reads the filesystem at build time.
 - It does not merge the PR. Reviewers do.
-- It does not edit any file outside `gallery/public/content/designs/<category>/<slug>/` plus the resulting git/branch state.
+- It does not edit any file outside `web/public/content/designs/<category>/<slug>/` plus the resulting git/branch state.
 
 ---
 

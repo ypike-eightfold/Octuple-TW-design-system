@@ -1,6 +1,8 @@
 # @tonyh-2-eightfold/ef-design-system
 
-Octuple DS Theme 2 components for Eightfold applications.
+Octuple DS Theme 2 components for Eightfold applications, plus the Claude Code skills, content guidelines, and design gallery designers use to build new screens.
+
+> **Designers — start here:** [docs/DESIGNER-WORKFLOW.md](docs/DESIGNER-WORKFLOW.md). End-to-end walkthrough of how to use this repo from "I have an idea" to "the design is live in the gallery" — no terminal experience required.
 
 ## Contents
 

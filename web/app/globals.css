@@ -1,0 +1,475 @@
+@import "@tonyh-2-eightfold/ef-design-system/styles";
+
+@import 'tailwindcss';
+
+/* Tailwind v4 theme: use design system shadcn tokens (Octuple typography + colors) */
+@theme {
+  --font-sans: var(--font-sans);
+  --font-mono: var(--font-mono);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --radius-sm: var(--radius-sm);
+  --radius-md: var(--radius-md);
+  --radius-lg: var(--radius-lg);
+  --radius-xl: var(--radius-xl);
+  --radius-2xl: var(--radius-2xl);
+  --shadow-card: 0 1px 3px rgb(0 0 0 / 0.06), 0 1px 2px rgb(0 0 0 / 0.04);
+  --shadow-card-hover: 0 4px 12px rgb(0 0 0 / 0.08), 0 2px 4px rgb(0 0 0 / 0.04);
+}
+
+/* Design system — Octuple tokens + component styles. Requires build at repo root: npm run build */
+@import "../../dist/assets/index.css";
+
+@custom-variant dark (&:is(.dark *));
+
+/* Hide scrollbar (still scrollable) — sidebar nav and main page */
+.scrollbar-hidden,
+html,
+body {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+.scrollbar-hidden::-webkit-scrollbar,
+html::-webkit-scrollbar,
+body::-webkit-scrollbar {
+  display: none !important;
+  width: 0;
+  height: 0;
+}
+
+/* Canonical shadcn base: default border color to --border, not currentColor */
+@layer base {
+  *, ::before, ::after {
+    border-color: var(--color-border);
+  }
+}
+
+/* Base — shadcn-style docs */
+html {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  scroll-padding-top: 6rem;
+}
+
+body {
+  font-family: var(--font-sans);
+  background: var(--color-background);
+  color: var(--color-foreground);
+  line-height: 1.6;
+}
+
+/* Material Symbols (font loaded in index.html); ligatures map icon names to glyphs */
+.material-symbols-outlined {
+  font-family: 'Material Symbols Outlined';
+  font-weight: 400;
+  font-style: normal;
+  font-size: 1em;
+  display: inline-block;
+  line-height: 1;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: normal;
+  letter-spacing: normal;
+}
+
+/* Focus visible for keyboard nav */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+
+/* Inline code in prose */
+code {
+  font-size: 0.875em;
+}
+
+:root {
+  --sidebar: hsl(0 0% 98%);
+  --sidebar-foreground: hsl(240 5.3% 26.1%);
+  --sidebar-primary: hsl(240 5.9% 10%);
+  --sidebar-primary-foreground: hsl(0 0% 98%);
+  --sidebar-accent: hsl(240 4.8% 95.9%);
+  --sidebar-accent-foreground: hsl(240 5.9% 10%);
+  --sidebar-border: hsl(220 13% 91%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+.dark {
+  --sidebar: hsl(240 5.9% 10%);
+  --sidebar-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-primary: hsl(224.3 76.3% 48%);
+  --sidebar-primary-foreground: hsl(0 0% 100%);
+  --sidebar-accent: hsl(240 3.7% 15.9%);
+  --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
+  --sidebar-border: hsl(240 3.7% 15.9%);
+  --sidebar-ring: hsl(217.2 91.2% 59.8%);
+}
+
+@theme inline {
+  --color-sidebar: var(--sidebar);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* Course card: 8px padding for image/banner, 16px for text; tag and actions 16px from card edge */
+.course-object-card__inner {
+  padding: 8px !important;
+}
+.course-object-card__tag-wrap {
+  left: 16px !important;
+}
+.course-object-card__banner-actions {
+  right: 16px !important;
+}
+.course-object-card__body {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+.course-object-card__divider {
+  margin-left: 8px !important;
+  margin-right: 8px !important;
+}
+.course-object-card .object-card-bottom-bar__content {
+  padding-left: 8px !important;
+  padding-right: 8px !important;
+}
+
+/* People card: tag and actions 16px from banner left/right (same as course card) */
+.people-object-card__tag-wrap {
+  left: 16px !important;
+}
+.people-object-card__banner-actions {
+  right: 16px !important;
+}
+
+/* Project card: ensure card and banner styles apply (match course card) */
+.project-object-card {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 264px;
+  max-width: 100%;
+  height: 360px;
+  box-sizing: border-box;
+  background: #fff;
+  border: 1px solid #D9DCE1;
+  border-radius: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  overflow: hidden;
+  text-decoration: none;
+  color: inherit;
+}
+a.project-object-card {
+  display: flex;
+}
+.project-object-card__inner {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  padding: 8px;
+  box-sizing: border-box;
+}
+.project-object-card__banner {
+  position: relative;
+  width: 100%;
+  height: 148px;
+  flex-shrink: 0;
+  align-self: stretch;
+  border-radius: 16px;
+  background: var(--color-background3-blue-violet, #E8E5F7) url('/object-card-backgrounds/project.svg') 0 0 repeat;
+  background-size: 100%;
+  background-color: var(--color-background3-blue-violet, #E8E5F7);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  padding: 12px 0 12px;
+}
+.project-object-card__tag-wrap {
+  left: 16px !important;
+}
+.project-object-card__tag-wrap .pill {
+  background: rgba(202, 207, 252, 1) !important;
+  color: #343C4C;
+}
+.project-object-card__tag-wrap .pill__icon {
+  color: #343C4C;
+}
+.project-object-card__banner-actions {
+  right: 16px !important;
+}
+.project-object-card__body {
+  flex: 1;
+  min-height: 0;
+  min-width: 0;
+  width: 100%;
+  padding: 12px 8px 16px 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+  text-align: left;
+  box-sizing: border-box;
+}
+.project-object-card__title {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  font: var(--typography-header4);
+  color: #1A212E;
+}
+.project-object-card__meta {
+  display: block;
+  width: 100%;
+  min-width: 0;
+  font: var(--typography-caption-medium);
+  color: #4F5666;
+}
+.project-object-card__divider {
+  flex-shrink: 0;
+  align-self: stretch;
+  margin: 0 8px;
+  border-top: 1px solid #D9DCE1;
+}
+.project-object-card__icon-btn {
+  padding: 6px;
+  border: none;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.9);
+  color: #4F5666;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+}
+.project-object-card__skills {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  margin-top: 8px;
+  overflow: hidden;
+  min-width: 0;
+  width: 100%;
+}
+.project-object-card__skill-tag {
+  flex-shrink: 0;
+  padding: 4px 10px;
+  background: #F6F7F8;
+  color: #4F5666;
+  font: var(--typography-caption-medium);
+  border-radius: 4px;
+}
+.project-object-card__manager {
+  display: flex !important;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  min-width: 0;
+}
+.project-object-card__manager-avatar {
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.project-object-card__manager-avatar--fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #E8E5F7;
+  color: #343C4C;
+  font: var(--typography-caption-medium);
+  font-size: 10px;
+}
+.project-object-card__manager-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  min-width: 0;
+}
+.project-object-card__manager-label {
+  font: var(--typography-caption-medium);
+  color: #4F5666;
+  font-size: 10px;
+  line-height: 1.2;
+}
+.project-object-card__manager-name {
+  font: var(--typography-body3);
+  color: #1A212E;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.project-object-card__contributed-text {
+  font: var(--typography-caption-medium);
+  color: #4F5666;
+}
+.project-object-card .object-card-bottom-bar {
+  align-self: stretch;
+}
+.project-object-card .object-card-bottom-bar__content {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+
+/* Demo: force overlay border to token so it wins in dev (canonical source remains design system overlay-surfaces.css) */
+[data-slot="dropdown-menu-content"],
+[data-slot="dropdown-menu-sub-content"],
+[data-slot="context-menu-content"],
+[data-slot="context-menu-sub-content"],
+[data-slot="select-content"],
+[data-slot="popover-content"],
+[data-slot="menubar-content"],
+[data-slot="menubar-sub-content"],
+[data-slot="navigation-menu-viewport"],
+[data-slot="combobox-content"],
+[data-slot="command"],
+[data-slot="hover-card-content"] {
+  border-color: var(--color-border-default) !important;
+}
+
+/* Navigation Menu catalog block: allow viewport/submenu to show, same trigger/indicator as design system */
+#navigation-menu .nav-menu__viewport-wrap {
+  overflow: visible;
+}
+#navigation-menu .nav-menu--underline .nav-menu__trigger {
+  padding-left: 8px;
+  padding-right: 8px;
+}
+#navigation-menu .nav-menu--underline .nav-menu__trigger:hover {
+  color: var(--color-tertiary-grey);
+}
+#navigation-menu .nav-menu--underline .nav-menu__trigger-label {
+  position: relative;
+}
+#navigation-menu .nav-menu--underline .nav-menu__trigger-label::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: transparent;
+  border-radius: 4px 4px 0 0;
+  transition: background 0.15s;
+}
+/* Hover and open (click) use same grey indicator – do not override to blue */
+#navigation-menu .nav-menu--underline .nav-menu__trigger:hover .nav-menu__trigger-label::after,
+#navigation-menu .nav-menu--underline .nav-menu__trigger[data-state='open'] .nav-menu__trigger-label::after {
+  background: var(--color-bg2-grey);
+}
+#navigation-menu .nav-menu--underline .nav-menu__trigger[data-state='open'] {
+  color: var(--color-tertiary-grey);
+}
+
+/* Navigation Menu catalog block: pill variant – shadcn canonical specs */
+#navigation-menu .nav-menu--pill .nav-menu__trigger {
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 8px 16px;
+  font: var(--typography-body3);
+  border-radius: 9999px;
+  background: transparent;
+}
+#navigation-menu .nav-menu--pill .nav-menu__trigger:hover {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+#navigation-menu .nav-menu--pill .nav-menu__trigger:focus-visible {
+  background: var(--accent);
+  color: var(--accent-foreground);
+  outline: 2px solid var(--ring);
+  outline-offset: 2px;
+}
+#navigation-menu .nav-menu--pill .nav-menu__trigger[data-state='open'] {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+#navigation-menu .nav-menu--pill .nav-menu__link {
+  height: 2.5rem;
+  min-height: 2.5rem;
+  padding: 8px 16px;
+  font: var(--typography-body3);
+  border-radius: 9999px;
+  background: transparent;
+  flex-direction: row;
+  align-items: center;
+}
+#navigation-menu .nav-menu--pill .nav-menu__link:hover,
+#navigation-menu .nav-menu--pill .nav-menu__link:focus-visible {
+  background: var(--accent);
+  color: var(--accent-foreground);
+}
+#navigation-menu .nav-menu--pill .nav-menu__link[data-active='true'] {
+  background: color-mix(in srgb, var(--accent) 50%, transparent);
+  color: var(--accent-foreground);
+}
+
+/* Tabs with lines: 8px horizontal inset for indicator (label+indicator padding) */
+[data-slot="tabs-list"][data-variant="line"] [data-slot="tabs-trigger"]::after {
+  left: 8px;
+  right: 8px;
+}
+
+/**
+ * Header page: Career Hub navbar + header stacked on ProductBackground.
+ * Navbar defaults to position:fixed (viewport); here it stays in flow over the wash.
+ */
+.header-assembled-ch-shell .navbar {
+  position: relative;
+  top: auto;
+  left: auto;
+  right: auto;
+  z-index: 10;
+}
+
+/* Force main page scrollbar hidden (last so it wins) */
+html,
+body,
+#root {
+  scrollbar-width: none !important;
+  -ms-overflow-style: none !important;
+}
+html::-webkit-scrollbar,
+body::-webkit-scrollbar,
+#root::-webkit-scrollbar {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+}
