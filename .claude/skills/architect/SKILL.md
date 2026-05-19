@@ -12,7 +12,34 @@ description: >
 
 # Architect
 
-Produces the system architecture foundation and, after database and API design are complete, the build phase plan. This skill runs in two passes orchestrated by the forger.
+## Context Manifest
+
+```yaml
+unit_type: one_shot
+required_inputs:
+  - docs/product/user-stories.md
+  - docs/product/personas.md
+  - docs/product/domain-doc.md
+  - docs/product/screen-inventory.md
+  - frontend/src/                                   # react mock screens
+  - docs/architecture/database.md                   # Pass 2 only
+  - docs/architecture/api.md                        # Pass 2 only
+forbidden_paths:
+  - docs/product/market-research.md
+budget_tokens: 400000
+artifacts:
+  # Pass 1 writes docs/architecture/system.md (tech stack, modules, boilerplate notes)
+  # Pass 2 writes docs/architecture/build-phases.md (dependency-ordered phase plan)
+  summary:            docs/architecture/system.md       # Pass 1 output
+  build_phases_plan:  docs/architecture/build-phases.md # Pass 2 output — forger lints only after Pass 2 runs
+outputs:
+  - docs/architecture/system.md
+  - docs/architecture/build-phases.md
+```
+
+Inline skill, runs in two passes. Pass 1 is invoked before db-architect / api-architect; Pass 2 is invoked after their outputs are approved.
+
+Produces the system architecture foundation and, after database and API design are complete, the build phase plan. This skill runs in two passes orchestrated by the forger, inline in the forger parent thread.
 
 **Pass 1** (after screen designs are approved): Tech stack, module breakdown, boilerplate integration notes, migration concerns.
 
@@ -27,14 +54,16 @@ Produces the system architecture foundation and, after database and API design a
 Confirm via forger:
 - Domain doc approved
 - MVP user stories approved
-- Screen designs approved (React mock screens from react-ux-designer in `frontend/src/`)
+- Screen designs approved (React mock screens from design-tw-ux-designer in `frontend/src/`)
+
+Theme system readiness is verified by `forger` during project init (step 6 of Project Creation) — architect does not re-check.
 
 ### Pass 2
 
 Confirm via forger:
 - All Pass 1 pre-conditions met and Pass 1 approved
-- DB design approved (`docs/db-design.md` from db-architect)
-- API spec approved (`docs/api-spec.md` from api-architect)
+- DB design approved (`docs/architecture/database.md` from db-architect)
+- API spec approved (`docs/architecture/api.md` from api-architect)
 
 If any are missing, stop and flag which upstream artifact needs approval first.
 
@@ -77,7 +106,7 @@ Present a recommended stack with rationale, then ask for confirmation before pro
 
 Define the major backend modules. Derive module names from the screen designs and user stories — do not assume a fixed set of modules.
 
-All architecture artifacts are written to `docs/architecture.md`. Code is structured under `backend/app/` following FastAPI conventions.
+All architecture artifacts are written to `docs/architecture/system.md`. Code is structured under `backend/app/` following FastAPI conventions.
 
 For each module discovered in the screens/stories, document:
 - **Module name** — named after the primary resource
@@ -173,12 +202,12 @@ Never ask the user to "confirm" by typing — always use clickable options.
 
 ## After Pass 1
 
-Write the architecture document to `docs/architecture.md` containing Sections 1-4.
+Write the architecture document to `docs/architecture/system.md` containing Sections 1-4.
 
 1. Show **Section 1** (tech stack) first and ask for quick confirmation
 2. Then show **Section 2** (modules)
 3. Then show **Section 3** (boilerplate notes) and **Section 4** (migration concerns) together
-4. Write `docs/architecture.md` with all four sections
+4. Write `docs/architecture/system.md` with all four sections
 5. Hand off to **forger** for approval gate
 6. After approval, forger proceeds to **db-architect**, then **api-architect**
 
@@ -186,15 +215,15 @@ Write the architecture document to `docs/architecture.md` containing Sections 1-
 
 ## Pass 2 Output: Build Phase Plan
 
-After db-design (`docs/db-design.md`) and api-spec (`docs/api-spec.md`) are both approved, the forger re-invokes the architect for Pass 2.
+After db-design (`docs/architecture/database.md`) and api-spec (`docs/architecture/api.md`) are both approved, the forger re-invokes the architect for Pass 2.
 
 ### Inputs for Pass 2
 
 Read these approved artifacts:
-- `docs/architecture.md` — tech stack, modules (from Pass 1)
-- `docs/db-design.md` — table inventory, SQLModel definitions, relationships
-- `docs/api-spec.md` — endpoint specs per module, RBAC matrix
-- `docs/user-stories.md` — MVP stories
+- `docs/architecture/system.md` — tech stack, modules (from Pass 1)
+- `docs/architecture/database.md` — table inventory, SQLModel definitions, relationships
+- `docs/architecture/api.md` — endpoint specs per module, RBAC matrix
+- `docs/product/user-stories.md` — MVP stories
 - Screen designs in `frontend/src/` — screen inventory
 
 ### Phase Design Rules
@@ -246,11 +275,11 @@ For a system with ~15 MVP stories, expect 4-5 phases:
 
 ## After Pass 2
 
-1. Append the build phase plan to `docs/architecture.md` as Section 5
-2. Write the phase plan to `context.json` under `build_phases[]`
-3. Set `current_build_phase` to 0 in `context.json`
-4. Hand off to **forger** for approval gate
-5. After approval, forger begins the **phased build loop** — Phase 1 backend-writer first
+1. Write the build phase plan to **`docs/architecture/build-phases.md`** as a new standalone file (canonical per `.claude/skills/_shared/artifact-taxonomy.md`). Do **not** append to `system.md` — Pass 1 and Pass 2 produce two separate artifacts.
+2. Populate `context.json.build_phases[]` with the **minimal projection** — one entry per phase with `{phase, name, stories[], db_models[], api_endpoints[], frontend_screens[], status: "pending", verified_at: null}`. Names/ids only; descriptions and specs live in the markdown above.
+3. Set `current_build_phase` to 0 (index of first phase) in `context.json`.
+4. Hand off to **forger** for the `approvals.build_phases` gate.
+5. After approval, forger begins the **phased build loop** — Phase 1 backend-writer **plan-gate** first (MODE: plan), then build, then frontend plan-gate, then frontend build.
 
 ---
 
@@ -258,7 +287,7 @@ For a system with ~15 MVP stories, expect 4-5 phases:
 
 1. **Domain-agnostic** — All module names, model references, and endpoint references must be derived from the project's screen designs and user stories. Never hardcode domain-specific entities (e.g., "Goal", "ReviewCycle") in this skill.
 2. **Incremental delivery** — Present work unit by unit inline in the conversation. Get user feedback before proceeding to the next unit. Don't batch everything and dump file paths.
-3. **Research awareness** — Check for the market research brief (`docs/market-research.md`) before starting. Use competitor insights and UX patterns from it to inform your output.
+3. **Research awareness** — Check for the market research brief (`docs/product/market-research.md`) before starting. Use competitor insights and UX patterns from it to inform your output.
 4. **Enterprise depth** — All outputs should be spec-level, not summary-level. Think about what an enterprise customer at a 5,000-person company would need.
 5. **No emoji in production artifacts** — Use text labels and SVG icons, not emoji, in any artifacts that will be used downstream.
 6. **Trailing slashes** — All route paths use trailing slashes (`/users/` not `/users`). Set `redirect_slashes=False` on the FastAPI app to avoid 307 redirects that strip auth headers.

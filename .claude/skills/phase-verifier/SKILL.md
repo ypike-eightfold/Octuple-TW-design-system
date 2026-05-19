@@ -20,6 +20,58 @@ triggers:
 
 The quality gate that decides whether a phase is done. Nothing passes without proof.
 
+## Context Manifest
+
+```yaml
+unit_type: stage
+required_inputs:
+  - context.json#build_phases[current]
+  - docs/phases/phase-<N>/tracker.md             # forger substitutes <N> (current phase number) before dispatch; merged tracker
+  - docs/phases/phase-<N>/decisions.md           # phase-scoped decision log
+  - docs/decisions.md                            # project-wide decision log
+per_unit_inputs:
+  # Stage 0 — automated gate tests
+  - frontend/e2e/gates/
+  # Stage 1 — backend verification
+  - backend/app/
+  - backend/scripts/seed.py
+  # Stage 2 — frontend verification
+  - frontend/src/pages/
+  - frontend/src/features/
+  # Stage 3 — integrated verification (fat stage)
+  - docs/architecture/api.md
+  - docs/phases/phase-<N>/build/                 # per-skill per-unit summaries (Stage 3 aggregates)
+  # Subagent reads the subset relevant to the current stage; see skill body for per-stage guidance.
+forbidden_paths:
+  - docs/product/market-research.md
+  - docs/product/stories/                        # stages verify against tracker, not raw stories
+  - docs/product/domain-doc.md
+budget_tokens: 900000
+artifacts:
+  summary:          docs/phases/phase-<N>/verify/stage-<K>.md
+  return_contract:  docs/phases/phase-<N>/verify/stage-<K>.return.json
+outputs:
+  - docs/phases/phase-<N>/verify/stage-<K>.md
+  - docs/phases/phase-<N>/verify/report.md       # Stage 3 only — full verification report (no word cap)
+  - docs/phases/phase-<N>/verify/summary.md      # Stage 3 only — hard 2000-word cap
+```
+
+## Running as a Subagent
+
+This skill is invoked by **forger** as a Task-tool subagent, one **stage** per invocation. Stages run in sequence (0 → 1 → 2 → 3 → critical-journey). Each stage is its own fresh context window.
+
+- **Stage 0 — Automated Gate Tests.** Run `frontend/e2e/gates/phase-<N>-*.spec.ts`. Pure execution — minimal context needed.
+- **Stage 1 — Backend Verification.** Seed DB, hit endpoints, compare responses to tracker's Backend Evidence column.
+- **Stage 2 — Frontend Verification.** Screen inventory reconciliation (mandatory), visual fidelity score (>90% required).
+- **Stage 3 — Full-Stack Integrated (the FAT STAGE).** This is the only stage that legitimately loads the phase summary drafts, all tracker slices, and api-spec together — it's the integration check. Still no raw user stories, no market research.
+
+When finished (per stage):
+1. Write `docs/phases/phase-<N>/verify/stage-<K>.md` with stage findings.
+2. On Stage 3 only: write `docs/phases/phase-<N>/verify/summary.md` (2000 word hard cap — verified via `wc -w`). Contents: what was built, key decisions, files touched, open issues.
+3. Write the JSON return contract (schema at `.claude/skills/_shared/return-contract.md`) at the `artifacts.return_contract` path declared in the manifest.
+4. If any stage finds issues, `status: blocked` with `blocked_reason` listing the failing rows; forger routes the fix back to the responsible writer skill.
+5. Do NOT call AskUserQuestion. Forger owns the phase-approval gate.
+
 ## Core Principles
 
 1. **Real verification, not import checks.** The server must start, the DB must connect, endpoints must return correct data, the UI must match the design.
@@ -28,7 +80,7 @@ The quality gate that decides whether a phase is done. Nothing passes without pr
 4. **Fix-then-re-verify loop.** When issues are found, fix them, then re-run the FULL verification -- not just the broken part.
 5. **User gets a working system.** After verification, all services stay running. The user gets a handoff card with every URL, credential, and testing step they need.
 6. **Builder-bias compensation.** The verifier often runs in the same agent context as the builder. To compensate for confirmation bias:
-   - Before scoring any screen, re-read the acceptance criteria from `docs/user-stories.md` for each story in this phase.
+   - Before scoring any screen, re-read the acceptance criteria from `docs/product/user-stories.md` for each story in this phase.
    - Check each acceptance criterion individually -- mark it PASS or FAIL with evidence (screenshot or API response).
    - If an acceptance criterion cannot be verified through the UI, it is NOT PASS -- it is UNTESTED.
    - The verification report MUST include a per-story acceptance criteria checklist with PASS/FAIL/UNTESTED for each item.
@@ -43,7 +95,7 @@ Before running verification, confirm:
 - Backend code exists for the phase's API endpoints
 - Frontend code exists for the phase's screens
 - `backend/scripts/seed.py` exists and covers this phase's data
-- Phase gate tests exist: `frontend/e2e/gates/phase-N.gate.spec.ts` (produced by test-writer)
+- Phase gate tests exist: `frontend/e2e/gates/phase-<N>-*.spec.ts` (one per module, produced by test-writer)
 
 If any are missing, report what's incomplete and stop.
 
@@ -71,7 +123,7 @@ SCREEN INVENTORY — Phase N
 | 3 | CycleDashboardPage   | YES             | YES         | OK      |
 ```
 
-4. **Any MISSING screen = automatic FAIL.** The phase cannot pass verification if a screen from the spec was never built. Report the missing screens and return to the frontend-ui-engineer for fixes.
+4. **Any MISSING screen = automatic FAIL.** The phase cannot pass verification if a screen from the spec was never built. Report the missing screens and return to the design-tw-frontend-engineer for fixes.
 
 ### Action Button Verification
 
@@ -92,7 +144,7 @@ Before starting any verification, identify the **critical user journey** for thi
 ### How to Identify the Critical Journey
 
 1. Read `build_phases[N].stories` from context.json
-2. For each story, read its acceptance criteria from `docs/user-stories.md`
+2. For each story, read its acceptance criteria from `docs/product/user-stories.md`
 3. Identify the primary persona action -- the one thing that, if it doesn't work, makes the entire phase worthless
 4. Define the journey as a numbered sequence of UI actions
 
@@ -108,6 +160,52 @@ Before starting any verification, identify the **critical user journey** for thi
 ### Critical Journey Rule
 
 **If the critical journey cannot be completed end-to-end through the UI, the phase is an automatic FAIL regardless of all other checks passing.** This is the highest-priority check -- do it first in Stage 3, before the rest of the walkthrough.
+
+---
+
+## Stage 0.5: Story Completeness Scan (MANDATORY -- before any server starts)
+
+Before starting Stage 1, run a COLD SCAN of the codebase against story acceptance criteria. This catches stubs, missing features, and incomplete implementations WITHOUT needing the server running.
+
+### Procedure
+
+1. Read `docs/product/user-stories.md` for every story in this phase
+2. For EACH acceptance criterion, search the codebase for implementation evidence. Note: grep ABSENCE is a RISK SIGNAL, not proof the feature is missing. Features can be implemented under different names (`handleBlur` instead of `autoSave`, a shared `MAX_CHARS` constant instead of literal `2000`, server-side RBAC with no client string). Every `NO MATCH` MUST be manually re-verified before escalating to `NOT FOUND`:
+
+```bash
+# Example: AC says "auto-save on focus-out" (use -E for portable alternation)
+grep -rEn "auto.save|autoSave|auto_save|onBlur.*save|debounce.*save" frontend/src/ backend/app/
+# If no results: manually inspect the form component for blur-driven PATCH calls before marking NOT FOUND.
+
+# Example: AC says "character limit of N"
+grep -rEn "max.*2000|maxLength.*2000|char_limit.*2000|\.max\(2000\)" frontend/src/ backend/app/
+# If no results: check for shared constants or schema.ts siblings before marking NOT FOUND.
+
+# Example: AC says "Submit requires all Required questions answered"
+grep -rEn "required.*validation|zodResolver|disabled.*required|validate.*required" frontend/src/
+# If no results: check sibling schema.ts or react-hook-form `validate` option before marking NOT FOUND.
+```
+
+3. Output the STORY COMPLETENESS SCAN. The Status column uses exactly three values:
+   - `FOUND` — grep matched code evidence.
+   - `NOT FOUND` — grep matched nothing AND manual re-verification confirmed the feature is absent. Only this status counts toward the gate.
+   - `UNGREPPABLE` — AC has no greppable signature (visual polish, analytics events, timing behaviour). The AC must be tagged `UNGREPPABLE` in `docs/product/user-stories.md` **by the story-writer at authoring time** (see `story-writer/SKILL.md`); the forger surfaces the tag in the tracker. The phase-verifier never sets this status on its own — an untagged AC with no grep evidence defaults to `NOT FOUND`.
+
+```
+STORY COMPLETENESS SCAN -- Phase N
+| Story   | AC# | Acceptance Criterion                    | Grep Pattern Used                    | Code Evidence Found          | Status      |
+|---------|-----|-----------------------------------------|--------------------------------------|------------------------------|-------------|
+| STORY-X | 1   | Auto-save on focus-out per field        | auto.save|autoSave|onBlur.*save     | useAutoSave hook found       | FOUND       |
+| STORY-X | 2   | Character limit N chars                 | max.*2000|char_limit                 | MAX_CHARS constant in schema | FOUND       |
+| STORY-X | 3   | Submit disabled without required        | disabled.*required|zodResolver       | MANUAL CHECK: no evidence    | NOT FOUND   |
+| STORY-X | 4   | Loading spinner matches product style   | (visual polish — UNGREPPABLE-tagged) | N/A                          | UNGREPPABLE |
+```
+
+### Gate Rule (STRICT)
+
+- If ANY AC is `NOT FOUND` (after manual re-check confirms absence): Phase is PREMATURE. Send back to the builder skill with the specific missing ACs listed.
+- ACs with status `UNGREPPABLE` are excluded from this gate and MUST be verified visually in Stage 3 (they appear in the AC-table for that story with Verification Method = "visual walkthrough").
+- If every AC is `FOUND` or `UNGREPPABLE`: Proceed to Stage 1.
 
 ---
 
@@ -128,6 +226,103 @@ Gate tests verify the minimum bar:
 **If gate tests fail, the phase automatically FAILS.** Report failures and return to the builder for fixes. Do NOT proceed to Stages 1-3.
 
 If gate tests don't exist yet (test-writer hasn't produced them), note this in the report and proceed with extra vigilance in Stages 2-3.
+
+---
+
+## Stage 0.5: Security Verification (MANDATORY — before any functional verification)
+
+Run the security checks before functional testing. Security bugs found later are more expensive to fix.
+
+### 0.5.1 Authorization Enforcement Scan
+
+For EVERY endpoint in the current phase, verify these three conditions. Use `curl` or the smoke test script.
+
+| Check | How | Pass Condition |
+|---|---|---|
+| **Auth required** | `curl -s -o /dev/null -w '%{http_code}' -X GET http://localhost:8000/api/v1/{endpoint}/` (no token) | Returns 401 |
+| **RBAC enforced** | `curl` with a token for a role that should NOT have access | Returns 403 |
+| **Tenant isolated** | `curl` with User A's token to access User B's resource | Returns 404 (not 403) |
+
+**Any endpoint that returns 200 without auth, or 200 for the wrong role, is an automatic FAIL.**
+
+```bash
+# Automated scan — add to e2e_smoke.py --phase N --security
+# For each endpoint:
+echo "Testing auth on /api/v1/goals/"
+STATUS=$(curl -s -o /dev/null -w '%{http_code}' http://localhost:8000/api/v1/goals/)
+[ "$STATUS" = "401" ] && echo "[PASS] No-auth -> 401" || echo "[FAIL] No-auth -> $STATUS"
+```
+
+### 0.5.2 Response Data Leak Scan
+
+For EVERY endpoint that returns user or resource data, verify the response does NOT contain:
+
+- `hashed_password` or `password`
+- `api_key`, `secret_key`, `secret`
+- Internal database auto-increment IDs (should be UUIDs)
+- PII (email, phone) in responses where the caller should not see it
+
+```bash
+# Scan response bodies for leaked fields
+curl -s -H "Authorization: Bearer $IC_TOKEN" http://localhost:8000/api/v1/users/ | \
+  python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+BANNED = {'hashed_password', 'password', 'api_key', 'secret_key', 'secret'}
+def check(obj, path=''):
+    if isinstance(obj, dict):
+        for k, v in obj.items():
+            if k in BANNED:
+                print(f'[FAIL] Banned field \"{k}\" found at {path}.{k}')
+            check(v, f'{path}.{k}')
+    elif isinstance(obj, list):
+        for i, v in enumerate(obj):
+            check(v, f'{path}[{i}]')
+check(data)
+print('[DONE] Response scan complete')
+"
+```
+
+### 0.5.3 Input Validation Spot-Check
+
+For 3-5 POST/PUT endpoints in the phase, send deliberately malicious input:
+
+| Payload | What It Tests | Expected |
+|---|---|---|
+| `{"title": "A" * 10000}` | Field length limits | 422 |
+| `{"sort_by": "name; DROP TABLE users;--"}` | SQL injection via sort | 400 or 422 |
+| `{"content": "<script>alert('xss')</script>"}` | XSS in text fields | 422, or 201 with sanitized content |
+| `{"status": "NONEXISTENT_VALUE"}` | Enum validation | 422 |
+| `{"email": "not-an-email"}` | Format validation | 422 |
+
+**Any endpoint that accepts a SQL injection payload or returns unsanitized `<script>` tags is an automatic FAIL.**
+
+### 0.5.4 Hardcoded Secrets Scan
+
+```bash
+# Scan backend code for hardcoded secrets
+grep -rn "password\s*=\s*['\"]" backend/app/ --include="*.py" | grep -v "hashed_password\|get_password_hash\|verify_password\|_password:" | head -20
+grep -rn "secret.*=.*['\"][a-zA-Z0-9]" backend/app/ --include="*.py" | grep -v "SECRET_KEY\|settings\.\|os\.environ\|config\." | head -20
+grep -rn "verify\s*=\s*False" backend/app/ --include="*.py" | head -10
+
+# Scan frontend build for leaked secrets
+grep -rn "sk_live\|Bearer [a-zA-Z0-9]\|api_key.*=.*['\"]" frontend/dist/assets/ 2>/dev/null | head -10
+```
+
+Any matches require investigation. Hardcoded secrets = automatic FAIL.
+
+### 0.5.5 Security Stage Verdict
+
+ALL of these must be true:
+- [ ] Every endpoint returns 401 without authentication
+- [ ] Every endpoint returns 403 for unauthorized roles
+- [ ] Cross-tenant resource access returns 404, not 200 or 403
+- [ ] No `hashed_password`, `api_key`, or `secret_key` in any API response
+- [ ] Malicious input (SQL injection, XSS, oversized) is rejected or sanitized
+- [ ] No hardcoded secrets in backend source code
+- [ ] No secrets in frontend production bundle
+
+**If ANY fails: STOP. Fix the issue. Re-run Stage 0.5 from the beginning.**
 
 ---
 
@@ -425,22 +620,49 @@ For EACH persona involved in the phase's stories (read the "As a..." from each s
 - NEVER approve a screen you haven't actually navigated to and seen render with real data.
 - If clicking a link results in an error page, "not found", or unexpected redirect -- that is a BLOCKER. Investigate and fix.
 
-### 3.6 Acceptance Criteria Verification
+### 3.6 Acceptance Criteria Verification (Structured Output)
 
-After the walkthrough, read each story's acceptance criteria from `docs/user-stories.md` and check each one:
+After the walkthrough, read each story's acceptance criteria from `docs/product/user-stories.md` and verify each one using the AC-table format below. Free-form checkboxes are prohibited because they allow vague "PASS" markings without evidence.
 
-```markdown
-### REVIEW-003: Employee Completes Self-Reflection
-- [ ] Notification with deadline and direct link -- UNTESTED (notifications not in this phase)
-- [ ] Landing page showing all my tasks and statuses -- PASS (screenshot: IC dashboard shows tasks)
-- [ ] Form renders all 4 question types correctly -- PASS (screenshot: form shows free text, rating, select)
-- [ ] Required field validation before submission -- PASS (tested: submit without rating shows error)
-- [ ] Progress indicator (X of Y questions answered) -- PASS (screenshot: "0 of 5 answered")
-- [ ] Auto-save every 60 seconds + manual Save Draft -- PASS (tested: Save Draft button works)
-...
+```
+AC VERIFICATION -- Phase N, Story STORY-X: Employee Completes Self-Reflection
+| AC# | Criterion                                    | Verification Method               | Evidence                                                    | Verdict   |
+|-----|----------------------------------------------|-----------------------------------|-------------------------------------------------------------|-----------|
+| 1   | Notification with deadline and direct link   | N/A (notifications out of phase)  | Deferred to Phase M                                         | UNTESTED  |
+| 2   | Landing page shows all my tasks and statuses | Navigate /ess after login         | Screenshot: IC dashboard lists 3 tasks with status badges   | PASS      |
+| 3   | Form renders all 4 question types correctly  | Open form, inspect each field     | Screenshot: free-text, rating, select, multi-select visible | PASS      |
+| 4   | Required field validation before submission  | Click Submit with empty required  | Inline errors render; Submit disabled                       | PASS      |
+| 5   | Progress indicator (X of Y answered)         | Answer 2 of 5, inspect header     | Screenshot: "2 of 5 answered"                               | PASS      |
+| 6   | Auto-save every 60 s + manual Save Draft     | Fill field, wait 60 s; then click | Network tab: PATCH /answers at 60 s; PATCH on click         | PASS      |
 ```
 
-Include this checklist in the verification report. UNTESTED items are acceptable if they depend on later phases, but should be explicitly noted.
+Rules:
+- **Verification Method** must describe the SPECIFIC ACTION taken (not "checked" or "verified").
+- **Evidence** must reference a screenshot, network call, or console output. Exact line/path preferred.
+- **Verdict** is one of: `PASS`, `FAIL`, `UNTESTED`. `PASS (looked fine)` is NOT acceptable.
+- `UNTESTED` is only acceptable for ACs that depend on later phases; always include the reason.
+- `FAIL` must describe what actually happened vs. what was expected.
+
+Include one AC-table per story in the verification report.
+
+### 3.6b Acceptance Criteria Structured Output (replaces free-form checklist)
+
+The AC verification MUST use this exact table format. Free-form checkboxes are prohibited because they allow vague "PASS" markings without evidence.
+
+```
+AC VERIFICATION -- Phase N, Story [STORY-ID]
+| AC# | Criterion                             | Verification Method           | Evidence                                          | Verdict |
+|-----|---------------------------------------|-------------------------------|---------------------------------------------------|---------|
+| 1   | Auto-save on focus-out                | Fill field, blur, wait 2s     | Network tab shows PATCH /answers call after blur   | PASS    |
+| 2   | Draft persists on reload              | Fill + save + reload page     | Fields show saved values after reload              | PASS    |
+| 3   | Submit blocked without required       | Click Submit with empty fields| Submit button is disabled; inline errors visible   | FAIL    |
+```
+
+Rules:
+- Verification Method must describe the SPECIFIC ACTION taken (not "checked" or "verified")
+- Evidence must reference a screenshot, network call, or console output
+- PASS requires evidence. "PASS (looked fine)" is NOT acceptable.
+- FAIL must describe what actually happened vs. what was expected.
 
 ### 3.7 Cross-Phase Regression (Phase 2+)
 
@@ -524,29 +746,30 @@ VERIFICATION SUMMARY
   E2E:       [X/Y] integration steps passed
   Bugs fixed: [N] issues found and resolved
 
-REPORT: docs/phase-N-verification.md
+REPORT: docs/phases/phase-<N>/verify/report.md
 ============================================================
 ```
 
 ### Step 3: Write Verification Report (MANDATORY -- HARD GATE)
 
-**You MUST write `docs/phase-N-verification.md` before presenting the handoff card or updating context.json.** This is not optional. The phase is NOT verified until this file exists on disk. Use the Write tool to create it -- do not skip this step even if the user says "looks good" or approves early.
+**You MUST write `docs/phases/phase-<N>/verify/report.md` before presenting the handoff card or updating context.json.** This is not optional. The phase is NOT verified until this file exists on disk. Use the Write tool to create it -- do not skip this step even if the user says "looks good" or approves early.
 
 Write the full report using the Verification Report Format below. Include all Stage 0-3 results, checklist scores, issues found, fixes applied, and per-story acceptance criteria checklists.
 
 ### Step 3b: Write Stage Checkpoints (Resumability)
 
-After completing EACH stage, append a checkpoint to `docs/phase-N-verification.md` so work can resume if context is lost:
+After completing EACH stage, append a checkpoint to `docs/phases/phase-<N>/verify/report.md` so work can resume if context is lost:
 
 ```markdown
 ## Checkpoint
 - Stage 0: PASS (gate tests passed) or SKIP (no gate tests)
+- Stage 0.5: PASS (12/12 auth checks, 0 data leaks, 0 injection accepts, 0 secrets)
 - Stage 1: PASS (37/37 endpoint checks, 53/53 regression)
 - Stage 2: PASS (5/5 screens >= 90%)
 - Stage 3: IN_PROGRESS -- critical journey verified, form verified, manager walkthrough pending
 ```
 
-On resume, read `docs/phase-N-verification.md` to determine which stage to continue from. Do NOT re-run completed stages unless a fix was applied that could cause regression.
+On resume, read `docs/phases/phase-<N>/verify/report.md` to determine which stage to continue from. Do NOT re-run completed stages unless a fix was applied that could cause regression.
 
 ### Step 4: Update Context
 
@@ -570,6 +793,20 @@ Update `context.json`:
 ## Stage 0: Gate Tests
 - Result: PASS / SKIP (no gate tests) / FAIL
 - Details: [N] tests passed
+
+## Stage 0.5: Security Verification
+- Auth enforcement: [X/Y] endpoints return 401 without token
+- RBAC enforcement: [X/Y] endpoints return 403 for wrong role
+- Tenant isolation: [X/Y] cross-tenant accesses return 404
+- Data leak scan: [PASS/FAIL] — no sensitive fields in responses
+- Input validation: [X/Y] malicious payloads rejected
+- Secrets scan: [PASS/FAIL] — no hardcoded secrets in code or bundle
+
+### Security Endpoint Matrix
+| Endpoint | Method | No Auth → 401 | Wrong Role → 403 | Cross-Tenant → 404 | Injection → 4xx |
+|---|---|---|---|---|---|
+| /users/ | GET | PASS | PASS | N/A | N/A |
+| /goals/ | POST | PASS | PASS | PASS | PASS |
 
 ## Stage 1: Backend
 - Server startup: OK
@@ -628,15 +865,8 @@ Update `context.json`:
 | IC | emily@... | OK | / (IC dashboard) | Top nav with 2 links | Emily Nguyen |
 | Manager | david@... | OK | /manager | Sidebar with 3 items | David Park |
 
-### Acceptance Criteria Checklist
-#### REVIEW-003: Employee Completes Self-Reflection
-- [x] Landing page showing all my tasks and statuses
-- [x] Form renders all 4 question types correctly
-- [x] Progress indicator (X of Y questions answered)
-- [x] Auto-save + manual Save Draft
-- [x] Submit locks the form with confirmation modal
-- [ ] Notification with deadline -- UNTESTED (Phase 5)
-...
+### Acceptance Criteria
+Use the AC-table format defined in Section 3.6 — one table per story, verdict column = PASS / FAIL / UNTESTED, evidence mandatory. Free-form `- [x]` checkboxes are prohibited throughout the verification report.
 
 ## Issues Found and Resolved
 | # | Issue | Severity | Screen/Endpoint | Fix Applied |
@@ -658,9 +888,9 @@ The boilerplate provides two template scripts at `boilerplate/backend/scripts/`:
 These are copied to the project at creation time. The phase-verifier generates the project-specific implementations inside them.
 
 Before Stage 1 of each phase, the phase-verifier MUST:
-1. Read `docs/api-spec.md` for endpoint list and `docs/architecture.md` for boilerplate notes
+1. Read `docs/architecture/api.md` for endpoint list and `docs/architecture/system.md` for boilerplate notes
 2. Read the React mock screens in `frontend/src/` for sample data
-3. Read `docs/domain-doc.md` for business rules
+3. Read `docs/product/domain-doc.md` for business rules
 4. Generate `seed_phase_N()` with data matching the prototype
 5. Generate `run_phase_N()` with tests for every endpoint
 6. Run both scripts to verify they work
@@ -718,7 +948,7 @@ When using `preview_*` tools for visual verification, be aware of these limitati
 10. **Leave services running.** After verification, all services stay up for the user.
 11. **End with handoff card.** Every verification ends with URLs, credentials, and testing steps for the user.
 12. **Seed data matches prototype.** Same people, same departments, same templates as the HTML design.
-13. **Verification report is mandatory.** Every phase ends with `docs/phase-N-verification.md` written to disk. The file must exist before context.json is updated or the handoff card is presented. No exceptions -- this is the permanent record of what was verified.
+13. **Verification report is mandatory.** Every phase ends with `docs/phases/phase-<N>/verify/report.md` written to disk. The file must exist before context.json is updated or the handoff card is presented. No exceptions -- this is the permanent record of what was verified.
 14. **Login through the UI.** Stages 2 and 3 must test authentication by navigating to /login and entering credentials in the form. localStorage/eval-based auth is prohibited for verification.
 15. **Error pages are automatic FAIL.** Any screen showing error content, "not found", 403, blank body, or unresolved loading state is an automatic FAIL for the phase. Investigate and fix before scoring.
 16. **Every persona tested through UI.** For each persona involved in the phase's stories, login through the UI, verify the landing page, nav bar, and user identity, then walk through that persona's stories.
@@ -727,6 +957,8 @@ When using `preview_*` tools for visual verification, be aware of these limitati
 19. **Console errors checked.** Before any Stage 2 or Stage 3 screen is scored, check browser console for errors via `preview_console_logs`. Unhandled errors = investigate before scoring.
 20. **Screen inventory checked.** Before Stage 2 visual scoring, read `build_phases[N].frontend_screens` from context.json and verify every listed screen has a page file, a route file, and is reachable. Missing screen = automatic FAIL.
 21. **Every action button clicked.** On every screen, click every "Create", "Add", "Edit", "Delete", "Export" button and verify its target works (dialog opens, route loads, download triggers). A dead link or 404 = BLOCKER.
+22. **Security verification is mandatory.** Stage 0.5 runs before any functional testing. An endpoint accessible without auth, leaking sensitive data, or accepting injection payloads is an automatic FAIL regardless of all other stages passing.
+23. **No hardcoded secrets in code or bundle.** The verifier scans backend source and frontend dist for hardcoded credentials. Any match is investigated; confirmed secrets = automatic FAIL.
 
 ---
 

@@ -5,6 +5,24 @@ description: Conducts market research on competing products in a given software 
 
 # Domain Researcher
 
+## Context Manifest
+
+```yaml
+unit_type: one_shot
+required_inputs: []                              # entry point — no pre-approved artifacts
+per_unit_inputs: []
+forbidden_paths: []
+budget_tokens: 300000
+artifacts:
+  summary:          docs/product/domain-doc.md   # primary output; also writes market-research.md + personas.md
+outputs:
+  - docs/product/market-research.md
+  - docs/product/domain-doc.md
+  - docs/product/personas.md
+```
+
+This skill is **inline** (runs in forger's parent thread, not as a subagent). It writes directly to disk and updates forger's approval state via normal state updates — no return-contract JSON required.
+
 Researches the competitive landscape for a software domain, then conducts a targeted discovery interview informed by that research. Produces a Market Research Brief and a Domain Assumptions Document that feed every downstream skill.
 
 **Key principle: Research comes BEFORE questions, not after.** The user should feel like they're talking to a domain expert, not a generic interviewer.
@@ -52,7 +70,7 @@ Show the market brief and say:
 
 > "Based on my research, here are the standard modules in [domain]. Here's what the top products offer. Now let me ask you some targeted questions about YOUR specific needs."
 
-Write the brief to `docs/market-research.md`.
+Write the brief to `docs/product/market-research.md`.
 
 ---
 
@@ -150,14 +168,14 @@ Skip questions already resolved by prior answers.
 
 After the interview, produce three artifacts:
 
-### 1. Market Research Brief (`docs/market-research.md`)
+### 1. Market Research Brief (`docs/product/market-research.md`)
 
 - Competitor analysis with feature matrix
 - UX patterns worth adopting (with product citations)
 - Patterns to avoid (common complaints)
 - Module depth notes for each selected module — how the reference products implement it
 
-### 2. Domain Assumptions Document (`docs/domain-doc.md`)
+### 2. Domain Assumptions Document (`docs/product/domain-doc.md`)
 
 ```markdown
 # Domain Assumptions Document
@@ -198,7 +216,7 @@ After the interview, produce three artifacts:
 
 ### 3. Module Depth Notes
 
-For each selected module, a summary of how the reference products implement it. These feed directly into story-writer and react-ux-designer. Include them as a section within the market research brief.
+For each selected module, a summary of how the reference products implement it. These feed directly into story-writer and design-tw-ux-designer. Include them as a section within the market research brief.
 
 ---
 

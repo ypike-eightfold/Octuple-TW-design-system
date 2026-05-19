@@ -7,12 +7,183 @@ description: Writes unit tests, integration tests, and end-to-end test scripts b
 
 Generates a full test suite — unit, integration, and E2E — from approved acceptance criteria and business logic.
 
+## Context Manifest
+
+```yaml
+unit_type: module
+required_inputs:
+  - context.json#build_phases[current]
+per_unit_inputs:
+  - docs/architecture/api.md#<unit>
+  - docs/product/stories/<story-id>.md
+  - backend/app/services/<unit>.py
+  - backend/app/api/routes/<unit>.py
+  - backend/app/models/<unit>.py
+  - docs/phases/phase-<N>/build/backend/<unit>.md      # what backend-writer actually built
+  - docs/phases/phase-<N>/build/frontend/<unit>.md           # what ui-builder actually built (if exists)
+forbidden_paths:
+  - docs/product/market-research.md
+  - docs/product/user-stories.md                                  # load per-story slice instead
+  - docs/architecture/system.md                                  # not needed for tests
+budget_tokens: 900000
+outputs:
+  - backend/tests/services/test_<unit>.py
+  - backend/tests/api/test_<unit>.py
+  - frontend/e2e/gates/phase-<N>-<unit>.spec.ts
+artifacts:
+  summary:          docs/phases/phase-<N>/build/tests/<unit>.md
+  return_contract:  docs/phases/phase-<N>/build/tests/<unit>.return.json
+  tracker_slice:    docs/phases/phase-<N>/tracker-slices/tests-<unit>.md
+```
+
+## Running as a Subagent
+
+This skill is invoked by **forger** as a Task-tool subagent, one **module** per invocation (1:1 with backend-writer modules). You receive the standard Task prompt envelope (`UNIT:`, `LOAD THESE FILES:`, `PRIOR DECISIONS:`, `CONTEXT BUDGET:`).
+
+When finished:
+1. Write service-level pytest tests at `backend/tests/services/test_<unit>.py`.
+2. Write API-level pytest tests at `backend/tests/api/test_<unit>.py`.
+3. Write a Playwright phase-gate spec at `frontend/e2e/gates/phase-<N>-<unit>.spec.ts`.
+4. Fill in the Test Evidence column of `docs/phases/phase-<N>/tracker-slices/tests-<unit>.md` for every row.
+5. Run tests locally and capture coverage. If any fail, iterate until green before returning.
+6. Write a <300-word summary at `docs/phases/phase-<N>/build/tests/<unit>.md` with these seven required sections: Unit ID + status · Test files created · AC rows covered · Coverage % · Fixtures · Flaky/skipped tests · Gate test selector.
+7. Write the JSON return contract (schema at `.claude/skills/_shared/return-contract.md`) at the `artifacts.return_contract` path declared in the manifest.
+8. Do NOT call AskUserQuestion. Use `status: blocked` in return JSON if endpoints in the module don't match the api-spec (common surprise).
+
+Run discovery (`openapi.json`, model scan, role scan) against the actual `backend/` on disk — do not trust the summary markdown alone for endpoint shapes.
+
+---
+
 ## Pre-conditions
 
 Confirm via forger:
 - User stories + acceptance criteria approved
 - API spec approved
 - Backend implementation approved
+
+---
+
+## Step 0: Discovery — Know What You Are Testing (MANDATORY)
+
+Before writing ANY test, run these discovery steps. Do NOT skip them. Tests generated without discovery will have wrong imports, wrong endpoints, wrong field names, and wrong RBAC expectations.
+
+### 0.1 Discover Backend API Surface
+
+Scan the actual implemented endpoints — do NOT rely on templates or assumptions:
+
+```bash
+# If backend is running (preferred — most accurate)
+cd backend && source .venv/bin/activate
+curl -s http://localhost:8000/api/v1/openapi.json | python3 -c "
+import json, sys
+spec = json.load(sys.stdin)
+print('=== ENDPOINTS ===')
+for path, methods in spec['paths'].items():
+    for method, detail in methods.items():
+        tags = detail.get('tags', ['untagged'])
+        sec = 'AUTH' if detail.get('security') else 'PUBLIC'
+        print(f'{method.upper():7s} {path:50s} [{sec}] tags={tags}')
+print()
+print('=== SCHEMAS ===')
+for name, schema in spec.get('components', {}).get('schemas', {}).items():
+    fields = list(schema.get('properties', {}).keys())
+    print(f'{name}: {fields}')
+"
+```
+
+```bash
+# If backend is NOT running — scan route files directly
+grep -rn '@router\.' backend/app/api/routes/ | grep -E 'get|post|put|patch|delete'
+```
+
+Save the output. This is your **endpoint inventory** — every test must reference real endpoints from this list.
+
+### 0.2 Discover Database Models
+
+```bash
+# List all SQLModel table classes
+grep -rn "class.*SQLModel.*table=True" backend/app/models/
+```
+
+This tells you what entities exist (User, Item, ReviewCycle, Goal, etc.), their field names, and relationships. Tests must use real model names and field names.
+
+### 0.3 Discover User Roles
+
+```bash
+# Find the UserRole enum
+grep -A 20 "class UserRole" backend/app/schemas/user.py backend/app/models/user.py 2>/dev/null
+```
+
+This tells you what roles are available (user, admin, manager, hr_admin, etc.). Each role needs test fixtures and RBAC boundary tests.
+
+### 0.4 Discover Frontend Routes
+
+```bash
+# TanStack Router file-based routes
+ls -R frontend/src/routes/ 2>/dev/null
+
+# Or grep for route definitions
+grep -rn "createRoute\|createFileRoute\|path:" frontend/src/routes/ 2>/dev/null | head -30
+```
+
+This tells you what pages exist. Each route needs at least a smoke test and an RBAC test.
+
+### 0.5 Discover Seed Data
+
+```bash
+# Check what test users are seeded
+cat backend/scripts/seed.py 2>/dev/null
+grep -A 5 "FIRST_SUPERUSER" backend/app/core/config.py 2>/dev/null
+```
+
+Use seeded credentials in E2E tests. Never hardcode credentials that don't exist in the seed script.
+
+---
+
+## Step 0.5: Cross-Reference — Ensure Full Coverage (MANDATORY)
+
+After discovery, cross-reference against approved artifacts to find coverage gaps.
+
+### Cross-Reference Matrix
+
+Build this matrix BEFORE writing any tests:
+
+```
+For each user story in docs/product/user-stories.md:
+  For each acceptance criterion (AC) in that story:
+    → Which backend endpoint(s) implement this AC? (from Step 0.1)
+    → Which frontend route(s) display this AC? (from Step 0.4)
+    → What role(s) should access it? (from Step 0.3)
+    → What should happen for unauthorized roles?
+    → What edge cases exist? (empty state, max length, duplicate, concurrent)
+```
+
+### Output the Coverage Plan
+
+Before writing tests, output a table like this for user approval:
+
+```markdown
+| Story | AC | Backend Test | Integration Test | E2E Test | Smoke | Gate |
+|-------|----|-------------|-----------------|----------|-------|------|
+| STORY-1 | AC1: Launch creates participants | test_review_cycle.py::test_launch_creates_participant_records | test_review_cycles_api.py::test_post_launch_201 | review-cycle.spec.ts::IC completes self-assessment | smoke.spec.ts::admin can see cycles | phase-2-<unit>.spec.ts |
+| STORY-1 | AC2: Rejects non-DRAFT | test_review_cycle.py::test_launch_rejects_non_draft | test_review_cycles_api.py::test_post_launch_400_active | — | — | — |
+| STORY-1 | AC3: Excludes inactive | test_review_cycle.py::test_launch_excludes_inactive | — | — | — | — |
+| (uncovered) | — | — | — | — | — | — |
+```
+
+**If any AC has no test mapped, flag it.** Ask the user whether to add a test or document it as a manual test case.
+
+### RBAC Coverage Matrix
+
+For every endpoint discovered in Step 0.1, ensure tests exist for:
+
+| Endpoint | Admin | Manager | Employee | Unauthenticated |
+|----------|-------|---------|----------|-----------------|
+| GET /review-cycles/ | 200 (list all) | 200 (own team) | 200 (own only) | 401 |
+| POST /review-cycles/ | 201 | 403 | 403 | 401 |
+| POST /review-cycles/{id}/launch/ | 200 | 403 | 403 | 401 |
+
+**Every cell must have a test.** If a cell says 403, there must be a test asserting 403.
 
 ---
 
@@ -27,6 +198,64 @@ Confirm via forger:
 | Test data / factories | pytest fixtures + factory functions | `backend/tests/conftest.py` |
 | Backend coverage | pytest-cov | via `bash scripts/test.sh` |
 | Frontend coverage | Vitest coverage (Istanbul) | via `pnpm run test:unit:coverage` |
+
+---
+
+## Step 0.6: UI-Through Test Mandate (MANDATORY)
+
+### The Problem This Solves
+
+In previous projects, all API tests passed but the product had critical bugs. Tests verified API status codes (200, 201, 403) which proves endpoints exist -- NOT that the UI renders data, forms save correctly, or buttons trigger real actions. This is "testing theater."
+
+### Rule: For Every Form-Type AC, There MUST Be a Playwright Test
+
+| AC Type | Example | Required Test |
+|---|---|---|
+| Data display | "Dashboard shows task count" | Playwright: verify text content |
+| Form submission | "User submits a form" | Playwright: fill form + submit + verify status change |
+| Draft persistence | "Auto-save on focus-out" | Playwright: fill + wait + reload + verify values persist |
+| Button action | "Export CSV downloads file" | Playwright: click + verify download |
+| State transition | "Status changes to Submitted" | Playwright: submit + verify badge text changes |
+| Validation | "Required fields show error" | Playwright: submit empty + verify inline error messages |
+| RBAC UI | "Employee cannot see admin nav" | Playwright: login as employee + verify nav items |
+
+### Mandatory Test Ratio
+
+For each phase, the test suite MUST contain:
+- At minimum 1 Playwright E2E test per user story (covering the critical happy-path journey)
+- At minimum 1 Playwright test per form page (fill + save + reload + verify persistence)
+- At minimum 1 Playwright test per persona involved (login + verify correct landing page)
+
+### Test Quality Gate: No Status-Code-Only Tests for UI Features
+
+```bash
+# Find test files that assert status_code but never assert response body content.
+# Per-file check (not piped context filter): piping `grep -v` across `-B/-A` context lines
+# drops legit status-code-only lines whenever a surrounding context line contains `json` or `data`.
+for f in $(grep -rln "assert.*status_code\b" backend/tests/); do
+  if ! grep -qE "assert.*\.json|assert.*\.data|assert.*\.body|assert.*\.content" "$f"; then
+    echo "STATUS-CODE-ONLY TEST FILE: $f"
+  fi
+done
+```
+
+For each status-code-only test:
+- If purely RBAC boundary (403/401): status-code-only is ACCEPTABLE
+- If data creation/retrieval: MUST also assert response body content
+- If form submission: there MUST be a corresponding Playwright test
+
+### Output: Test Quality Matrix
+
+```
+TEST QUALITY MATRIX -- Phase N
+| Story   | AC                       | API Test (pytest)            | UI Test (Playwright)           | Verdict |
+|---------|--------------------------|------------------------------|--------------------------------|---------|
+| STORY-X | Submit form                | test_submit_200 (status+body)| self-assess.spec.ts (fill+submit)| OK    |
+| STORY-X | Auto-save on focus-out     | NONE                         | NONE                           | BLOCKED |
+| STORY-X | Character limit N chars      | test_422 (status+msg)        | NONE                           | NEEDS UI test |
+```
+
+Any AC with NONE in BOTH columns = BLOCKED. Any form AC with no Playwright test = BLOCKED.
 
 ---
 
@@ -303,18 +532,195 @@ Exit 0 if all pass, exit 1 if any fail. The `main()` function routes `--phase N`
 
 ---
 
+### 4b. Security Tests — Authorization, Injection, and Data Exposure (MANDATORY)
+
+Every phase MUST include security tests. ~60% of SaaS vulnerabilities are broken authorization — these tests catch them before deployment.
+
+#### Authorization Tests (Covers Mistakes #1, #2)
+
+For EVERY endpoint in the phase, test these access control scenarios:
+
+```python
+# backend/tests/security/test_authorization.py
+import pytest
+from httpx import AsyncClient
+
+class TestAuthorizationEnforcement:
+
+    @pytest.mark.asyncio
+    async def test_unauthenticated_access_returns_401(self, client: AsyncClient):
+        """Every protected endpoint must return 401 without a token."""
+        protected_endpoints = [
+            ("GET", "/api/v1/users/"),
+            ("GET", "/api/v1/review-cycles/"),
+            ("POST", "/api/v1/goals/"),
+            # Add every endpoint in this phase
+        ]
+        for method, url in protected_endpoints:
+            res = await client.request(method, url)
+            assert res.status_code == 401, f"{method} {url} returned {res.status_code} without auth"
+
+    @pytest.mark.asyncio
+    async def test_wrong_role_returns_403(self, client: AsyncClient, ic_token: str):
+        """Non-admin user must not access admin endpoints."""
+        admin_endpoints = [
+            ("POST", "/api/v1/review-cycles/"),
+            ("GET", "/api/v1/admin/settings/"),
+            # Add all admin-only endpoints
+        ]
+        for method, url in admin_endpoints:
+            res = await client.request(
+                method, url,
+                headers={"Authorization": f"Bearer {ic_token}"},
+            )
+            assert res.status_code == 403, f"{method} {url} returned {res.status_code} for IC role"
+```
+
+#### Cross-Tenant / IDOR Tests (Covers Mistake #2)
+
+Create resources as Org A / User A, then attempt to access them as Org B / User B:
+
+```python
+class TestTenantIsolation:
+
+    @pytest.mark.asyncio
+    async def test_user_cannot_access_other_orgs_resources(
+        self, client: AsyncClient, org_a_token: str, org_b_resource_id: str
+    ):
+        """User from Org A must get 404 (not 403) when accessing Org B's resource."""
+        res = await client.get(
+            f"/api/v1/resources/{org_b_resource_id}/",
+            headers={"Authorization": f"Bearer {org_a_token}"},
+        )
+        # 404, not 403 — don't leak existence of other orgs' resources
+        assert res.status_code == 404
+
+    @pytest.mark.asyncio
+    async def test_manager_cannot_access_other_teams_reviews(
+        self, client: AsyncClient, manager_a_token: str, manager_b_report_id: str
+    ):
+        """Manager A must not see Manager B's direct reports' reviews."""
+        res = await client.get(
+            f"/api/v1/reviews/{manager_b_report_id}/",
+            headers={"Authorization": f"Bearer {manager_a_token}"},
+        )
+        assert res.status_code == 404
+```
+
+#### Data Exposure Tests (Covers Mistake #3)
+
+Verify API responses do not leak sensitive fields:
+
+```python
+class TestDataExposure:
+
+    @pytest.mark.asyncio
+    async def test_user_list_excludes_password_hash(self, client: AsyncClient, admin_token: str):
+        """User list must never include hashed_password."""
+        res = await client.get(
+            "/api/v1/users/",
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        for user in res.json()["data"]:
+            assert "hashed_password" not in user
+            assert "password" not in user
+
+    @pytest.mark.asyncio
+    async def test_non_admin_cannot_see_pii(self, client: AsyncClient, ic_token: str):
+        """Non-admin user should not see other users' email/phone in list responses."""
+        res = await client.get(
+            "/api/v1/team/members/",
+            headers={"Authorization": f"Bearer {ic_token}"},
+        )
+        for member in res.json()["data"]:
+            # IC should only see name and role, not email/phone
+            assert "phone" not in member or member.get("phone") is None
+```
+
+#### Input Validation Tests (Covers Mistakes #5, #7)
+
+Test that the API rejects malicious input server-side:
+
+```python
+class TestInputValidation:
+
+    @pytest.mark.asyncio
+    async def test_rejects_sql_injection_in_sort(self, client: AsyncClient, admin_token: str):
+        """Sort parameter must be validated against allowlist."""
+        res = await client.get(
+            "/api/v1/users/?sort_by=name; DROP TABLE users;--",
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        assert res.status_code in (400, 422)
+
+    @pytest.mark.asyncio
+    async def test_rejects_oversized_input(self, client: AsyncClient, ic_token: str):
+        """API must enforce field length limits server-side."""
+        res = await client.post(
+            "/api/v1/goals/",
+            headers={"Authorization": f"Bearer {ic_token}"},
+            json={"title": "A" * 10000, "level": "INDIVIDUAL"},
+        )
+        assert res.status_code == 422
+
+    @pytest.mark.asyncio
+    async def test_rejects_html_in_text_fields(self, client: AsyncClient, ic_token: str):
+        """Script tags in text fields must be sanitized or rejected."""
+        xss_payload = '<script>alert("xss")</script>Normal text'
+        res = await client.post(
+            "/api/v1/feedback/",
+            headers={"Authorization": f"Bearer {ic_token}"},
+            json={"content": xss_payload, "recipient_id": "..."},
+        )
+        if res.status_code == 201:
+            # If accepted, verify the stored content is sanitized
+            assert "<script>" not in res.json().get("content", "")
+```
+
+#### Pagination Abuse Tests
+
+```python
+class TestPaginationLimits:
+
+    @pytest.mark.asyncio
+    async def test_rejects_excessive_page_size(self, client: AsyncClient, admin_token: str):
+        """API must cap the limit parameter to prevent resource exhaustion."""
+        res = await client.get(
+            "/api/v1/users/?limit=999999",
+            headers={"Authorization": f"Bearer {admin_token}"},
+        )
+        # Should either cap the limit or reject it
+        if res.status_code == 200:
+            assert len(res.json()["data"]) <= 1000  # reasonable max
+```
+
+#### E2E Smoke — Security Checks Per Endpoint
+
+Extend the existing `e2e_smoke.py` per-endpoint matrix to ALWAYS include:
+
+| Check | Method | Expected | Purpose |
+|---|---|---|---|
+| Happy path | Correct role + valid data | 200/201 | Feature works |
+| No auth | No token | 401 | Auth enforced |
+| Wrong role | Token for unauthorized role | 403 | RBAC enforced |
+| Cross-tenant | Token from different org | 404 | Tenant isolation |
+| Bad input | Invalid/malicious request body | 422 | Validation works |
+| Oversized input | Extremely long field values | 422 | Length limits enforced |
+
+---
+
 ## Test Coverage Targets
 
-| Module | Unit | Integration | E2E |
-|---|---|---|---|
-| Auth / RBAC | 95% | Yes | Yes |
-| Goals | 90% | Yes | Yes |
-| Review Cycles | 95% | Yes | Yes |
-| Calibration | 90% | Yes | -- |
-| PIP | 95% | Yes | Yes |
-| Notifications | 80% | Yes | -- |
-| Analytics | 70% | Yes | -- |
-| E2E smoke (per phase) | -- | -- | All phase endpoints x 4+ checks, exit 0 |
+| Module | Unit | Integration | E2E | Security |
+|---|---|---|---|---|
+| Auth / RBAC | 95% | Yes | Yes | 401/403 on every endpoint |
+| Goals | 90% | Yes | Yes | Cross-tenant, role escalation |
+| Review Cycles | 95% | Yes | Yes | Cross-tenant, role escalation |
+| Calibration | 90% | Yes | -- | Rating adjustment auth |
+| PIP | 95% | Yes | Yes | Manager-only, HR-only gates |
+| Notifications | 80% | Yes | -- | No cross-user notification access |
+| Analytics | 70% | Yes | -- | Data scoping by role |
+| E2E smoke (per phase) | -- | -- | All phase endpoints x 6+ checks, exit 0 | All 6 checks per endpoint |
 
 ---
 
@@ -366,20 +772,119 @@ def test_cycle(db_session: Session, test_user: User) -> ReviewCycle:
 ## Cross-Cutting Rules
 
 1. **Incremental delivery** — Present work unit by unit inline in the conversation. Get user feedback before proceeding to the next unit. Don't batch everything and dump file paths.
-2. **Research awareness** — Check for the market research brief (`docs/market-research.md`) before starting. Use competitor insights and UX patterns from it to inform your output.
+2. **Research awareness** — Check for the market research brief (`docs/product/market-research.md`) before starting. Use competitor insights and UX patterns from it to inform your output.
 3. **Enterprise depth** — All outputs should be spec-level, not summary-level. Think about what an enterprise customer at a 5,000-person company would need.
 4. **No emoji in production artifacts** — Use text labels and SVG icons, not emoji, in any artifacts that will be used downstream.
 
 ---
 
-## After Writing Tests
+## After Writing Tests — Verify and Fix (MANDATORY)
 
-1. Show test coverage summary per module
-2. Run all new Playwright tests against a live backend+frontend to verify they pass. Fix any test that fails due to test code issues (not app bugs). If tests fail due to app bugs, hand the bug list to the appropriate builder skill.
-3. Highlight any acceptance criteria that couldn't be automated (manual test cases)
-4. Generate phase gate test file (`frontend/e2e/gates/phase-N.gate.spec.ts`) that the phase-verifier will run as a pre-check before manual verification
+Do NOT hand off tests without running them first. Broken tests are worse than no tests.
+
+### Step V1: Run Backend Tests
+
+```bash
+cd backend && source .venv/bin/activate
+python app/initial_data.py  # re-seed if needed
+pytest tests/ -v --tb=short 2>&1
+```
+
+**For each failure, determine the cause:**
+
+| Cause | Action |
+|-------|--------|
+| Import error (module not found) | The service/model is not implemented yet. Add `skipif` import guard so the test skips cleanly. |
+| Wrong field name / wrong endpoint path | Your discovery was wrong. Re-run Step 0.1, fix the test. |
+| Assertion error (wrong status code) | Check if the endpoint exists and RBAC is correct. Fix the test expectation or flag as app bug. |
+| Database error | Check migration state. Run `alembic upgrade head`. |
+| SMTP / email error | Expected in local dev. Skip with `-k "not recovery_password"` or mock `send_email`. |
+
+**Fix all test-code issues. Re-run until the only failures are genuine app bugs or intentional skips.**
+
+### Step V2: Run E2E Smoke Tests (Backend Only)
+
+```bash
+cd backend && source .venv/bin/activate
+python scripts/e2e_smoke.py --phase 1
+```
+
+If this fails, the API endpoints have issues. Fix before writing Playwright tests that depend on them.
+
+### Step V3: Run Playwright E2E Tests
+
+```bash
+cd frontend
+npx playwright install chromium  # if not installed
+npx playwright test --project=chromium 2>&1
+```
+
+**Common Playwright failures and fixes:**
+
+| Failure | Likely Cause | Fix |
+|---------|-------------|-----|
+| `page.waitForURL` timeout at `/login` | Login page not implemented yet | Add `test.skip` with reason, or check if route exists first |
+| `getByLabel` not found | Form field label doesn't match | Inspect the actual rendered HTML, use correct label/role/testid |
+| `getByText` not found | Text content is different from expected | Read the actual component, match the real text |
+| `toHaveURL` fails | Route path is different | Check `frontend/src/routes/` for actual path |
+| 401/403 on API call | RBAC doesn't match seeded user's role | Check seed script for correct credentials and role |
+
+**Fix all test-code issues. Do NOT leave broken Playwright tests — they block the entire E2E suite via dependency chains.**
+
+### Step V4: Output Coverage Summary
+
+After all tests pass (or skip cleanly), output:
+
+```markdown
+## Test Execution Summary
+
+### Backend (pytest)
+| Status | Count | Details |
+|--------|-------|---------|
+| PASSED | 92 | Auth, RBAC, CRUD, validation |
+| SKIPPED | 31 | Stub tests for unimplemented services |
+| FAILED | 2 | SMTP not configured (known) |
+
+### Frontend (Playwright)
+| Status | Count | Details |
+|--------|-------|---------|
+| PASSED | 12 | Smoke, gate, RBAC |
+| FAILED | 5 | Auth-setup (login page not built) |
+| DID NOT RUN | 47 | Blocked by auth-setup |
+
+### Coverage Gaps
+| Story | AC | Gap | Recommendation |
+|-------|----|-----|----------------|
+| STORY-X | AC4 | No E2E test for manager override | Add after UI is built |
+```
+
+### Step V5: Generate Stub Tests for Unbuilt Features
+
+For services/endpoints that don't exist yet, generate **stub tests** using the import guard pattern:
+
+```python
+try:
+    from app.services.review_cycle import ReviewCycleService
+    AVAILABLE = True
+except ImportError:
+    AVAILABLE = False
+
+pytestmark = pytest.mark.skipif(not AVAILABLE, reason="service not yet implemented")
+```
+
+This ensures:
+- Tests define the contract BEFORE implementation
+- Tests auto-activate when the service is built
+- Test suite always runs clean (skips, not errors)
+
+### Step V6: Hand Off
+
+1. Show the coverage summary (Step V4)
+2. Show the cross-reference matrix (from Step 0.5) with coverage status
+3. Highlight any ACs that couldn't be automated (document as manual test cases)
+4. Generate phase gate test file (`frontend/e2e/gates/phase-<N>-<unit>.spec.ts`, one per module)
 5. Hand off to **forger** for approval
-6. After approval, update **forger**
+6. After approval, update **forger** context
 
 ---
 
@@ -566,7 +1071,7 @@ test('IC completes self-reflection form end to end', async ({ page }) => {
 
 **Purpose:** Create an automated safety net that the phase-verifier runs BEFORE manual verification. Catches obvious structural bugs (missing layouts, broken forms, 403s) without needing human judgment.
 
-**Location:** `frontend/e2e/gates/phase-N.gate.spec.ts`
+**Location:** `frontend/e2e/gates/phase-<N>-<unit>.spec.ts` (one per module)
 
 **Each phase gate test file covers:**
 1. All persona logins work through the actual login page
@@ -577,7 +1082,7 @@ test('IC completes self-reflection form end to end', async ({ page }) => {
 
 **Example:**
 ```typescript
-// frontend/e2e/gates/phase-2.gate.spec.ts
+// frontend/e2e/gates/phase-2-<unit>.spec.ts
 import { test, expect } from '@playwright/test'
 import { loginViaUI } from '../helpers'
 

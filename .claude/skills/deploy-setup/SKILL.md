@@ -7,6 +7,36 @@ description: Generates infrastructure configuration, Docker setup, CI/CD pipelin
 
 Generates all infrastructure, environment, and deployment configuration for production launch.
 
+## Context Manifest
+
+```yaml
+unit_type: one_shot
+required_inputs:
+  - docs/architecture/system.md
+  - context.json#project                        # for integrations, compliance, tech_stack
+forbidden_paths:
+  - docs/product/market-research.md
+  - docs/product/user-stories.md
+  - docs/architecture/database.md
+  - docs/architecture/api.md
+budget_tokens: 900000
+outputs:
+  - deploy/Dockerfile.backend
+  - deploy/Dockerfile.frontend
+  - deploy/docker-compose.yml
+  - deploy/docker-compose.prod.yml
+  - deploy/nginx.conf
+  - deploy/.env.example
+  - deploy/.github/workflows/ci.yml
+artifacts:
+  summary:          docs/architecture/deployment.md
+  return_contract:  docs/architecture/.deploy-setup.return.json
+```
+
+Forger invokes as a Task subagent after all build phases verified. Return JSON contract: see `.claude/skills/_shared/return-contract.md`. Do NOT call AskUserQuestion; forger owns the approval gate.
+
+---
+
 ## Pre-conditions
 
 Confirm via forger:
@@ -420,7 +450,7 @@ Based on domain doc compliance requirements, adjust hosting:
 ## Cross-Cutting Rules
 
 1. **Incremental delivery** — Present work unit by unit inline in the conversation. Get user feedback before proceeding to the next unit. Don't batch everything and dump file paths.
-2. **Research awareness** — Check for the market research brief (`docs/market-research.md`) before starting. Use competitor insights and UX patterns from it to inform your output.
+2. **Research awareness** — Check for the market research brief (`docs/product/market-research.md`) before starting. Use competitor insights and UX patterns from it to inform your output.
 3. **Enterprise depth** — All outputs should be spec-level, not summary-level. Think about what an enterprise customer at a 5,000-person company would need.
 4. **No emoji in production artifacts** — Use text labels and SVG icons, not emoji, in any artifacts that will be used downstream.
 

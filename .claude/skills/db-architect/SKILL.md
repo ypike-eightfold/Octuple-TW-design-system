@@ -11,16 +11,42 @@ description: >
 
 # DB Architect
 
+## Context Manifest
+
+```yaml
+unit_type: one_shot
+required_inputs:
+  - docs/product/user-stories.md
+  - docs/product/domain-doc.md
+  - docs/architecture/system.md
+  - docs/product/screen-inventory.md
+  - frontend/src/
+forbidden_paths:
+  - docs/product/market-research.md
+budget_tokens: 400000
+artifacts:
+  summary:          docs/architecture/database.md
+outputs:
+  - docs/architecture/database.md
+  - designs/db-er-diagram.md                       # standalone Mermaid ER
+```
+
+Inline skill.
+
 Produces a production-ready PostgreSQL database design: table inventory, full SQLModel definitions with constraints, index strategy, and a Mermaid ER diagram. Targets PostgreSQL 15+.
 
 This skill is domain-agnostic. All table names, column names, and relationships are derived entirely from the project's screen designs and user stories — never from assumptions or domain knowledge.
 
+This skill runs inline in the forger parent thread (not as a Task subagent) — the output is a single design doc and the skill often asks clarifying questions mid-run.
+
+---
+
 ## Pre-conditions
 
 Before proceeding, verify:
-- Approved screen designs exist (React mock screens in `frontend/src/` from react-ux-designer)
-- Approved user stories exist (`docs/user-stories.md`)
-- Approved architecture exists (`docs/architecture.md` — tech stack and module breakdown from architect Pass 1)
+- Approved screen designs exist (React mock screens in `frontend/src/` from design-tw-ux-designer)
+- Approved user stories exist (`docs/product/user-stories.md`)
+- Approved architecture exists (`docs/architecture/system.md` — tech stack and module breakdown from architect Pass 1)
 
 If any are missing, stop and tell the user which input is needed first.
 
@@ -36,9 +62,9 @@ Work in six sequential phases. Present each phase in chat, get confirmation via 
 
 ### Step 1a: Scan inputs
 
-Read the React mock screens in `frontend/src/` and `docs/user-stories.md`. Extract every noun that represents a distinct piece of data the system stores. Do not invent tables; derive every table from something visible in the screens or stated in a story.
+Read the React mock screens in `frontend/src/` and `docs/product/user-stories.md`. Extract every noun that represents a distinct piece of data the system stores. Do not invent tables; derive every table from something visible in the screens or stated in a story.
 
-Also read `docs/architecture.md` Section 2 (Module Breakdown) to align table groupings with the approved module structure.
+Also read `docs/architecture/system.md` Section 2 (Module Breakdown) to align table groupings with the approved module structure.
 
 Organise discovered tables into three tiers:
 
@@ -330,7 +356,7 @@ erDiagram
 
 Write two files after all phases are approved:
 
-### `docs/db-design.md`
+### `docs/architecture/database.md`
 
 ```markdown
 # Database Design
@@ -391,7 +417,7 @@ Never ask the user to type confirmations — always use clickable options.
 
 ## After Writing Files
 
-1. Confirm both files are written: `docs/db-design.md` and `designs/db-er-diagram.md`
+1. Confirm both files are written: `docs/architecture/database.md` and `designs/db-er-diagram.md`
 2. Present the ER diagram inline in chat using a fenced `mermaid` block
 3. Hand off to forger for approval
 4. After approval, update forger with confirmed schema

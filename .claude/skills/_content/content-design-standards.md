@@ -1,0 +1,1334 @@
+---
+name: content-design-standards
+description: Eightfold's product content principles, voice, tone, grammar, capitalization, punctuation, and UI copy patterns. Reference document — load via grep or section-targeted reads.
+source: Content Design Standards (Google Doc, 45-page export)
+---
+
+Last update: Mar 30, 2026
+
+# Content design standards
+
+## Table of contents
+
+- [Guides hierarchy](#guides-hierarchy)
+- [Product content principles](#product-content-principles)
+- [Voice and tone](#voice-and-tone)
+  - [Voice](#voice)
+  - [Tone](#tone)
+  - [Tone spectrum](#tone-spectrum)
+  - [Tone framework](#tone-framework)
+  - [Guidance to use tone strategically](#guidance-to-use-tone-strategically)
+  - [Audience considerations](#audience-considerations)
+  - [Values to voice](#values-to-voice)
+- [Standards](#standards)
+- [Content types](#content-types)
+  - [Accessibility](#accessibility)
+  - [Alt text](#alt-text)
+  - [ARIA labels](#aria-labels)
+  - [AI experiences](#ai-experiences)
+  - [Agile CD tools](#agile-cd-tools)
+  - [Project NEO design principles](#project-neo-design-principles)
+  - [Color](#color)
+  - [CTA](#cta)
+  - [Disclaimer](#disclaimer)
+  - [Email](#email)
+  - [Greeting](#greeting)
+  - [Illustrations](#illustrations)
+  - [Messages](#messages)
+  - [Confirmation dialog](#confirmation-dialog)
+  - [Confirmation message (positive)](#confirmation-message-positive)
+  - [Error message (negative)](#error-message-negative)
+  - [Loading message (neutral)](#loading-message-neutral)
+  - [Menu](#menu)
+  - [Notification](#notification)
+  - [Onboarding](#onboarding)
+  - [Promotional](#promotional)
+  - [Prompt](#prompt)
+  - [Responses (AI chat responses)](#responses-ai-chat-responses)
+- [Style](#style)
+  - [Abbreviations](#abbreviations)
+  - [Acronyms](#acronyms)
+  - [Capitalization](#capitalization)
+  - [File types, filenames, and extensions](#file-types-filenames-and-extensions)
+  - [Date](#date)
+  - [Date abbreviations](#date-abbreviations)
+  - [Gestures](#gestures)
+  - [Ghost text](#ghost-text)
+  - [Grammar](#grammar)
+  - [Information architecture / hierarchy](#information-architecture--hierarchy)
+  - [Links](#links)
+  - [Lists](#lists)
+  - [Location](#location)
+  - [Naming](#naming)
+  - [Numbers](#numbers)
+  - [Placeholder text (a.k.a. Ghost text)](#placeholder-text-aka-ghost-text)
+  - [Pronouns](#pronouns)
+  - [Punctuation](#punctuation)
+  - [Sensitive terms](#sensitive-terms)
+  - [Symbols](#symbols)
+  - [Tags](#tags)
+  - [Time](#time)
+  - [Time abbreviations](#time-abbreviations)
+  - [Timestamp](#timestamp)
+  - [Tooltips](#tooltips)
+  - [Tooltip content patterns for accessibility](#tooltip-content-patterns-for-accessibility)
+
+## Guides hierarchy
+
+- Follow these standards and the terms list for in-product content
+- For external marketing and communications, use the Eightfold brand guidelines
+- For product documentation and knowledge base articles, use the Eightfold docs style guide
+- For any topic not covered in this style guide, default to using the Microsoft Style Guide
+- For spelling, use Merriam-Webster and American English
+
+## Product content principles
+
+- **Clear**
+  - Content must serve the actual users of a product. If there are multiple personas for a flow, write to the lowest comprehension level, so that information is clear for everyone. Content design will also influence UI and product flow to make experiences easy to understand.
+- **Efficient**
+  - Use precise technical language when it helps users complete tasks faster. Technical language is not "jargon" when:
+    - Terms are industry standard for intended users
+      - Validate with landscape research and/or user research
+    - It's more efficient than plain language
+      - For example, recruiters understand the difference between screening, functional, and coding interviews. A flow that described those interviews in plain language would slow recruiters down and make their workflow harder.
+  - Employ UX best practices, like progressive reveal, to balance the need for clarity and efficiency
+- **Contextual**
+  - Provide information when people can immediately act on it or when it affects their decisions (ie: longer time commitment). When it adds value, customize content to the user and/or use case.
+- **Ethical**
+  - Equip people to make informed decisions about their actions and personal information. Content must be accurate and set the right expectations.
+
+All principles work together to create a worldclass user experience. Some are in tension with each other: Design and product decisions must weigh tradeoffs. Work to identify solutions that serve the needs of our users, customers, and business.
+
+## Voice and tone
+
+The Eightfold brand guidelines apply to marketing and external communications. Voice within Eightfold products is aligned with the brand voice and upholds the same values.
+
+<!-- Source PDF was truncated at "uphold the" with no continuation. This sentence has been completed based on context (the surrounding paragraphs about brand voice/values). Verify against the canonical Google Doc before publishing externally. -->
+
+
+### Voice
+
+Eightfold's product voice is professional and caring. We stand for ethical AI and leadership in the talent space. The way we communicate represents our expertise in these domains.
+
+### Tone
+
+Eightfold products serve different users and use cases. Think of how you speak differently with your CEO, your manager, and your teammates. While our product voice is universal, different products deliver different emotional experiences. For example, TM is generally more conversational than TA, but remains formal when dealing with skills assessment. That's because people do not want the platform to seem casual about their job performance, but are open to a friendlier experience when guided to learn and grow.
+
+Product teams do not need to figure this out on every project. This section provides guidance for teams to improve user experience with a strategic use of tone.
+
+### Tone spectrum
+
+Eightfold has 5 active tones:
+
+- Technical
+- Functional
+- Educate
+- Inspire
+- Celebrate
+
+### Tone framework
+
+| Tone | Technical | Functional | Educate | Inspire | Celebrate |
+|---|---|---|---|---|---|
+| Emotion | Neutral | Neutral | Neutral - Positive | Positive | Positive |
+| JTBD | Confirm system actions; Show relevant data | Orient user; Complete task | Gain knowledge | Discover features | Reward accomplishments |
+| Examples | Autosaved 5:04 PM Sep 6, 2025; Location not specified | Jobs; Search jobs; Create position; Request feedback; Recommended for you; Based on your profile | Employees will be recommended based on Match Score for this role | Learn about the many ways you can grow here | Welcome to Career Hub! |
+
+Source: 2025 UX team audit
+
+### Guidance to use tone strategically
+
+### Audience considerations
+
+- **Consumer**
+  - People are using our platform to job search and grow
+  - Content can empower them by surfacing relevant info and options
+  - Write to a 5th grade reading level to serve the greatest number of people
+    - Test on Hemingway app
+- **Enterprise / Hiring Company**
+  - People are using our platform to do their jobs
+  - Content can make their jobs easier by keeping product flows easy and clear
+  - We can assume comprehension of standard industry terms, and use our terms list to ensure accuracy and consistency
+
+### Values to voice
+
+This is how Eightfold values apply to our voice and tone.
+
+- **Extreme Ownership**
+  - If we have to explain something complicated in product, it's a strong signal we can improve the UX. We own that responsibility as a product team. The result will be a simpler, clearer voice.
+- **Compassion**
+  - Our users are working hard and dealing with rejection (from candidates as recruiters, from hiring companies as job seekers). This is why our voice is warm, but not heavy handed. We are supportive, but not patronizing.
+- **Integrity**
+  - If we say it in product, we're making a promise. Content must be accurate and set the right expectations. We do not mislead anyone just to get clicks.
+- **Transparency**
+  - Some actions have important or irreversible consequences. Include info that users need to make a truly informed decision for themselves. Question what's missing.
+- **Excellence**
+  - The work is in balancing these very challenging needs. We have unique technology in a complex space, but have to present info in as clear and simple ways as possible. The harder you work to make our UX excellent, the more you have scaled your efforts because it will make the lives of millions of users better as they use and benefit from our products.
+
+## Standards
+
+## Content types
+
+### Accessibility
+
+General guidance:
+
+- Use alt text for images and elements that only serve a visual purpose
+  - Because the alt text describes what users can see
+- Use ARIA labels for interactive elements
+  - Because the labels describes what users can do and what the elements will do when activated
+
+**Who writes accessibility content?**
+
+- UXD, PM, and Eng can all write accessibility strings. Discuss with your team. The important thing is that it does get written and included in the code.
+
+### Alt text
+
+Alt text describes images and other visual elements. It improves accessibility for people who use screen readers and provides additional context if an image cannot load properly.
+
+Alt text does not appear in the UI. Instead, it will appear in the alt attribute of an image's HTML code.
+
+This guidance is aligned with WCAG Guidelines for Accessibility.
+
+- Be descriptive, but keep it short
+  - 125 characters max
+  - Do not use phrases like "an image of" at the beginning of alt text
+
+**Example**
+
+| Yes | No | Why |
+|---|---|---|
+| `<img src="background-image.jpg" alt="A dog sitting in a field of grass">` | `<img src="background-image.jpg" alt="An image of a dog sitting in a field of grass">` | Unnecessary because screen readers announce by default that alt text is written for an image |
+
+- Describe only the most important elements in an image, such as the main subject and setting
+  - Do not describe how the image looks. Refer to the context of the image on the page and decide what is relevant information.
+
+**Example**
+
+| Yes | No | Why |
+|---|---|---|
+| `<img src="background-image.jpg" alt="A dog sitting in a field of grass">` | `<img src="background-image.jpg" alt="A tan and white beagle looking to the right while sitting in a sunny field of grass">` | Distracts from the main focus of an image |
+
+- For visual elements that are decorative, alt text is represented by an empty set, or null
+  - If an image can be deleted without affecting the information communicated on a page, then it is decorative
+  - Include the alt attribute so the screen reader can still recognize the image as a decorative element
+
+**Example**
+
+| Yes | No | Why |
+|---|---|---|
+| `<img src="background-image.jpg" alt="">` | `<img src="background-image.jpg">` | Screen reader may read out the name of the file if there is no alt attribute, causing confusion for the user |
+
+- For icons that represent an action or link, use alt text to tell user what will happen
+  - Refer to CTA standards
+
+**Example**
+
+| Yes | No | Why |
+|---|---|---|
+| `<img src="icon.jpg" alt="Contact help center">` | `<img src="icon.jpg" alt="Question mark">` | Not descriptive enough |
+
+### ARIA labels
+
+Accessible Rich Internet Applications (ARIA) labels can be used when native labels aren't possible or don't provide enough context.
+
+ARIA labels do not appear in the UI. This is content that lives in code to support accessibility.
+
+This guidance is aligned with WCAG Guidelines for Accessibility.
+
+**Types of ARIA labels**
+
+| ARIA type | Use when | Example |
+|---|---|---|
+| `aria-label` | Use `aria-label` when there is no visible label in the UI. Ex: icons. If labeling an image, use alt text instead. | `<button aria-label="close">X</button>` |
+| `aria-labelledby` | Use `aria-labelledby` to use the text of another UI element as a label. Reference the unique id of the element containing the label. You can use the text of one or more elements. | `<aside aria-labelledby="facts">` `<h2 id="facts">Some really neat facts</h2>` |
+| `aria-describedby` | Use `aria-describedby` to use the text of another UI element as a description that can be announced by assistive technology. Reference the unique id of the element containing the label. You can use the text of one or more elements. | `<label for="name">Name (required)</label>` `<input type="text" id="name" aria-describedby="error">` `<span id="error">Name is required. Enter your response.</span>` |
+| Multiple id references | Use when referencing more than one UI element in `aria-labelledby` or `aria-describedby` | `<span class="visually-hidden" id="context">plus context</span>` `<a href="#" id="self" aria-labelledby="self context">Link text</a>` |
+
+**Example**
+
+| Yes | No | Why |
+|---|---|---|
+**Yes** — Concise `aria-label`, separate tooltip via `aria-describedby`:
+
+```html
+<button aria-label="clap">clap icon</button>
+<input type="text" id="name" aria-describedby="tooltip">
+<span id="tooltip">You can support this project with a clap</span>
+```
+
+**No** — Overstuffed `aria-label` containing state, instructions, and tooltip text all jammed together:
+
+```html
+<!-- DON'T: aria-label is bloated with state ("clickable not clapped"),
+     instructions ("click to add clap"), a count ("0 claps"), the action verb
+     ("add button"), and the tooltip copy. Screen readers read the entire
+     attribute, which becomes unintelligible. -->
+<button aria-label="clickable not clapped, click to add clap, 0 claps add button. You can support this project with a clap (Tool Tip)">clap icon</button>
+```
+
+**Why** — Label the icon as a button because it is clickable. Name the icon concisely. Use text from another UI element to describe the icon via `aria-describedby` — that follows ARIA best practice. Don't cram state, count, and tooltip text into the label itself.
+
+<!-- The "No" example was malformed in the source PDF (missing closing quote on aria-label). It has been reconstructed here to show the intent: an overstuffed aria-label is the anti-pattern. Verify against the canonical Google Doc before publishing externally. -->
+
+**Resources:**
+
+- Accessible name calculation
+- Knowledge base, Indiana University
+
+### AI experiences
+
+Copilot and agentic AI experiences are designed in 2 key ways:
+
+- Integrated with existing UI
+  - Existing standards all apply (do not reinvent the wheel)
+- Added as a chat
+  - Reference framework for Conversational interfaces
+
+### Agile CD tools
+
+Agentic AI work is proceeding rapidly. Agile CD tools document and scale decisions, so that product teams can work quickly, while minimizing risk and maximizing efficiency.
+
+- AI Interviewer (TA)
+  - CRD
+  - Content tracker
+
+These decisions will be distilled into broader standards once content is in a stable state.
+
+### Project NEO design principles
+
+1. **Declare Intent Early**
+   - What it means: Let users know exactly what's happening and what's expected of them.
+   - How: Use prominent titles, step counters, or short descriptions (e.g., "Step 1 of 3: Enter Job Details").
+   - Offer a quick summary of what the user will achieve by the end (e.g., "In 3 steps, you'll complete your application.").
+2. **Reveal, Don't Overwhelm**
+   - What it means: Only show what's necessary at the moment. Hide advanced options or edge cases by default.
+   - How: Use progressive disclosure (e.g., collapsible sections).
+   - Stack content vertically, avoid tabs or carousels unless strictly necessary.
+3. **Focus with Purpose**
+   - What it means: Each screen or interaction should have one primary goal.
+   - How: Highlight a single primary CTA (call-to-action).
+   - Use white space generously to draw attention to what matters most.
+   - Minimize visual noise: remove or downplay secondary actions.
+4. **Build Trust Through Transparency**
+   - What it means: Users should never wonder what's happening in the background or what will happen next.
+   - How: Use inline loading messages ("Saving changes..."), progress indicators, and explanations of next steps.
+   - Disclose data use ("We use your location to find nearby jobs.").
+5. **Remove Before You Refine**
+   - What it means: Redesign by subtraction. Keep asking, "Can this be removed or delayed?"
+   - How: Strip down legacy features or elements not used 80% of the time.
+   - Refactor cluttered flows into micro-interactions or self-contained modules.
+
+### Color
+
+Color is visual content that serves a communication purpose. Be aware that color carries both personal and universal meanings. Designers must base decisions on universal meaning because using the wrong colors can confuse users.
+
+This guidance will help designers and product teams make consistent color decisions and minimize user confusion.
+
+1. Refer to Octuple Design System > Elements > Colors
+   - System colors are labeled with their meanings on the Eightfold platform
+2. Stay consistent with past usage of colors
+   - Ex: If a pending status uses a specific yellow, use the same yellow when adding a pending status to a different feature
+   - The Octuple Design System designates specific colors for critical, warning, success, and text links
+3. Consider the universal meaning of the color you want to use
+   - Many are assigned in the Octuple Design System > Elements > Colors
+4. Do not rely on color alone to communicate key information
+   - This would decrease accessibility
+
+**Content patterns**
+
+| Pattern | Meaning |
+|---|---|
+| Green | Green is positive. In this example, green is used to highlight a desired increase |
+| Green | Green is positive. In this example, green is used to highlight confirmation that a desired action was completed |
+| Red | Red is negative. In this example, red is used to highlight urgency and a need for action |
+| Red | Red is negative. In this example, red is used to highlight that a CTA is a destructive action (removes information) |
+| Gray | Gray is neutral. In this example, gray is used to provide some visual contrast, but does not add any emotional value |
+
+### CTA
+
+CTA is an acronym for "call-to-action"
+
+- This is a broad term that refers to any content that encourages a specific action by the user
+
+| Example | UI element | UX implication |
+|---|---|---|
+| (button) | CTA button | High cost: moves user to a different screen |
+| (link) | Text link | Medium cost: opens modal or tab in addition to current screen. Octuple guidance: use designated color for text links |
+| Set alerts for the updates you want. | Text (not linked) | Low cost: does not change screen |
+| (icon) | Icon | Open new tab: sets expectation for user, so they are not surprised. Accessibility requirement: helps visually impaired users understand how to navigate back to where they were |
+
+- Help users make informed choices
+  - Clarify the most important info: this is a UX judgment call
+    - Will the app move to a different screen?
+    - What is the outcome of this action?
+    - What is the value of this action?
+  - Confirm accuracy of info (check with product, eng)
+  - Ensure consistent use of iconography
+
+- Maintain a clear focus
+  - 1 action per element
+    - Multi-action CTAs are live, but will be addressed in content cleanup
+    - Clarify the most immediate outcome
+    - Rely on progressive reveal (don't describe several steps at once, it overwhelms the user)
+  - 3 words or less
+    - Exceptions ok, only when necessary for clarity
+
+- Maintain consistency
+  - Use active voice
+  - Follow capitalization guidance
+
+- No punctuation
+
+**Examples**
+
+| Yes | No | Why |
+|---|---|---|
+| Skip | (variant) | Focus on immediate outcome. Next screen can explain next step |
+| OK | OK! | No punctuation. Makes the action harder to read. Assumes user sentiment (which makes some people angry) |
+| (single action) | `Next: <text>` | `Next: <text>` does not meet standards. Passive, no clear action. Legacy pattern before we had a content system. This is why you might see shipped examples. Although there may be inconsistency by shipping correct CTA text, it will help Eightfold improve UX incrementally and prevent design debt |
+
+### Disclaimer
+
+**Legal risk**
+
+- All new disclaimers must get legal review
+  - If existing disclaimers are used in a new context, it must also get legal review
+- Use language exactly as approved
+  - Use existing content patterns to drive consistency, minimize risk, and work efficiently
+  - Copy and paste approved language to prevent manual errors
+- Do not provide disclaimer language for customers
+  - Legal may advise or provide templates
+
+**Approved content**
+
+| Shipped | Usage and examples | Approvals and notes |
+|---|---|---|
+| Always check accuracy of generated responses. | Disclaimer for generative AI output. Placement: Beneath text input field | Approved May 2024 |
+
+### Email
+
+**Product:** When part of a product flow, an email serves UX goals
+
+- This is different from marketing emails because people don't need to be convinced to try the product
+- Focus on moving people forward as quickly and easily as possible, so they have a great experience
+
+**Growth:** When part of a growth strategy, an email serves business and UX goals
+
+- This is a hybrid of product, education, and marketing
+- Focus on user needs to deliver info clearly
+- Be careful of trying to do too many things in one message - strategy is about making choices
+
+| Email | Email type | UX implication |
+|---|---|---|
+| Email verification | Product | High cost: blocks new users from signing in and using our platform |
+| Welcome | Growth | Medium cost: onboards new users and sets expectations |
+| Job recommendations | Growth | Medium cost: reinforces value and drives retention (or churn if it annoys people) |
+
+**Maintain a clear focus**
+
+- It's tempting to pack a lot of info into emails, but this can backfire
+  - If it's too much, people can close, delete, or unsubscribe without returning to our platform
+- Each email should have one primary goal
+  - CTA drives an action that achieves that goal
+  - Header provides the reason why user should take that action
+  - Text explains why those two are connected
+    - "When you create your profile, you'll get personalized recommendations."
+
+**Empower, don't overwhelm**
+
+- Emails can provide education and context
+
+### Greeting
+
+The purpose of a greeting is to:
+
+- Set the tone for a product, feature, or flow
+- Set expectations
+  - Each product and feature has a clear focus
+    - Clarify what the agent can support within that focus
+    - Boost user work performance
+      - Streamline current workflow
+        - Calculate and suggest options
+        - Track and notify
+        - Automate
+      - Show opportunities with other workflows, features, etc. that user may not have realized alone
+  - What happens when there is no specific product or feature?
+    - Get information about what user wants help with
+      - As efficiently as possible
+
+Style of greeting depends on:
+
+- Placement
+- Context
+
+### Illustrations
+
+Illustrations are powerful tools in product design, but they should be used with focus and purpose. Drawing from best practices like those at Airbnb, here are some guidelines to help you decide when and where to use illustrations.
+
+**1. Use Illustrations in Products to Add Context and Simplify Complex Ideas**
+
+- When to Use:
+  - To clarify complex processes, such as onboarding steps or feature explanations.
+  - To visuallly represent abstract concepts that might be hard to describe with text alone.
+  - To guide users with emphasis on their next action (e.g., in empty states, or success/error pages).
+- Why:
+  - Helps users quickly grasp information or actions.
+  - Reduces cognitive load by presenting information visually in an intuitive way.
+
+**2. Avoid Overusing Illustrations Everywhere**
+
+- Avoid When:
+  - They don't directly contribute to user understanding or decision-making.
+  - They overwhelm interfaces, compete with core content, or slow down loading times.
+  - They are used purely for decoration without clear relevance to the user's need.
+- Why:
+  - Excessive use can distract users, reduce focus on functionality, and make the product feel cluttered rather than purposeful.
+
+**3. Ensure Context Relevance**
+
+- Every illustration should serve a purpose that enhances the user experience. If the illustration feels disconnected from the content or functionality, reconsider adding it. For example:
+  - Use a helpful onboarding visual that explains, not decorates.
+  - Avoid unnecessary visuals on task-heavy interfaces where clarity is key.
+
+**4. Prioritize Visual Consistency**
+
+- Do:
+  - Use consistent styles, shapes, and proportions across all illustrations in the product.
+  - Ensure colors, themes, and tone align with your brand's visual language.
+- Avoid:
+  - Mixing different artistic styles, as it disrupts the cohesive experience.
+
+**5. Keep Users Front and Center**
+
+- Illustrations should serve the user's needs first:
+  - Ask if the visual solves a user's problem or makes their task easier.
+  - Avoid self-indulgent or overly artistic illustrations that prioritize aesthetics over practicality.
+
+**6. Think of Empty States and Moments of Delight**
+
+- Use illustrations thoughtfully to improve engagement:
+  - Empty states (e.g., "No Data Found") gain value with simple, encouraging visuals.
+  - Feedback screens (e.g., completion or success messages) can use illustrations to celebrate the user's progress.
+
+**7. Evaluate Performance Impact**
+
+- Ensure illustrations don't increase loading times or hinder accessibility. Prioritize optimized SVGs and scalable formats.
+
+**Checklist Before Adding an Illustration:**
+
+- Is this solving a problem for the user, or just decorative?
+- Does it complement surrounding interface elements without competing with them?
+- Is it consistent with our visual and brand style?
+- Does it add clarity, simplify a process, or reduce user confusion?
+
+Following these principles, illustrations can enhance understanding, create an emotional connection, and elevate user experiences without overloading the interface.
+
+### Messages
+
+### Confirmation dialog
+
+Double-checks with the user before something happens
+
+- Restate the user's action in the CTA for clarity
+  - Do not use "Yes/No" or "Ok/Cancel" as response options
+- Only use confirmation dialogs for actions with serious consequences, not standard actions
+
+**Example**
+
+| Yes | No | Why |
+|---|---|---|
+| (Restated action in CTA) | (Generic "Are you sure?") | Restating the action clarifies for the user what they're doing and the consequences of their actions |
+| (Impact-focused copy) | "Are you sure?" | Do not ask if user is sure. This delivers no new info. Instead, clarify the impact of continuing with the action, so user can make a more informed decision. |
+
+### Confirmation message (positive)
+
+Short, quick hit of info
+
+- What happened as a result of user action
+- What the system did for the user
+
+**Timely**
+
+- A confirmation message must show up immediately after an action
+  - This gives context to the message
+
+**Functional**
+
+- Provide factual info, no emotional language
+  - Do not use words like: "congratulations", "success", "successfully"
+  - Do not use exclamation marks
+
+**Octuple components**
+
+- Info bar > Styles > Positive
+- Message bar > Styles > Positive
+- Snack bar > Styles > Positive
+
+**Octuple guidance**
+
+- Use designated color for success messages
+
+**Reference**
+
+- Google confirmation & acknowledgement
+- Atlassian success message
+
+### Error message (negative)
+
+**Accessibility**
+
+- Use error icon before error text message
+  - This is to make scanning of information quicker and also to support the error text. Dark grey text and dark red text are hard to differentiate for vision impaired users.
+
+**Short, quick hit of info**
+
+- What's wrong
+- What can I do about it
+
+**Timely**
+
+- An error message must show up immediately after an action
+  - This gives context to the message
+
+**Functional**
+
+- Provide factual info, no emotional language
+  - Do not use words like: "sorry", "oh no"
+  - Do not use exclamation marks
+
+**Octuple components**
+
+- Info bar > Styles > Disruptive
+- Message bar > Styles > Disruptive
+- Snack bar > Styles > Disruptive
+
+**Octuple guidance**
+
+- Use designated color for critical and warning messages
+
+**Reference**
+
+- Adobe error message guidelines
+- Writing clearer error messages
+
+### Loading message (neutral)
+
+**Content patterns**
+
+| Formula | Example | Guidance |
+|---|---|---|
+| Verb + subject… | Generating emails… | House style includes ellipsis (set of 3 dots at end of text) |
+| Verb + subject + subject… | Reviewing profiles and jobs… | House style includes ellipsis (set of 3 dots at end of text). Do not over explain (see below) |
+
+**Short, quick hit of info**
+
+- What is the system doing for the user
+
+**Timely**
+
+- A loading message only shows while the system is doing something
+
+**Functional**
+
+- Provide factual info, no emotional language, no assumptions
+  - Do not use words like: "carefully" or "precise"
+  - Do not use exclamation marks
+- Do not over explain
+
+**Example**
+
+| Yes | No | Why |
+|---|---|---|
+| Refining emails… | Reviewing and refining emails… | It is reasonable to expect AI to review text in order to refine it. The content does not need to list everything. |
+
+### Menu
+
+**Short, quick hit of info**
+
+- What do I get if I tap on this?
+  - What experience
+  - What outcome
+
+**Mini system**
+
+- Options should have same style & focus/info
+  - People will be scanning options to choose what to do
+  - Consistency of style & info will help them do that
+
+### Notification
+
+- See also: Email
+
+**Forms**
+
+- Email
+- In-Product
+- Push
+
+### Onboarding
+
+**Different from other UX content**
+
+- Focus is on educating users about overall experience & options
+- Not as actionable
+- Welcome people to a new experience & set them up for success
+
+**Forms**
+
+- Tooltips
+- Tours
+
+**Reference**
+
+- Intuit questions for not needing tooltips
+
+### Promotional
+
+**Forms**
+
+- Banners
+- Modals (pop-ups)
+
+Banners are promotional messages to draw a user's attention to a new or relevant feature
+
+- While Eightfold might have business reasons to drive awareness of a certain feature, this type of message must still meet product content standards because it is showing up inside a product flow
+
+### Prompt
+
+**AI experiences**
+
+The purpose of prompts is to:
+
+- Set expectations
+  - Each product and feature has a clear focus
+    - Clarify what the agent can support within that focus
+- Take fast action
+  - Show key actions
+    - Can these be personalized to the user?
+  - Show opportunities with other workflows, features, etc. that user may not have realized alone
+
+Refer to CTA standards unless prompts are highly conversational
+
+### Responses (AI chat responses)
+
+**AI experiences**
+
+- All AI responses must serve a purpose
+  - Move the user forward in their workflow
+  - Offer value to user
+  - Support informed choice
+    - Actions to take
+    - Outcomes of each action
+      - No bad surprises
+
+**Assess the value of all content**
+
+- Does it serve a strategic purpose?
+
+| Purpose | Sub-type | Value to user | Relevant standards |
+|---|---|---|---|
+| Confirm | User input | AI acts on correct request | |
+| Confirm | User intent | AI acts with user's permission | Confirmation dialog — Double-checks with the user before something happens |
+| Clarify | Details | AI acts on correct request | |
+| Provide | Context | User can make informed choices | Tooltips — Useful information or guidance |
+| Provide | Insights | User can make informed choices | Tooltips — Useful information or guidance |
+| Explain | Sources | User can make informed choices | |
+| Explain | Rationale | User can make informed choices | |
+| Explain | Calculations | User can make informed choices | |
+
+**Example**
+
+(Example content was a visual figure in the source PDF and was not captured in the text export.)
+
+## Style
+
+### Abbreviations
+
+- Only use abbreviations if necessary to conserve space
+  - See date and time abbreviations
+- Do not add periods after abbreviations
+
+| Yes | No | Why |
+|---|---|---|
+| Sep 16 | Sep. 16 | Unnecessary punctuation |
+
+- Do not use Latin abbreviations like etc. and e.g.
+  - etc. = and the rest
+  - e.g. = for example
+  - i.e. = that is, or in other words
+
+| Yes | No | Why |
+|---|---|---|
+| Upload resume, cover letter, and related documents. | Upload resume, cover letter, etc. | Latin abbreviations are often used incorrectly and may not translate accurately to other languages |
+
+### Acronyms
+
+- Do not make up new acronyms
+- Write acronyms in ALL CAPS
+- On first reference, spell out the acronym before putting the acronym in parentheses. After first reference, use only the acronym.
+
+| Yes | No | Why |
+|---|---|---|
+| First reference: Equal Employment Opportunity Commission (EEOC). Second reference: EEOC | First reference: EEOC (Equal Employment Opportunity Commission) | Spelling out the acronym first clarifies what it is |
+
+- If the persona is familiar with an acronym, do not spell it out
+  - Refer to this list of familiar acronyms
+
+| Yes | No | Why |
+|---|---|---|
+| HR | Human resources (HR) | Spelling out familiar acronyms causes overexplaining |
+
+- Do not use periods in acronyms
+
+| Yes | No | Why |
+|---|---|---|
+| US | U.S. | Unnecessary punctuation |
+
+- Do not use apostrophes when pluralizing acronyms
+
+| Yes | No | Why |
+|---|---|---|
+| FTEs | FTE's | Apostrophes are used for contractions or to show ownership, not to make things plural |
+
+### Capitalization
+
+- Sentence case for everything, unless specified otherwise
+  - Sentence case for CTA buttons
+  - Title case for proper nouns
+    - Check branded terms
+    - If not listed, check with content design
+
+| No | Reason |
+|---|---|
+| "Sign Up" | "Sign Up" is a generic action, not the name of a product. Use: Sign up for free. Random capitalization adds friction for users and erodes trust in our brand. If it seems like we don't know basic grammar, why would people trust us about more complex things |
+
+### File types, filenames, and extensions
+
+- Use all caps for file type
+- Use lowercase for filenames and extensions
+  - Extensions must include period at beginning
+
+**Content patterns**
+
+| Category | Examples |
+|---|---|
+| File type | PDF, CSV, TXT, DOC |
+| Filename | for_example.pdf, for_example.csv, for_example.txt, for_example.doc |
+| File extension | .pdf, .csv, .txt, .doc |
+
+**Examples**
+
+| Yes | No |
+|---|---|
+| upload CSV | (lowercase file type) |
+
+### Date
+
+- Abbreviate the month if it is written with a day, year, or both
+  - Refer to date abbreviations and abbreviation standards
+
+| Yes | No | Why |
+|---|---|---|
+| Sep 16, 2024 | September 16, 2024 | Not necessary to spell out month when accompanied by day and year |
+| Sep 16 | September 16 | Not necessary to spell out month when accompanied by day |
+| Sep 2024 | September 2024 | Not necessary to spell out month when accompanied by year |
+
+- Spell out the entire month if it stands alone with no day or year
+
+| Yes | No | Why |
+|---|---|---|
+| This feature will be available in April | This feature will be available in Apr | Provides clarity when the month stands alone |
+
+- Format dates for US English as follows:
+  - Month day, year
+  - Use letters for month, and use numbers for day and year
+  - Do not use ordinal numbers in dates
+- If there is not enough space in the design:
+  - Using slashes in dates is OK, but try to avoid this
+    - Format the date as mm/dd/yy
+  - Abbreviating days of the week is OK
+    - Refer to date abbreviations and abbreviation standards
+- Expressing date range
+  - Use hyphen for date range
+    - One space before and after the hyphen
+
+| Yes | No | Why |
+|---|---|---|
+| Sep 16, 2024 - Sept 18, 2024 | Sep 16, 2024-Sept 18, 2024 | More clear and easy to read |
+
+### Date abbreviations
+
+| Day of the week | Abbreviation |
+|---|---|
+| Monday | Mo |
+| Tuesday | Tu |
+| Wednesday | We |
+| Thursday | Th |
+| Friday | Fr |
+| Saturday | Sa |
+| Sunday | Su |
+
+| Month | Abbreviation |
+|---|---|
+| January | Jan |
+| February | Feb |
+| March | Mar |
+| April | Apr |
+| May | May |
+| June | Jun |
+| July | Jul |
+| August | Aug |
+| September | Sep |
+| October | Oct |
+| November | Nov |
+| December | Dec |
+
+Go to Time abbreviations for amount of time, like month or year.
+
+### Gestures
+
+- Avoid describing specific gestures (like "click" or "tap") in product
+  - UI design patterns are better at showing people how to interact
+    - Content is better at telling people what will happen if they interact
+  - Text descriptions of gestures are not scalable
+    - Different devices, settings, OS may have different interaction patterns
+    - This is especially true for accessibility considerations (like screen readers)
+
+| Yes | No | Why |
+|---|---|---|
+| Upload resume | Click here to upload resume | Shorter. Sets clear expectation of what will happen. Supports accessibility |
+
+### Ghost text
+
+See guidance for placeholder text.
+
+### Grammar
+
+- Use active voice (subject > action)
+  - Example:
+    - I threw the ball (active)
+    - The ball was thrown by me (passive)
+- Use present tense
+
+| Yes | No | Why |
+|---|---|---|
+| List where you want to work | Locations where you want to work | Shorter. Clarifies action to take |
+| Add relevant skills | Relevant skills to add | Shorter. Clarifies action to take |
+
+- Keep verbs simple
+
+| Yes | No | Why |
+|---|---|---|
+| Application submitted | Application has been submitted; Application was submitted | Adds unnecessary words |
+
+- Use common contractions with "not" and personal pronouns
+  - Examples: can't, won't, you've, we've
+- Do not use contractions with multiple verbs and contractions that are uncommon
+  - Example: would've, y'all, how're
+- Do not use contractions with nouns and proper nouns
+
+| Yes | No | Why |
+|---|---|---|
+| This platform is available | This platform's available | Can seem like the apostrophe is used to show ownership |
+
+### Information architecture / hierarchy
+
+- Assess the information architecture of your design with 10 principles from Abby Covert
+  - **Findable:** Able to be located
+  - **Accessible:** Easily approached and/or entered
+  - **Clear:** Easily Perceptible
+  - **Communicative:** Talkative, informing, timely
+  - **Useful:** Capable of producing the desired or intended result
+  - **Credible:** Worthy of confidence, reliable
+  - **Controllable:** Able to adjust to a requirement
+  - **Valuable:** Of great use, service and importance
+  - **Learnable:** To fix in the mind, in the memory
+  - **Delightful:** Greatly pleasing
+- Visual hierarchy
+  - Guide user's eye to the most important UI elements
+    - Ex: color, header formatting
+  - Use logical grouping and ordering to make a feature feel intuitive
+    - Ex: making menu items alphabetical or in order of a workflow
+  - Learn more about visual hierarchy from NN/Group
+- Progressive reveal
+  - Deliver crucial information in the most visible elements
+    - Ex: headers, titles, button text
+  - Provide relevant details for users who choose to read more
+    - Ex: descriptive text, tooltip
+
+### Links
+
+- Make link text descriptive
+
+| Yes | No | Why |
+|---|---|---|
+| Search for anything on Google | Search for anything here | No description makes it unclear to the user what they are navigating to |
+| Development plans | Click here | No description makes it unclear to the user what they are navigating to |
+
+- Do not put several different links right next to each other
+
+| Yes | No | Why |
+|---|---|---|
+| This is Career Hub. Here are your career interests. Here are your projects. | View Career Hub, career interests, projects. | Links right next to each other make it hard for users to identify different links |
+
+### Lists
+
+- **Bullets**
+  - Use for lists of short, related information
+  - Each item must be a complete, distinct thought
+- **Numbers**
+  - Use only when the specific order of steps or priority matters
+
+### Location
+
+- List information from smallest to largest
+
+| Yes | No |
+|---|---|
+| Santa Clara, CA | CA, Santa Clara |
+| Santa Clara, CA, US | CA, US, Santa Clara |
+
+- Use common abbreviations
+
+| Yes | No |
+|---|---|
+| Santa Clara, CA, US | Santa Clara, California, United States |
+| | Santa Clara, Cali, US |
+
+- Avoid unnecessary punctuation
+
+| Yes | No |
+|---|---|
+| Santa Clara, CA, US | Santa Clara, Calif., U.S. |
+
+### Naming
+
+Names are a more formal version of terms that we use in our products. (View terms list)
+
+Names are not required for every project. In fact, there is additional work and investment, so the decision to name something must be strategic.
+
+Refer to the Eightfold Product Naming Playbook to:
+
+- Decide if your product or feature needs a name (slide)
+- Plan a responsible timeline (slide)
+- Follow process (slide)
+
+Use the decision framework:
+
+1. Answer the questions for each option
+2. Log your assessment in relevant cell
+3. Color code it like a traffic light (yes, no, maybe)
+
+This tool will help you visually assess how your options compare to each other. You know your strategy. This helps you see it laid out!
+
+Need more help? Sign up for content design office hours. We can discuss what you want to communicate and identify design solutions to choose from. CD is here to be a strategic partner for making Eightfold products best-in-class… and helping you succeed!
+
+### Numbers
+
+- Use digits instead of text
+
+| Yes | No | Why |
+|---|---|---|
+| 3 years | Three years | Saves space, helps with translation, easier to scan |
+
+- Express ranges of numbers using a hyphen
+  - No space before and after the hyphen
+
+| Yes | No | Why |
+|---|---|---|
+| 3-9 | 3 - 9 | Clarifies that the number range is one element |
+
+- Use a comma as a thousands separator in numbers larger than 999
+
+| Yes | No | Why |
+|---|---|---|
+| 4,000,000 | 4000000 | Improves readability of numbers |
+
+- When describing pagination, use the formatting "Number of number," not "Number/number"
+
+| Yes | No | Why |
+|---|---|---|
+| 1 of 10 | 1/10 | Prevents pagination from reading like a fraction and helps with translation |
+
+### Placeholder text (a.k.a. Ghost text)
+
+The purpose of placeholder text is to:
+
+- Offer light guidance
+- Clarify what to input
+  - Provide examples of what user could input
+
+**Guidance**
+
+- Only use when it adds value to the user
+  - It is ok to use in some, but not all, form fields (this is not inconsistency)
+- Placeholder text disappears when a user begins to type
+  - Do not use to show critical information or warnings
+  - Do not use to show lengthy examples
+
+**How to write**
+
+- Short, concise instructions (ideal: 4 words or less)
+- Use existing patterns to drive consistency
+
+**Content patterns**
+
+- AI input field
+- Search bar
+
+**Learn more**
+
+- Placeholders in Form Fields Are Harmful (Nielsen Norman Group)
+
+### Pronouns
+
+- Avoid using pronouns unnecessarily
+
+| Yes | No | Why |
+|---|---|---|
+| Upload resume | You can upload your resume | Shorter. Already clear from context (who uploads, whose resume) |
+
+- Ok to use second person ("you") when it adds clarity
+
+| Yes | No | Why |
+|---|---|---|
+| When you add a URL, it will be saved to your profile. | When a URL is added, it will be saved to the profile. | Clarifies who adds the URL. Clarifies where it will be saved |
+
+- Avoid using first person ("we" or "us") to refer to Eightfold
+  - Instances are live, but will be addressed in content cleanup
+  - Exceptions ok, only when necessary for clarity
+
+| Yes | No | Why |
+|---|---|---|
+| 52 jobs match your profile and skills | We found 52 jobs that match your profile and skills | Shorter. Distracts from key info |
+
+### Punctuation
+
+- Use
+  - Serial commas (also known as the Oxford comma)
+  - For commas, decimals, and percent signs, use "Numbers" section in Eightfold documentation style guide
+
+| Yes | No | Why |
+|---|---|---|
+| Add skills, awards, and patents | Add skills, awards and patents | Keeps separate items distinct |
+
+- Use
+  - Periods in text with multiple sentences
+
+| Yes | No | Why |
+|---|---|---|
+| This is the first sentence. This is the second sentence. | This is the first sentence. This is the second sentence | Maintains consistency |
+
+- Do not use
+  - Unnecessary punctuation
+    - No periods at end of short sentences
+    - No hyphens
+    - Limit exclamation marks, semicolons, and em dashes
+
+| Yes | No | Why |
+|---|---|---|
+| This is a short sentence | This is a short sentence. / This is a short sentence! | Not necessary in the UI. Visual design separates concepts. |
+| This is one sentence. This is a second sentence. | This is one sentence. This is a second sentence | When there are multiple sentences, punctuation is needed to separate concepts. |
+| This is info · More info | This is info - more info / This is info - More info | Hyphens are informal and distracting |
+
+- Unnecessary spaces
+
+| Yes | No |
+|---|---|
+| Goal: 400 applications | Goal : 400 applications |
+
+- Punctuation as a shorthand
+
+| Yes | No |
+|---|---|
+| Add skills and awards | Add skills & awards |
+
+### Sensitive terms
+
+Some of the language we use have troubling connotations and history. This is true of some terms that are widely used in the talent industry. In all cases, we'd like to set a positive example as Eightfold. Please use your best judgment so that we don't use terms that hurt people.
+
+- Defined sensitive terms
+
+**Helpful hints:**
+
+- Don't use black, white, dark, or light as metaphors (Intuit)
+  - Yes: dark mode (literal description of darker screen)
+  - No: blacklist, whitelist (puts a positive connotation on white/light and a negative or mysterious one on black/dark)
+- Don't imply "otherness" and exclusivity (Intuit)
+  - Yes: "people from under-represented groups" or "untapped talent" or if relevant use specific groups like "Black and Hispanic" or "Black, Hispanic, Female."
+  - No: "Minority" isn't an ideal term as it contrasts something being "minor" and something "major."
+  - No: "Diverse person" or "diverse candidate(s)" have become common but are awkward (is the person themselves diverse?) "Diversity hires" also isn't ideal. It also sometimes leaves you wondering who is included in the definition. Does this include veterans? People with disabilities? Women? Asians? Is a Silicon Valley employee/executive from China or India "diverse" or not? A minority or not? Does it depend on the country they're from? Is a woman a "minority" or "diverse," when they're often the majority, not the minority, in a school or workforce?
+  - No: LatinX, Latino.
+    - Hispanic may be a better term, as someone could be from Spain but accidentally referred to as "Latino" when they're not.
+- Don't dehumanize people
+  - No: human capital
+  - No: master/slave usage for computer hardware
+- Don't assume gender
+  - Avoid pronouns
+- Use gender-neutral language
+  - Intuit
+- If an experience must refer to gender, work with eng to base language on info that user has explicitly input
+
+### Symbols
+
+- Do not use the ampersand symbol &
+  - Refer to terms list
+
+### Tags
+
+**Use carefully**
+
+- Historically, product teams have relied on tags as a quicker solution than UX best practices. Long term, leadership is asking for cleaner UI with less tags.
+- Minimize design debt by using tags for intended purposes only.
+
+**Purpose of a tag**
+
+- Highlight an element on a page in order to draw attention to it
+- Make it more searchable
+
+**Add tags to communicate**
+
+- Status of
+  - Position
+  - Candidate
+- Traits of
+  - Candidates
+  - Workflow item
+
+**Writing tags**
+
+- Short
+  - 1-2 words
+- Contextual
+  - Meaning must be clear based on context because there is no room for a lot of text
+  - Design tags in sets
+    - How does this tag work with other tags on this screen?
+    - How does this tag work with other tags in this product?
+
+### Time
+
+- Expressing time of day
+  - Use digits
+  - Always include both hour and minute
+
+| Yes | No | Why |
+|---|---|---|
+| 3:00 PM | 3 PM | Provides more detail and clarity |
+
+- Always include AM or PM (no periods, ALL CAPS)
+  - Add a space between the time and AM/PM
+
+| Yes | No | Why |
+|---|---|---|
+| 2:30 PM | 2:30 (missing AM/PM); 2:30PM (spacing); 2:30 P.M. (punctuation); 2:30 pm (capitalization); 14:30 (24 hour time); 14:30 PM (24 hour time) | Provides more detail and clarity. Adding space before AM or PM separates elements |
+
+- Expressing ranges of time
+  - Follow standards for expressing time of day
+  - Use hyphen for ranges of time
+    - No space before and after the hyphen
+
+| Yes | No | Why |
+|---|---|---|
+| 1:00 PM-3:00 PM | 1:00 PM - 3:00 PM (spacing); 1 PM-3 PM (missing minutes); 1:00-3:00 (missing AM/PM) | Clarifies that the time range is one element |
+
+- Expressing time elapsed
+  - Only use when timestamp automatically updates
+    - Otherwise information will not be accurate
+  - Use numerals
+  - Follow guidelines in table:
+
+| When this amount of time has elapsed… | Use this copy |
+|---|---|
+| Less than 1 minute | X seconds ago |
+| More than 1 minute but less than 1 hour | X minutes ago |
+| More than 1 hour but less than 1 day | X hours ago |
+| 1 day | yesterday |
+| 2 or more days but less than 91 days | X days ago |
+| More than 90 days | Date stamp (refer to date standards) |
+
+| Yes | No | Why |
+|---|---|---|
+| Last updated 01/12/24 | Last updated 213 days ago | Easier to understand an exact date when a longer period of time has elapsed |
+| Last updated 2 hours ago | Last updated today | Provides more detail |
+| Last updated yesterday | Last updated 1 day ago | Language is more natural |
+
+- If there is not enough space in the design:
+  - Abbreviating units of time is OK
+    - Refer to time abbreviations and abbreviation standards
+  - Do not pluralize abbreviations
+  - One space between the number and the abbreviation
+
+| Yes | No | Why |
+|---|---|---|
+| Last updated 12 min ago | Last updated 12 mins ago | "s" is unnecessary |
+
+### Time abbreviations
+
+| Unit | Abbreviation |
+|---|---|
+| seconds | sec |
+| minutes | min |
+| hours | hr |
+| days | d |
+| weeks | wk |
+| months | mo |
+| years | yr |
+
+### Timestamp
+
+- The info must be accurate
+- Do not use filler words, like "at" or "on"
+  - Use filler words lightly in emails, because people expect full sentences in emails
+- Show only the info that is useful in a specific context
+  - For example, if the year is not necessary, don't include in the timestamp
+- Placement
+  - The timestamp is info about when an action took place, therefore it must be visually connected to the action
+
+**Content patterns**
+
+| Yes | Why | No |
+|---|---|---|
+| `{time}` / `Autosaved {time}` / `Published {time}` — Examples: Autosaved 3:25 PM; Published 3:25 PM | System and technical info does not require sentence structure. Do not use filler words | Autosaved at {time} |
+| `{time} {date}` — Examples: 3:25 PM Dec 24; Autosaved 3:25 PM Dec 24; Published 3:25 PM Dec 24; Autosaved 3:25 PM Dec 2024; Published 3:25 PM Dec 2024; Autosaved 3:25 PM Dec 24, 2024; Published 3:25 PM Dec 24, 2024 | Follow standards for dates. Do not use filler words. Do not use filler punctuation | Autosaved at {time} on {date}; `{time}, {date}`; `{time} - {date}`; `{time}; {date}`; `{time} : {date}`; `{time} / {date}` |
+| `{time} {date}` / `Updated by {name}` — Example: 3:25 PM Dec 24, 2024 / Updated by John Doe | Use secondary text when necessary to specify key info. Use this structure for tables and lists because it is easier to scan | |
+| Your interview is scheduled for 8:00 AM on Mar 9 | Use this structure for emails because people expect to read grammatical sentences. Time and date can be bolded to highlight key info, so people can find it easily in a sentence | Your interview is scheduled for 8:00 AM Mar 9 (Incorrect in email, but correct in system generated string) |
+| `{time elapsed}` — Example: Autosaved 5 minutes ago; Published 5 minutes ago | Follow standards for time elapsed. Only use when timestamp automatically updates | |
+
+### Tooltips
+
+Brief, informative text that serves a clear purpose.
+
+- Keep it short
+  - 1-2 lines
+- Keep it concise
+  - Use bullet points or table to simplify complex data
+- Do not over-explain
+  - Info must be immediately relevant
+- Assess value before adding
+  - Tooltip must serve a purpose
+
+| Purpose | Example |
+|---|---|
+| Provide information that user can immediately act on | |
+| Provide context for users to make informed decisions | |
+| Introduce a new feature | |
+| Provide guidance about how to use a feature | |
+| Explain the reasoning for insights or recommendations | |
+| Define complex concepts | |
+| Ensure accessibility | Refer to accessibility content patterns |
+| Icon-only components (tags, buttons) must have a tooltip as label | |
+
+### Tooltip content patterns for accessibility
+
+| Icon | Tooltip |
+|---|---|
+| (kebab / more) | More actions |
+| (X) | Close |
+| (pencil) | Edit |
+| (collapse arrow) | Collapse |
+| (expand arrow) | Expand |
+| (drag handle) | Drag to reorder |
+| (trash) | Delete |
+| (info / chevron) | Details |
+| (broom / X) | Clear |

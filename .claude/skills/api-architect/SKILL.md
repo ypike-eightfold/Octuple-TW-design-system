@@ -3,7 +3,7 @@ name: api-architect
 description: >
   Designs a complete REST API specification from screen designs, user stories, and approved database schema.
   Analyses each page of the React prototype page by page, maps every UI interaction to a REST endpoint, and
-  produces a structured API spec in docs/api-spec.md with per-module sections, per-page subsections, and
+  produces a structured API spec in docs/architecture/api.md with per-module sections, per-page subsections, and
   per-endpoint input/output/method definitions with sample data. Use this skill when the user wants to define
   the API, spec out endpoints, map screens to REST calls, or produce an API contract before backend implementation.
   Always trigger after screen designs, user stories, and db-design are approved. Never produce an API spec
@@ -12,30 +12,56 @@ description: >
 
 # API Designer
 
+## Context Manifest
+
+```yaml
+unit_type: one_shot
+required_inputs:
+  - docs/product/user-stories.md
+  - docs/product/domain-doc.md
+  - docs/architecture/database.md
+  - docs/architecture/system.md
+  - docs/product/screen-inventory.md
+  - frontend/src/
+forbidden_paths:
+  - docs/product/market-research.md
+budget_tokens: 400000
+artifacts:
+  summary:          docs/architecture/api.md
+outputs:
+  - docs/architecture/api.md
+```
+
+Inline skill. Maps every page in `frontend/src/routes/` to a REST endpoint.
+
 Produces a production-ready REST API specification by walking the React screen prototype page by page, understanding what each screen does, and designing the minimum correct set of endpoints to power it as a React SPA. All endpoints follow REST best practices and are prefixed with `/api/v1/`.
 
 This skill is domain-agnostic. Every endpoint, field name, and resource is derived from what is visible in the screens and stated in the user stories — never from assumptions or domain knowledge.
 
+This skill runs inline in the forger parent thread (not as a Task subagent) — the output is a single spec doc and the skill may ask clarifying questions mid-run.
+
+---
+
 ## Pre-conditions
 
 Before proceeding, verify:
-- Approved screen designs exist (React mock screens in `frontend/src/` from react-ux-designer)
-- Approved user stories exist (`docs/user-stories.md`)
-- Domain doc exists (`docs/domain-doc.md`)
-- Approved database design exists (`docs/db-design.md` from db-architect)
-- Approved architecture exists (`docs/architecture.md` — tech stack and modules from architect Pass 1)
+- Approved screen designs exist (React mock screens in `frontend/src/` from design-tw-ux-designer)
+- Approved user stories exist (`docs/product/user-stories.md`)
+- Domain doc exists (`docs/product/domain-doc.md`)
+- Approved database design exists (`docs/architecture/database.md` from db-architect)
+- Approved architecture exists (`docs/architecture/system.md` — tech stack and modules from architect Pass 1)
 
 If any are missing, stop and tell the user which input is needed first.
 
 ### Using the Approved Database Schema
 
-Before designing endpoints, read `docs/db-design.md` to understand:
+Before designing endpoints, read `docs/architecture/database.md` to understand:
 - **Table/model names** — use these as resource names in endpoint paths (e.g., if the model is `ReviewCycle`, the resource path is `/review-cycles`)
 - **Relationships** — understand which entities are related and how, to design nested vs flat endpoints
 - **Enums and status fields** — use the exact enum values from the schema in request/response bodies
 - **JSON columns** — non-queryable data stored as JSON should be passed through as-is in responses
 
-Align response body field names with the SQLModel column names from `docs/db-design.md` (snake_case). This prevents translation bugs between API and database layers.
+Align response body field names with the SQLModel column names from `docs/architecture/database.md` (snake_case). This prevents translation bugs between API and database layers.
 
 ---
 
@@ -228,7 +254,7 @@ Derive personas and access rules entirely from the screen designs and user stori
 
 ## Phase 5 — Output File
 
-Write `docs/api-spec.md` using this exact structure:
+Write `docs/architecture/api.md` using this exact structure:
 
 ```markdown
 # API Specification
@@ -308,7 +334,7 @@ Never ask the user to type confirmations — always use clickable options.
 
 ## After Writing the File
 
-1. Confirm `docs/api-spec.md` is written
+1. Confirm `docs/architecture/api.md` is written
 2. Print the full module list with endpoint counts as a summary table:
 
 | Module | Pages | GET endpoints | Write endpoints | Total |
