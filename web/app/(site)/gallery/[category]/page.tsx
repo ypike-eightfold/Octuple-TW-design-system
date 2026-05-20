@@ -40,12 +40,14 @@ export default async function CategoryPage({ params }: { params: Params }) {
               href={`/gallery/${d.category}/${d.slug}`}
               className="group overflow-hidden rounded-lg border border-[var(--border)] bg-[var(--card)] transition hover:border-[var(--primary)]"
             >
-              <div className="aspect-[16/10] overflow-hidden bg-[var(--background)]">
-                {/* Next/image with unoptimized:true; using <img> for simplicity */}
+              <div className="overflow-hidden bg-[var(--background)]">
+                {/* Thumbnail fills the card width and keeps the full screenshot
+                    visible (no crop). The screenshots are 1440×900 so the
+                    aspect ratio stays consistent across cards on its own. */}
                 <img
                   src={d.thumbnailUrl}
                   alt=""
-                  className="h-full w-full object-cover transition group-hover:scale-[1.02]"
+                  className="block w-full h-auto transition group-hover:scale-[1.01]"
                 />
               </div>
               <div className="p-4">

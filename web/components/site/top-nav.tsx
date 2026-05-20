@@ -33,10 +33,11 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
   const active = activeTabFor(pathname);
 
   return (
-    <header className="sticky top-0 z-50 h-16 border-b border-[var(--border)] bg-[var(--card)]">
-      {/* Full-width inner so the brand sits at the left edge of the viewport
-          (matching the catalog's full-width sidebar+main layout) instead of
-          floating inside a max-w-6xl box that misaligns with /components. */}
+    <header className="sticky top-0 z-50 h-16 border-b border-white/30 bg-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/30">
+      {/* Glassmorphism: translucent fill + backdrop-blur so the hero
+          illustration on /  shows through the nav. On routes without
+          a hero behind it, the card-color underlay still reads as a
+          clean header thanks to the body background. */}
       <div className="flex h-full w-full items-center justify-between gap-4 px-6">
         <Link href="/" className="flex items-center gap-3">
           <img
