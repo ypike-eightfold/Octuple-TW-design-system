@@ -1384,11 +1384,11 @@ export default function App() {
     <div className="min-h-screen bg-background text-foreground font-sans antialiased">
       <aside className="fixed left-0 top-0 z-40 flex h-screen w-56 flex-col border-r border-border bg-background">
         <div className="flex h-14 shrink-0 items-center gap-2 border-b border-border px-4">
-          {/* Octuple logo (same as the global top nav). EIGHTFOLD_LOGO_PATH
+          {/* Octuple logo (PNG, same as the global top nav). EIGHTFOLD_LOGO_PATH
               continues to power the Navbar component examples below so the
               catalog still shows what those components actually look like
               with the brand logo. */}
-          <img src="/octuple-logo.svg" alt="" className="h-6 w-6 shrink-0 object-contain" />
+          <img src="/octuple-logo.png" alt="" className="h-6 w-6 shrink-0 object-contain" />
           <span className="font-semibold tracking-tight text-foreground">Design System</span>
         </div>
         <nav className="flex-1 overflow-y-auto overflow-x-hidden px-2 py-4 scrollbar-hidden">

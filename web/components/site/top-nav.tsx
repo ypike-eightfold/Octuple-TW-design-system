@@ -24,9 +24,10 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
     <header className="border-b border-[var(--border)] bg-[var(--card)]">
       <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 px-6 py-4">
         <Link href="/" className="flex items-center gap-3">
-          {/* Octuple logo. Sits next to the wordmark; clicking either returns home. */}
+          {/* Octuple logo (PNG; the brand version with the full-color gradient).
+              Sits next to the wordmark; clicking either returns home. */}
           <img
-            src="/octuple-logo.svg"
+            src="/octuple-logo.png"
             alt=""
             aria-hidden
             className="h-7 w-7 shrink-0 object-contain"
