@@ -4,8 +4,9 @@ import { auth, signOut } from "@/auth";
 import { TopNav } from "@/components/site/top-nav";
 
 export const metadata: Metadata = {
-  title: "Eightfold Design System",
-  description: "Components, designs, and Claude Code skills for Eightfold products.",
+  title: "Design at Eightfold AI",
+  description:
+    "The design system, patterns, content guidelines, and gallery of approved designs for Eightfold AI products.",
   robots: { index: false, follow: false },
 };
 

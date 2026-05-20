@@ -45,7 +45,7 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
             aria-hidden
             className="h-7 w-7 shrink-0 object-contain"
           />
-          <span className="font-semibold whitespace-nowrap">EF Design System</span>
+          <span className="font-semibold whitespace-nowrap">Design at Eightfold AI</span>
         </Link>
 
         {/* Design system's Tabs primitive (line variant). Wrapped in a
