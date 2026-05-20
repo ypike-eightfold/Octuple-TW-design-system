@@ -3,6 +3,9 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
+  // Hide the floating Next.js "N" dev indicator so screenshots used for the
+  // gallery thumbnails don't end up with a debug badge baked in.
+  devIndicators: false,
   // Vendored shadcn primitives in /components/ui/ reference type names that
   // don't exist in the currently-pinned versions of some Radix/react-resizable
   // packages. The components work at runtime; TypeScript type-only mismatches

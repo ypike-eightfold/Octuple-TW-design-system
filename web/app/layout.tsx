@@ -21,6 +21,15 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang="en">
+      <head>
+        {/* Material Symbols Outlined — ef-design-system's Pill, InsightCard,
+            StatCard, etc. render icons via <span class="material-symbols-outlined">.
+            Without this stylesheet the icon names fall back to literal text. */}
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&display=swap"
+        />
+      </head>
       <body>
         <TopNav
           session={session}
