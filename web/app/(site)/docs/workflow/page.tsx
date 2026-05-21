@@ -15,12 +15,12 @@ function hasScreenshot(filename: string): boolean {
   }
 }
 
-/** Stacked step block: text on top, screenshot below at a comfortable
-    reading width. Images use w-full + a max-width so they never get
-    cramped into a narrow side column, and they don't blow up to span
-    the full page on wide viewports. If the screenshot file isn't in
-    /docs-screenshots/ yet, renders a labeled placeholder card showing
-    the expected filename. */
+/** Stacked step block: text on top, optional screenshot below at a
+    comfortable reading width. Pass `screenshot` + `caption` to show
+    the image (or a "screenshot pending" placeholder if the file isn't
+    in /docs-screenshots/ yet). Omit both to render a text-only step —
+    used for steps that don't need an illustration (e.g. "send an
+    email", "authorize an OAuth prompt"). */
 function Step({
   number,
   title,
@@ -30,11 +30,13 @@ function Step({
 }: {
   number?: number;
   title: string;
-  screenshot: string;
-  caption: string;
+  screenshot?: string;
+  caption?: string;
   children: React.ReactNode;
 }) {
-  const available = hasScreenshot(screenshot);
+  // No screenshot prop → text-only step, no image slot at all.
+  const showSlot = Boolean(screenshot);
+  const available = showSlot && hasScreenshot(screenshot!);
   return (
     <section className="border-t border-[var(--border)] py-10">
       <h3 className="text-xl font-semibold tracking-tight">
@@ -42,30 +44,34 @@ function Step({
         {title}
       </h3>
       <div className="mt-3 space-y-3 leading-relaxed">{children}</div>
-      <div className="mt-6">
-        {available ? (
-          <figure>
-            <img
-              src={`/docs-screenshots/${screenshot}`}
-              alt={caption}
-              className="w-full rounded-lg border border-[var(--border)] shadow-sm"
-            />
-            <figcaption className="mt-2 text-xs text-[var(--muted-foreground)]">{caption}</figcaption>
-          </figure>
-        ) : (
-          <div className="flex aspect-[1440/900] w-full items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-[var(--card)] p-6 text-center">
-            <div className="space-y-3">
-              <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
-                Screenshot pending
+      {showSlot && (
+        <div className="mt-6">
+          {available ? (
+            <figure>
+              <img
+                src={`/docs-screenshots/${screenshot}`}
+                alt={caption ?? ""}
+                className="w-full rounded-lg border border-[var(--border)] shadow-sm"
+              />
+              {caption && (
+                <figcaption className="mt-2 text-xs text-[var(--muted-foreground)]">{caption}</figcaption>
+              )}
+            </figure>
+          ) : (
+            <div className="flex aspect-[1440/900] w-full items-center justify-center rounded-lg border border-dashed border-[var(--border)] bg-[var(--card)] p-6 text-center">
+              <div className="space-y-3">
+                <div className="text-[10px] font-semibold uppercase tracking-wider text-[var(--muted-foreground)]">
+                  Screenshot pending
+                </div>
+                {caption && <p className="text-sm">{caption}</p>}
+                <code className="inline-block rounded bg-[var(--background)] px-2 py-1 text-[11px] font-mono text-[var(--muted-foreground)] border border-[var(--border)]">
+                  /docs-screenshots/{screenshot}
+                </code>
               </div>
-              <p className="text-sm">{caption}</p>
-              <code className="inline-block rounded bg-[var(--background)] px-2 py-1 text-[11px] font-mono text-[var(--muted-foreground)] border border-[var(--border)]">
-                /docs-screenshots/{screenshot}
-              </code>
             </div>
-          </div>
-        )}
-      </div>
+          )}
+        </div>
+      )}
     </section>
   );
 }
@@ -108,8 +114,6 @@ export default function WorkflowPage() {
       <Step
         number={1}
         title="Get added to the Eightfold GitHub org"
-        screenshot="step-01-email-helpdesk.png"
-        caption="An email composed to helpdesk@eightfold.ai requesting Eightfold GitHub org access (include your GitHub username)."
       >
         <p>
           Email{" "}
@@ -188,8 +192,6 @@ export default function WorkflowPage() {
       <Step
         number={5}
         title="The first time Claude talks to GitHub"
-        screenshot="step-05-gh-auth-login.png"
-        caption="The GitHub OAuth authorization page that opens when Claude runs `gh auth login` for the first time."
       >
         <p>
           The first time you ask Claude to do anything with GitHub (clone the repo, push a design),
