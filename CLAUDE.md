@@ -6,7 +6,7 @@ When a designer (or anyone) opens a session in this repo, the **first thing to f
 
 ---
 
-## At session start: ask which version
+## Version routing — ask before any design work
 
 The repo supports two design systems:
 
@@ -15,16 +15,74 @@ The repo supports two design systems:
 | **Tailwind (`tw`)** | The new `ef-design-system` package — Tailwind v4, shadcn-style utilities, lives in `src/`. Components shown at https://ef-design-system.vercel.app/. | New projects, greenfield work, anything that doesn't need to drop into an existing OG product. |
 | **OG Octuple (`og`)** | The original Eightfold Octuple component library — pre-Tailwind, classic CSS, lives upstream at https://github.com/EightfoldAI/octuple. Most existing Eightfold products use this. | Working on or alongside existing TA / TM / Octuple / Career Hub product surfaces. |
 
-**Required behavior:** at the start of any new design conversation, if the user has not already stated which version they want, ask them. One short question, two options (tw / og), plus "I'm not sure — recommend one." If they're not sure, recommend `tw` for greenfield and `og` for changes that have to integrate with an existing product surface.
+### The rule (MUST, not SHOULD)
 
-Once a version is chosen, **only invoke skills matching that prefix** for design work in this session:
+**The very first time a user prompt contains a design verb in this session, Claude MUST stop and ask which version — unless the version is already pinned (see "Skip the ask" below).** Don't grep the codebase, don't load skills, don't draft code, don't propose options. Just ask.
+
+**Design verbs that trigger the ask:** *design, build, mock, wireframe, prototype, sketch, create, add, layout, redesign, refactor, restyle, fix, change, update, screen, page, view, dashboard, form, modal, dialog, drawer, table, card, button, nav, header, footer, sidebar, tab.* Plural and -ing forms count. Product-area words (employee profile, talent acquisition, career hub, etc.) imply a design verb.
+
+**The question, verbatim:**
+
+> Quick gate before I touch anything: which design system version are you working in?
+>
+> - **`tw`** — new Tailwind ef-design-system (greenfield)
+> - **`og`** — original Octuple (existing Eightfold products)
+> - **Not sure** — I'll recommend based on context
+
+Wait for the answer. Don't proceed until you have one.
+
+### Skip the ask
+
+Only skip the question when **one** of these is unambiguous:
+
+1. The user already named the version in the current message ("design X with Octuple", "build a tw mock of Y", "/design-og-ux-designer …").
+2. The user named the version earlier in this conversation and the new request is clearly the same body of work.
+3. The user is editing an existing file whose imports already pin the version (e.g. they say "edit `frontend/src/pages/Foo.tsx`" and Foo.tsx imports from `@eightfold.ai/octuple` → OG, or from `@tonyh-2-eightfold/ef-design-system` → tw).
+4. The user invoked a versioned skill explicitly (`/design-tw-frontend-engineer`, etc.).
+
+When skipping, state which signal you used in one short line ("Going with `og` — your prompt said Octuple") so the user can correct you on the spot.
+
+### What "Not sure" means
+
+If the user picks "Not sure," recommend based on these signals, in order:
+
+1. Did they mention an existing product surface (TA, TM, Career Hub, Talent Forge)? → `og`
+2. Is the work greenfield or "new project"? → `tw`
+3. Is the work touching a file whose imports name one library? → that one.
+4. Default → `tw`.
+
+Recommend, give a one-line reason, then wait for confirmation.
+
+### After the version is chosen
+
+For this session, **only invoke skills matching that prefix** for design work:
 
 - `tw` → `design-tw-ux-designer`, `design-tw-frontend-engineer`
 - `og` → `design-og-ux-designer`, `design-og-frontend-engineer`, `design-og-component-reference`
 
 Non-versioned skills (architect, story-writer, ui-builder, publish-design, etc.) apply to either.
 
-If a user explicitly invokes a skill by name (e.g. they type `/design-og-ux-designer`), that overrides the routing — no need to ask.
+### Examples
+
+**Triggers the ask:**
+
+- "Design a manager review screen." → ask
+- "Add a new tab to the talent profile page." → ask (talent profile = product surface, but doesn't name a version)
+- "Build a dashboard for the recruiter view." → ask
+- "Mock up the org chart." → ask
+
+**Skips the ask:**
+
+- "Design a tw mock of the recruiter dashboard." → skip, use `tw`. State why.
+- "Build this in Octuple: a candidate pipeline view." → skip, use `og`. State why.
+- "Edit `frontend/src/pages/Recruiter.tsx` to add a search bar." → check the file's imports first; if they pin a version, skip and state which.
+- "/design-og-ux-designer design a manager review screen." → skip, the slash command pins `og`.
+
+**Doesn't trigger (no design verb):**
+
+- "What's in this repo?" → no ask
+- "Where are the skills defined?" → no ask
+- "Explain how the gallery works." → no ask
 
 ---
 

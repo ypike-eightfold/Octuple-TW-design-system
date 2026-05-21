@@ -131,17 +131,17 @@ export default function WorkflowPage() {
         number={2}
         title="Install Claude Code"
         screenshot="step-02-install-claude-code.png"
-        caption="The Claude Code download page at claude.com/claude-code."
+        caption="The Claude download page at claude.com/download — desktop + Claude Code in one place."
       >
         <p>
           Download from{" "}
           <a
-            href="https://claude.com/claude-code"
+            href="https://claude.com/download"
             className="text-[var(--primary)] underline"
             target="_blank"
             rel="noopener noreferrer"
           >
-            https://claude.com/claude-code
+            https://claude.com/download
           </a>{" "}
           and run the installer. Sign in with your Anthropic account.
         </p>
