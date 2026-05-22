@@ -936,6 +936,7 @@ it("responds to --primary override", () => {
 | Component Patterns | references/component-patterns.md | Tables, forms, dashboards, wizards, timelines with code examples |
 | API Integration | references/api-integration.md | TanStack Query template, axios setup, error handling, pagination |
 | Best Practices | references/best-practices.md | Anti-flakiness rules for reliable generation across sessions |
+| **Accessibility** | references/accessibility.md | WCAG 2.1 AA + WCAG 2.2 AA. Radix/shadcn primitives that already handle ARIA, where ARIA still has to be hand-wired (icon-only Buttons, live regions, sortable tables), color/contrast through the semantic token contract, keyboard patterns, screen reader testing, the WCAG 2.2 net-new criteria (focus-not-obscured, dragging, target size, consistent help, redundant entry, accessible authentication). |
 | **Skill Reference** | docs/skill-reference-shiftpulse-retro.md | Cross-skill mistake catalog, ESLint rules, type boundary rules |
 | Content Design Standards | ../_content/content-design-standards.md | Eightfold writing voice, grammar, UI copy patterns (buttons, errors, empty states, aria-labels). **Shared between Tailwind and OG** — single source of truth. |
 | Terms List | ../_content/terms-list.md | Authoritative Eightfold product terminology — branded terms, approved usage, do-not-use alternatives. **GREP this file** for specific terms — 4,000+ lines, not meant to be read end-to-end. |
