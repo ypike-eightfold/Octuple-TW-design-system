@@ -4,6 +4,8 @@ Octuple DS Theme 2 components for Eightfold applications, plus the Claude Code s
 
 > **Designers — start here:** [docs/DESIGNER-WORKFLOW.md](docs/DESIGNER-WORKFLOW.md). End-to-end walkthrough of how to use this repo from "I have an idea" to "the design is live in the gallery" — no terminal experience required.
 
+> **Active development happens at [`ypike-eightfold/Octuple-TW-design-system`](https://github.com/ypike-eightfold/Octuple-TW-design-system).** This file was originally seeded from `tonyh-2-eightfold/ef-design-system` (the published npm package still uses that scope). The fork is where designers clone from, where the gallery deploys to Vercel, and where new content/skill/feature PRs land.
+
 ## Contents
 
 - **Tokens**: Typography, color palette, semantic colors, spacing, and corner radius (Octuple DS Theme 2). Figma: [typography 47:3](https://www.figma.com/design/SlKRC7oKF7XZyHMv2op4ch/Octuple-DS--Theme-2-?m=auto&node-id=47-3), [palette 11686:119298](https://www.figma.com/design/SlKRC7oKF7XZyHMv2op4ch/Octuple-DS--Theme-2-?m=auto&node-id=11686-119298), [semantic tokens 25849:127027](https://www.figma.com/design/SlKRC7oKF7XZyHMv2op4ch/Octuple-DS--Theme-2-?m=auto&node-id=25849-127027), [spacing & corner radius 11686:120880](https://www.figma.com/design/SlKRC7oKF7XZyHMv2op4ch/Octuple-DS--Theme-2-?m=auto&node-id=11686-120880)

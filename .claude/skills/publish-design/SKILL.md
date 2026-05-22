@@ -13,7 +13,7 @@ Takes a finished design — built with either the Tailwind (`design-tw-*`) or OG
 The gallery is **PR-merge-driven**: designs only appear in the gallery after a PR merges into `main`. This skill never bypasses that. It assumes:
 
 - `gh` CLI is installed and authenticated against the eightfold-ai GitHub org
-- The working directory is a clone of `tonyh-2-eightfold/ef-design-system`
+- The working directory is a clone of `ypike-eightfold/Octuple-TW-design-system`
 - The designer has write access to the repo (branch-on-main-repo workflow, not fork-and-PR)
 
 If any of those are not met, the skill reports the missing prerequisite and stops.

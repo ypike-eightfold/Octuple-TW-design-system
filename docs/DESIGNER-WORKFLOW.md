@@ -28,7 +28,7 @@ Download the **LTS** version from https://nodejs.org and run the installer. Clic
 
 ### 4. Get added to the design-system repo
 
-Once you're in the Eightfold org (step 1), ask whoever owns the `tonyh-2-eightfold/ef-design-system` repo to add you as a collaborator with **write** access. You'll get an email.
+Once you're in the Eightfold org (step 1), ask whoever owns the `ypike-eightfold/Octuple-TW-design-system` repo to add you as a collaborator with **write** access. You'll get an email.
 
 ### 5. The first time Claude talks to GitHub
 
@@ -44,7 +44,7 @@ You'll never have to do this again on this laptop.
 
 If this is your **first time** on this laptop, ask:
 
-> **You:** Clone the ef-design-system repo from `tonyh-2-eightfold/ef-design-system` to my Desktop.
+> **You:** Clone the design system repo from `ypike-eightfold/Octuple-TW-design-system` to my Desktop.
 
 Claude will create a folder on your Desktop with the repo in it.
 

@@ -111,8 +111,8 @@ If the org already has a token (`apps-script-content-sync`), skip to step 2.
 1. GitHub → **Settings (avatar) → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
 2. **Name:** `apps-script-content-sync`
 3. **Expiration:** 1 year. Set a calendar reminder to rotate.
-4. **Resource owner:** the org that owns `ef-design-system` (`tonyh-2-eightfold`).
-5. **Repository access:** *Only select repositories* → `ef-design-system`.
+4. **Resource owner:** your GitHub account (`ypike-eightfold`) — the account that owns the fork the script writes to.
+5. **Repository access:** *Only select repositories* → `Octuple-TW-design-system`.
 6. **Repository permissions** → **Contents** → **Read and write**. (That's the only permission needed. Leave everything else at "No access.")
 7. **Generate token.** Copy the token string somewhere safe — you'll need to paste it once per doc in step 4.
 

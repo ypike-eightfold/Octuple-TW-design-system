@@ -18,7 +18,7 @@ missing, it renders a labeled placeholder showing the expected filename.
 | `step-01-email-helpdesk.png` | An email composed to helpdesk@eightfold.ai asking for Eightfold GitHub org access |
 | `step-02-install-claude-code.png` | The Claude Code download page at claude.com/claude-code |
 | `step-03-install-nodejs.png` | The Node.js download page at nodejs.org with the LTS version highlighted |
-| `step-04-github-repo.png` | The tonyh-2-eightfold/ef-design-system repository main page on GitHub |
+| `step-04-github-repo.png` | The ypike-eightfold/Octuple-TW-design-system repository main page on GitHub |
 | `step-05-gh-auth-login.png` | The GitHub OAuth authorization page that opens when Claude runs `gh auth login` |
 | `step-day-01-clone-repo.png` | Claude Code conversation showing "Clone the ef-design-system repo to my Desktop" |
 | `step-day-02-version-question.png` | Claude Code asking which design-system version (tw / og) |
