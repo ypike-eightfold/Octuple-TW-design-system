@@ -939,3 +939,7 @@ it("responds to --primary override", () => {
 | **Skill Reference** | docs/skill-reference-shiftpulse-retro.md | Cross-skill mistake catalog, ESLint rules, type boundary rules |
 | Content Design Standards | ../_content/content-design-standards.md | Eightfold writing voice, grammar, UI copy patterns (buttons, errors, empty states, aria-labels). **Shared between Tailwind and OG** — single source of truth. |
 | Terms List | ../_content/terms-list.md | Authoritative Eightfold product terminology — branded terms, approved usage, do-not-use alternatives. **GREP this file** for specific terms — 4,000+ lines, not meant to be read end-to-end. |
+| Gem: Response Confidence Score | ../../../gems/response-confidence-score.md | Confidence-scoring rubric for AI-mediated UI copy. Apply when shipping UI that needs to signal AI uncertainty. |
+| Gem: Guidance Layer | ../../../gems/guidance-layer.md | Guidance-layer guardrails — how to express limitations and defer to a human in AI features. |
+| Gem: OH Prompt Instructions | ../../../gems/OH/prompt-instructions.md | OH Gem persona + scope. Reference when building screens that interact with OH. |
+| Gem: OH Content Quality Framework | ../../../gems/OH/content-quality-framework.md | Content-quality rubric used by OH. Apply to copy on screens that present OH outputs. |

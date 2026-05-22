@@ -76,6 +76,10 @@ This skill ships with detail docs for specific concerns. Read the relevant one b
 | [`localization.md`](localization.md) | Date / number / currency formatting; no hardcoded locale strings |
 | [`../_content/content-design-standards.md`](../_content/content-design-standards.md) | Eightfold writing voice/tone, grammar rules, UI copy patterns (buttons, errors, empty states, tooltips), accessibility writing requirements. **Shared between Tailwind and OG versions** — single source of truth. |
 | [`../_content/terms-list.md`](../_content/terms-list.md) | Authoritative Eightfold product terminology — branded terms, approved usage, do-not-use alternatives. **GREP this file** for specific terms — 4,000+ lines, not meant to be read end-to-end. Shared between Tailwind and OG. |
+| [`../../../gems/response-confidence-score.md`](../../../gems/response-confidence-score.md) | Rubric for response confidence scoring — apply when generating AI-mediated UI copy (chat responses, recommendations) that needs to signal uncertainty. |
+| [`../../../gems/guidance-layer.md`](../../../gems/guidance-layer.md) | Guidance-layer guardrails — how to express limitations, when to defer to a human, what to surface alongside an AI response. Shapes copy for AI features. |
+| [`../../../gems/OH/prompt-instructions.md`](../../../gems/OH/prompt-instructions.md) | The OH Gem's persona, scope, allowed topics, and response format. Use as a reference when designing screens that interact with OH. |
+| [`../../../gems/OH/content-quality-framework.md`](../../../gems/OH/content-quality-framework.md) | The content-quality rubric the OH Gem uses to evaluate, draft, and refine responses. Apply the same rubric to copy on screens that present OH outputs. |
 
 ---
 

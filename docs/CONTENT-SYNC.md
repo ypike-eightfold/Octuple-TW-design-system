@@ -15,15 +15,18 @@ This file documents:
 
 ## Doc → file map
 
-| Google Doc (canonical source) | Target file in this repo |
-|---|---|
-| Content Design Standards | `.claude/skills/_content/content-design-standards.md` |
-| Terms List | `.claude/skills/_content/terms-list.md` |
-| _doc 3 — TBD_ | `.claude/skills/_content/<filename>.md` |
-| _doc 4 — TBD_ | `.claude/skills/_content/<filename>.md` |
-| _doc 5 — TBD_ | `.claude/skills/_content/<filename>.md` |
+| # | Google Doc (canonical source) | Target file in this repo | `COMMIT_PREFIX` |
+|---|---|---|---|
+| 1 | Content Design Standards | `.claude/skills/_content/content-design-standards.md` | `content: sync "Content Design Standards"` |
+| 2 | Terms list | `.claude/skills/_content/terms-list.md` | `content: sync "Terms List"` |
+| 3 | response_confidence_score instructions for custom Gem | `gems/response-confidence-score.md` | `gems: sync "Response Confidence Score"` |
+| 4 | Guidance layer instructions | `gems/guidance-layer.md` | `gems: sync "Guidance Layer"` |
+| 5 | Gem OH prompt instructions | `gems/OH/prompt-instructions.md` | `gems(OH): sync "Prompt Instructions"` |
+| 6 | Content quality framework for Gem OH | `gems/OH/content-quality-framework.md` | `gems(OH): sync "Content Quality Framework"` |
 
-When you add a new synced doc, update this table.
+Docs 1+2 are shared content read by every design skill. Docs 3+4 are generic Gem instructions (used by any custom Gem). Docs 5+6 are specific to the OH Gem. When you add a new synced doc, update this table.
+
+> **Heads up on docs 3–6:** the placeholder files exist with the right frontmatter + AUTO-SYNCED banner. The first run of each doc's Apps Script will replace the "Awaiting first sync" body with the actual content. See [`gems/README.md`](../gems/README.md) for the gem-tree layout.
 
 ---
 

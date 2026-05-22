@@ -138,6 +138,25 @@ Both `design-tw-ux-designer` and `design-og-ux-designer` reference these. If you
 
 ---
 
+## Gem instructions — applied when designing AI features
+
+Alongside the shared content rules, four files under `gems/` carry the source-of-truth instructions for internal Eightfold custom Gems (Google Gemini assistants):
+
+```
+gems/
+├── response-confidence-score.md     # generic: rubric for AI uncertainty scoring
+├── guidance-layer.md                # generic: AI guardrails + when-to-defer rules
+└── OH/                              # specific to the OH Gem
+    ├── prompt-instructions.md       # OH persona, scope, allowed topics
+    └── content-quality-framework.md # OH content rubric
+```
+
+These aren't Claude Code skills — they're version-controlled mirrors of Google Docs that the design skills (`design-og-ux-designer`, `design-og-frontend-engineer`, `design-tw-ux-designer`, `design-tw-frontend-engineer`) reference when generating UI copy for AI-mediated screens. That way Claude's output matches what the OH Gem itself would produce.
+
+The Google Doc is canonical. Each `.md` is auto-synced via Apps Script — see [`docs/CONTENT-SYNC.md`](docs/CONTENT-SYNC.md). Don't hand-edit the files; they get overwritten on the next sync.
+
+---
+
 ## Unified web app — landing, components, gallery, docs
 
 A single Next.js 15 app under `web/` powers everything served at `ef-design-system.vercel.app`:

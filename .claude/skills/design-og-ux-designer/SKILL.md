@@ -42,6 +42,10 @@ Before designing:
 | `../design-og-frontend-engineer/references/learnings.md` | Accumulated quirks — e.g. SearchBox is officially supported but the team avoids it. Knowing these shapes the design. |
 | [`../_content/content-design-standards.md`](../_content/content-design-standards.md) | Voice, tone, grammar for every piece of text in the design. |
 | [`../_content/terms-list.md`](../_content/terms-list.md) | Authoritative product terminology — **grep this** for any term you're tempted to make up. |
+| [`../../../gems/response-confidence-score.md`](../../../gems/response-confidence-score.md) | Rubric for response confidence scoring — apply when generating AI-mediated UI copy (chat responses, recommendations, search results) that needs to signal uncertainty. |
+| [`../../../gems/guidance-layer.md`](../../../gems/guidance-layer.md) | Guidance-layer guardrails — how to express limitations, when to defer to a human, what to surface alongside an AI response. Shapes copy for AI features. |
+| [`../../../gems/OH/prompt-instructions.md`](../../../gems/OH/prompt-instructions.md) | The OH Gem's persona, scope, allowed topics, and response format. Use as a reference when designing screens that interact with OH. |
+| [`../../../gems/OH/content-quality-framework.md`](../../../gems/OH/content-quality-framework.md) | The content-quality rubric the OH Gem uses to evaluate, draft, and refine responses. Apply the same rubric to copy on screens that present OH outputs. |
 
 ---
 

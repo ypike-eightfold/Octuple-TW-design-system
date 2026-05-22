@@ -42,6 +42,10 @@ Before writing any code:
 | `../design-og-component-reference/components/<Name>.md` | Per-component deep docs. Grep for the specific component you need. |
 | `../_content/content-design-standards.md` | Voice, tone, and copy rules for every label, button, error, tooltip. |
 | `../_content/terms-list.md` | Authoritative product terminology — grep for the specific term. |
+| `../../../gems/response-confidence-score.md` | Confidence-scoring rubric for AI-mediated copy (chat responses, recommendations). Apply when shipping UI that needs to signal AI uncertainty. |
+| `../../../gems/guidance-layer.md` | Guidance-layer guardrails — how to express limitations and defer to a human in AI features. |
+| `../../../gems/OH/prompt-instructions.md` | OH Gem persona + scope. Reference when building screens that interact with OH. |
+| `../../../gems/OH/content-quality-framework.md` | Content-quality rubric used by OH. Apply to copy on screens that present OH outputs. |
 
 ---
 
