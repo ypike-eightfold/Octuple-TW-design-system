@@ -2030,8 +2030,368 @@ useEffect(() => {
 
 ---
 
-**Last Updated:** November 20, 2024  
-**Version:** 1.10.0  
-**Status:** ✅ Complete and WCAG 2.1 Level AA Compliant
+## WCAG 2.2 — New Success Criteria
+
+WCAG 2.2 (W3C Recommendation, October 2023) added six net-new success criteria on top of WCAG 2.1. Octuple applications targeting WCAG 2.2 AA must satisfy all six.
+
+### 2.4.11 Focus Not Obscured (Minimum) — Level AA
+
+**Goal:** When an element receives focus, no part of it should be hidden by author-created content (sticky headers, fixed footers, cookie banners, persistent toasts).
+
+**Anti-pattern:**
+```tsx
+// ❌ Sticky header — focused element scrolls behind it
+<Layout.Header style={{ position: 'fixed', top: 0, height: 64, width: '100%' }}>
+  ...
+</Layout.Header>
+<Layout.Content>
+  {/* When you Tab to a TextInput near the top, the header covers it */}
+  <TextInput id="name" />
+</Layout.Content>
+```
+
+**Fix — scroll-margin on focusable elements:**
+```css
+/* Global focus styles in your app stylesheet */
+:focus-visible {
+  scroll-margin-top: 80px;  /* matches the sticky header height */
+}
+```
+
+```tsx
+// Or per-element via inline style
+<TextInput id="name" style={{ scrollMarginTop: '80px' }} />
+```
+
+**Fix — auto-collapse the sticky element on focus near the top:**
+```tsx
+import { useEffect, useRef } from 'react';
+
+const headerRef = useRef<HTMLDivElement>(null);
+
+useEffect(() => {
+  const handler = (e: FocusEvent) => {
+    const target = e.target as HTMLElement | null;
+    if (!target || !headerRef.current) return;
+    const headerRect = headerRef.current.getBoundingClientRect();
+    const targetRect = target.getBoundingClientRect();
+    if (targetRect.top < headerRect.bottom) {
+      headerRef.current.style.transform = 'translateY(-100%)';
+    }
+  };
+  document.addEventListener('focusin', handler);
+  return () => document.removeEventListener('focusin', handler);
+}, []);
+
+return (
+  <Layout.Header ref={headerRef} style={{ position: 'fixed', top: 0, transition: 'transform 200ms' }}>
+    ...
+  </Layout.Header>
+);
+```
+
+**Quick test:** Tab through the page. The currently focused element must be fully visible at all times.
+
+---
+
+### 2.5.7 Dragging Movements — Level AA
+
+**Goal:** Any drag-and-drop action must have a single-pointer (click / tap) or keyboard alternative.
+
+**Anti-pattern:**
+```tsx
+// ❌ Drag-only reorder using react-beautiful-dnd / react-dnd with no keyboard fallback
+<DragDropContext onDragEnd={handleReorder}>
+  <Droppable droppableId="goals">
+    {(provided) => (
+      <ul ref={provided.innerRef} {...provided.droppableProps}>
+        {goals.map((g, i) => (
+          <Draggable key={g.id} draggableId={g.id} index={i}>
+            {(prov) => (
+              <li ref={prov.innerRef} {...prov.draggableProps} {...prov.dragHandleProps}>
+                {g.title}
+              </li>
+            )}
+          </Draggable>
+        ))}
+      </ul>
+    )}
+  </Droppable>
+</DragDropContext>
+```
+
+**Fix — add up/down buttons alongside the drag handle:**
+```tsx
+import { mdiDragVertical, mdiChevronUp, mdiChevronDown } from '@mdi/js';
+import { Button, ButtonShape, ButtonVariant } from '@eightfold.ai/octuple';
+
+const ReorderableGoal = ({ goal, index, onMoveUp, onMoveDown, isFirst, isLast }) => (
+  <li style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+    <Icon path={mdiDragVertical} aria-hidden="true" />
+    <span style={{ flex: 1 }}>{goal.title}</span>
+    <Button
+      iconProps={{ path: mdiChevronUp as IconName }}
+      ariaLabel={`Move "${goal.title}" up`}
+      disabled={isFirst}
+      shape={ButtonShape.Round}
+      variant={ButtonVariant.Neutral}
+      onClick={() => onMoveUp(index)}
+    />
+    <Button
+      iconProps={{ path: mdiChevronDown as IconName }}
+      ariaLabel={`Move "${goal.title}" down`}
+      disabled={isLast}
+      shape={ButtonShape.Round}
+      variant={ButtonVariant.Neutral}
+      onClick={() => onMoveDown(index)}
+    />
+  </li>
+);
+```
+
+**Quick test:** Disconnect your mouse. Can you reorder, move, or pan every drag interaction with keyboard alone?
+
+---
+
+### 2.5.8 Target Size (Minimum) — Level AA
+
+**Goal:** Pointer targets at least **24×24 CSS px** (Octuple aims for 40×40 wherever practical).
+
+**Anti-pattern:**
+```tsx
+// ❌ 16x16 icon button via a raw <span>, tap target too small on mobile
+<span onClick={handleRemove} style={{ width: 16, height: 16, cursor: 'pointer' }}>
+  <Icon path={mdiClose} size={0.7} />
+</span>
+```
+
+**Fix — use Octuple Button (default 40×40 hit area):**
+```tsx
+// ✅ Octuple Button — meets target size by default
+<Button
+  iconProps={{ path: mdiClose as IconName }}
+  ariaLabel="Remove tag"
+  shape={ButtonShape.Round}
+  size={ButtonSize.Small}  // still 32×32+
+  variant={ButtonVariant.Neutral}
+  onClick={handleRemove}
+/>
+
+// ✅ For 16-px icons that must be tappable, expand the hit area
+<button
+  type="button"
+  aria-label="Remove tag"
+  style={{
+    position: 'relative',
+    width: 16,
+    height: 16,
+    background: 'transparent',
+    border: 'none',
+    cursor: 'pointer',
+  }}
+>
+  {/* Pseudo-element via inline span padding the hit area to 24x24 */}
+  <span
+    style={{
+      position: 'absolute',
+      inset: -4,
+    }}
+  />
+  <Icon path={mdiClose} size={0.7} />
+</button>
+```
+
+**Exceptions allowed by WCAG 2.2:**
+- Inline text links (within a sentence)
+- Equivalent target available elsewhere on the page
+- Browser- or user-agent-controlled targets
+
+**Quick test:** Use Chrome DevTools → Toggle device toolbar → Mobile (iPhone). Tap every interactive element. Anything < 24×24 fails.
+
+---
+
+### 3.2.6 Consistent Help — Level A
+
+**Goal:** Help mechanisms (contact link, chat widget, help center link, support email) appear in the same relative location across pages.
+
+**Anti-pattern:**
+```
+Page A: Help link in top nav
+Page B: Help link in footer
+Page C: No help link at all
+```
+
+**Fix — put help in your AppShell:**
+```tsx
+import { mdiHelpCircle } from '@mdi/js';
+
+const AppShell = ({ children }) => (
+  <Layout>
+    <Layout.Header role="banner">
+      <nav role="navigation" aria-label="Main navigation">
+        <Menu items={mainMenuItems} />
+        {/* Help always lives here, every page */}
+        <Button
+          text="Help"
+          iconProps={{ path: mdiHelpCircle as IconName }}
+          variant={ButtonVariant.Neutral}
+          onClick={() => navigate('/help')}
+        />
+      </nav>
+    </Layout.Header>
+
+    <Layout.Content role="main">{children}</Layout.Content>
+
+    <Layout.Footer role="contentinfo">
+      <a href="/help">Help & Support</a>
+    </Layout.Footer>
+  </Layout>
+);
+```
+
+Pick **one** location (top-nav button, footer link, or persistent help widget) and keep it there. If you use a floating help button, give it a stable position across every route.
+
+---
+
+### 3.3.7 Redundant Entry — Level A
+
+**Goal:** Don't ask the user to re-enter information they already provided in the same process.
+
+**Anti-pattern:**
+```tsx
+// ❌ Multi-step wizard re-asks the same email on step 4 that was captured on step 1
+const Step4 = () => {
+  const [email, setEmail] = useState('');
+  return (
+    <Form>
+      <Form.Item label="Email Address" name="email">
+        <TextInput value={email} onChange={(e) => setEmail(e.target.value)} />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+**Fix — persist wizard state and pre-fill known fields:**
+```tsx
+// Context-based wizard state
+const WizardContext = createContext({
+  email: '',
+  fullName: '',
+  setEmail: (v: string) => {},
+  setFullName: (v: string) => {},
+});
+
+const Step4 = () => {
+  const { email } = useContext(WizardContext);
+  return (
+    <Form>
+      <Form.Item
+        label="Email Address"
+        name="email"
+        help={<span>We saved your email from step 1. <a href="#" onClick={resetEmail}>Edit</a></span>}
+      >
+        <TextInput value={email} readOnly aria-describedby="email-prefill-hint" />
+      </Form.Item>
+    </Form>
+  );
+};
+```
+
+**Use HTML autofill tokens** so the browser can pre-fill known values:
+```tsx
+<TextInput id="email" type="email" autoComplete="email" />
+<TextInput id="given-name" autoComplete="given-name" />
+<TextInput id="family-name" autoComplete="family-name" />
+<TextInput id="street-address" autoComplete="street-address" />
+```
+
+**Exceptions:** security-sensitive re-entry (confirm password, confirm payment) is allowed.
+
+---
+
+### 3.3.8 Accessible Authentication (Minimum) — Level AA
+
+**Goal:** No authentication step depends on a cognitive function test (memorize-then-type, transcribe-from-audio, solve a puzzle).
+
+**Anti-patterns:**
+- Distorted-text CAPTCHA with no alternative
+- "Type the third character of your password" (memory test)
+- Math puzzles ("What's 7 + 9?") as the only spam gate
+- Disabling paste on password fields (forces memorize-then-type)
+
+**Fix — allow paste on password fields:**
+```tsx
+// ✅ Default: paste is allowed. Don't override.
+<TextInput id="password" htmlType="password" autoComplete="current-password" />
+
+// ❌ NEVER do this
+<TextInput
+  htmlType="password"
+  onPaste={(e) => e.preventDefault()}
+/>
+```
+
+**Fix — SSO / OAuth as the primary path:**
+```tsx
+import { mdiGoogle, mdiMicrosoft } from '@mdi/js';
+
+<div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+  <Button
+    text="Continue with Google"
+    iconProps={{ path: mdiGoogle as IconName }}
+    variant={ButtonVariant.Neutral}
+    size={ButtonSize.Large}
+    onClick={signInWithGoogle}
+    style={{ width: '100%' }}
+  />
+  <Button
+    text="Continue with Microsoft"
+    iconProps={{ path: mdiMicrosoft as IconName }}
+    variant={ButtonVariant.Neutral}
+    size={ButtonSize.Large}
+    onClick={signInWithMicrosoft}
+    style={{ width: '100%' }}
+  />
+</div>
+```
+
+SSO satisfies 3.3.8 because the cognitive function test is delegated to the identity provider, which is required to be accessible itself.
+
+**Fix — CAPTCHA with a non-cognitive fallback:**
+```tsx
+// ✅ Use a CAPTCHA that includes alternative verification methods
+//   (Google reCAPTCHA v3 / hCaptcha both expose audio + accessibility cookies)
+<div className="g-recaptcha" data-sitekey={siteKey} data-callback={onVerify} />
+```
+
+**Fix — passkeys (WebAuthn):**
+```tsx
+// ✅ WebAuthn / passkeys are explicitly recognized as 3.3.8-compliant
+const credential = await navigator.credentials.get({
+  publicKey: { challenge, allowCredentials, userVerification: 'required' },
+});
+```
+
+**Quick test:** Sign in to your app using only your password manager's autofill (no typing). If paste is blocked or copy-from-manager is broken, you fail 3.3.8.
+
+---
+
+### Summary table — WCAG 2.2 net-new criteria
+
+| Criterion | Level | One-line gate |
+|---|---|---|
+| 2.4.11 Focus Not Obscured (Minimum) | AA | Sticky / fixed elements never hide a focused element. Use `scroll-margin-top` or auto-collapse on focus. |
+| 2.5.7 Dragging Movements | AA | Every drag interaction has a button / keyboard alternative. |
+| 2.5.8 Target Size (Minimum) | AA | Pointer targets ≥ 24×24 CSS px. Use Octuple `Button` (default 40×40) or expand the hit area. |
+| 3.2.6 Consistent Help | A | Help / contact link lives in the same relative location on every page (AppShell). |
+| 3.3.7 Redundant Entry | A | Don't re-ask data already provided in the same flow. Use wizard state, autofill tokens. |
+| 3.3.8 Accessible Authentication (Minimum) | AA | No cognitive tests. Allow paste on password fields. SSO / passkeys are first-class. |
+
+---
+
+**Last Updated:** May 22, 2026
+**Version:** 1.11.0
+**Status:** ✅ Complete — WCAG 2.1 Level AA + WCAG 2.2 AA net-new
 
 **For questions or contributions, see `docs/CONTRIBUTING-TO-DOCS.md`.**
