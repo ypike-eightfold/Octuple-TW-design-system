@@ -568,6 +568,14 @@ quick-filter sidebar.`}</pre>
           <strong>"I want to fix a design that's already in the gallery."</strong> Ask Claude to open the
           design and let you iterate. Same publish flow opens a new PR with the changes.
         </li>
+        <li>
+          <strong>"My content standards / terms list update isn't reflected in Claude's suggestions."</strong>{" "}
+          Those files (<code>.claude/skills/_content/*.md</code>) are synced from Google Docs by an{" "}
+          Apps Script. The doc owner needs to click <strong>Eightfold → Sync to repo</strong> in the
+          Google Doc after editing. See <code>docs/CONTENT-SYNC.md</code> for the setup and how to
+          rotate the GitHub token used by the script (the token expires once a year — calendar a
+          reminder).
+        </li>
       </ul>
     </article>
   );

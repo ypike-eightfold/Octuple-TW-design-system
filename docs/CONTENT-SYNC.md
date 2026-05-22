@@ -1,0 +1,275 @@
+# Content sync — Google Docs → skill files
+
+Some of the Markdown files under `.claude/skills/_content/` (and the OG-skill references) are **owned by Google Docs**, not by this repo. They sync into the repo via a small Google Apps Script bound to each doc. When a doc owner clicks **Eightfold → Sync to repo** in the doc's menu bar, the doc is exported as Markdown and committed to `main`.
+
+This file documents:
+
+- Which files in this repo are auto-synced from a doc
+- How to set up the sync for a new doc
+- How to update / rotate the GitHub token the script uses
+- What to do when an `.md` and a doc drift apart
+
+> **Where the sync actually runs:** Google Apps Script, bound to each doc. There's no GitHub Action involved on the receiving side — the script writes to the repo via the GitHub Contents API.
+
+---
+
+## Doc → file map
+
+| Google Doc (canonical source) | Target file in this repo |
+|---|---|
+| Content Design Standards | `.claude/skills/_content/content-design-standards.md` |
+| Terms List | `.claude/skills/_content/terms-list.md` |
+| _doc 3 — TBD_ | `.claude/skills/_content/<filename>.md` |
+| _doc 4 — TBD_ | `.claude/skills/_content/<filename>.md` |
+| _doc 5 — TBD_ | `.claude/skills/_content/<filename>.md` |
+
+When you add a new synced doc, update this table.
+
+---
+
+## Direction of truth
+
+- The **doc is canonical.** Edit there.
+- The **`.md` file is a generated mirror.** Direct edits will be **overwritten on the next sync.**
+- Both files in `.claude/skills/_content/` carry a `<!-- AUTO-SYNCED FROM A GOOGLE DOC -->` banner near the top to remind editors.
+- If you absolutely need to hand-edit an `.md` (e.g. emergency fix while a doc owner is OOO), edit the **doc** to match afterwards, or the next sync will revert you.
+
+---
+
+## What syncs and what doesn't
+
+The Apps Script exports the doc as **Markdown** using Google Drive's native `text/markdown` export. That means:
+
+| Sync handles cleanly | Sync handles poorly |
+|---|---|
+| Headings (H1–H6) | Comments and suggested edits (stripped — only accepted text is exported) |
+| Paragraphs, bold, italic, code formatting | Embedded images (not pulled — paths break) |
+| Bulleted + numbered lists (nested too) | Complex multi-column layouts |
+| Hyperlinks | Drawings and embedded diagrams |
+| Simple tables | Tables with merged cells (formatting may flatten) |
+| Footnotes | Page breaks, headers / footers |
+
+If a doc relies heavily on the "poorly handled" column, the synced `.md` will need a cleanup pass after the first sync. That's a one-time cost — the cleanup goes back into the doc as a structural improvement so future syncs come out clean.
+
+---
+
+## Setting up the sync for a new doc
+
+> Time: ~15 minutes the first time, ~3 minutes per additional doc.
+
+### 1. Generate a GitHub token (one token covers all docs)
+
+If the org already has a token (`apps-script-content-sync`), skip to step 2.
+
+1. GitHub → **Settings (avatar) → Developer settings → Personal access tokens → Fine-grained tokens → Generate new token**.
+2. **Name:** `apps-script-content-sync`
+3. **Expiration:** 1 year. Set a calendar reminder to rotate.
+4. **Resource owner:** the org that owns `ef-design-system` (`tonyh-2-eightfold`).
+5. **Repository access:** *Only select repositories* → `ef-design-system`.
+6. **Repository permissions** → **Contents** → **Read and write**. (That's the only permission needed. Leave everything else at "No access.")
+7. **Generate token.** Copy the token string somewhere safe — you'll need to paste it once per doc in step 4.
+
+### 2. Open the doc → Extensions → Apps Script
+
+A new tab opens with the Apps Script editor.
+
+### 3. Replace `Code.gs` with this script
+
+```javascript
+// ─── Per-doc config — CHANGE THESE TWO LINES ─────────────────
+const TARGET_PATH   = '.claude/skills/_content/your-target-file.md';
+const COMMIT_PREFIX = 'content: sync "Doc Name Here"';
+// ─────────────────────────────────────────────────────────────
+
+const TARGET_REPO   = 'tonyh-2-eightfold/ef-design-system';
+const TARGET_BRANCH = 'main';
+
+function getPat_() {
+  const pat = PropertiesService.getScriptProperties().getProperty('GITHUB_PAT');
+  if (!pat) throw new Error('Set GITHUB_PAT in Project Settings → Script properties.');
+  return pat;
+}
+
+function exportAsMarkdown_() {
+  const docId = DocumentApp.getActiveDocument().getId();
+  const url = 'https://www.googleapis.com/drive/v3/files/' + docId +
+              '/export?mimeType=text/markdown';
+  const res = UrlFetchApp.fetch(url, {
+    headers: { Authorization: 'Bearer ' + ScriptApp.getOAuthToken() },
+    muteHttpExceptions: true,
+  });
+  if (res.getResponseCode() !== 200) {
+    throw new Error('Markdown export failed: ' + res.getContentText());
+  }
+  return res.getContentText();
+}
+
+function fetchExisting_() {
+  const url = 'https://api.github.com/repos/' + TARGET_REPO +
+              '/contents/' + TARGET_PATH + '?ref=' + TARGET_BRANCH;
+  const res = UrlFetchApp.fetch(url, {
+    headers: {
+      Authorization: 'token ' + getPat_(),
+      Accept: 'application/vnd.github+json',
+    },
+    muteHttpExceptions: true,
+  });
+  if (res.getResponseCode() === 404) return null;
+  if (res.getResponseCode() !== 200) {
+    throw new Error('GET failed: ' + res.getContentText());
+  }
+  const json = JSON.parse(res.getContentText());
+  const content = Utilities.newBlob(
+    Utilities.base64Decode(json.content)
+  ).getDataAsString();
+  return { content: content, sha: json.sha };
+}
+
+/** Pulls the YAML frontmatter (--- ... ---) from the existing file
+    so we can keep it intact on every sync. The doc itself shouldn't
+    contain the frontmatter; it lives only in the repo file. */
+function extractFrontmatter_(existingContent) {
+  if (!existingContent) return '';
+  const m = existingContent.match(/^---\n[\s\S]*?\n---\n/);
+  return m ? m[0] + '\n' : '';
+}
+
+function pushToGitHub_(markdown) {
+  const existing = fetchExisting_();
+  const frontmatter = extractFrontmatter_(existing && existing.content);
+
+  const doc = DocumentApp.getActiveDocument();
+  const banner =
+    '<!--\n' +
+    '  AUTO-SYNCED FROM A GOOGLE DOC — DO NOT EDIT THIS FILE DIRECTLY.\n' +
+    '  Source: ' + doc.getUrl() + '\n' +
+    '  Last sync: ' + new Date().toISOString() + '\n' +
+    '-->\n\n';
+
+  const fullContent = frontmatter + banner + markdown;
+
+  const body = {
+    message: COMMIT_PREFIX + ' (' + new Date().toISOString().slice(0, 10) + ')',
+    content: Utilities.base64Encode(fullContent, Utilities.Charset.UTF_8),
+    branch: TARGET_BRANCH,
+  };
+  if (existing) body.sha = existing.sha;
+
+  const url = 'https://api.github.com/repos/' + TARGET_REPO +
+              '/contents/' + TARGET_PATH;
+  const res = UrlFetchApp.fetch(url, {
+    method: 'put',
+    headers: {
+      Authorization: 'token ' + getPat_(),
+      Accept: 'application/vnd.github+json',
+    },
+    contentType: 'application/json',
+    payload: JSON.stringify(body),
+    muteHttpExceptions: true,
+  });
+  if (res.getResponseCode() >= 300) {
+    throw new Error('PUT failed: ' + res.getContentText());
+  }
+  return JSON.parse(res.getContentText());
+}
+
+function syncToRepo() {
+  const ui = DocumentApp.getUi();
+  try {
+    const md = exportAsMarkdown_();
+    const result = pushToGitHub_(md);
+    ui.alert(
+      'Synced',
+      'Committed to ' + TARGET_REPO + '@' + TARGET_BRANCH + ':' + TARGET_PATH +
+      '\n\n' + result.commit.html_url,
+      ui.ButtonSet.OK
+    );
+  } catch (e) {
+    ui.alert('Sync failed', String(e), ui.ButtonSet.OK);
+  }
+}
+
+function onOpen() {
+  DocumentApp.getUi()
+    .createMenu('Eightfold')
+    .addItem('Sync to repo', 'syncToRepo')
+    .addToUi();
+}
+```
+
+### 4. Change the two config lines at the top
+
+- `TARGET_PATH` — the exact repo path this doc should publish to (see the doc → file map above).
+- `COMMIT_PREFIX` — what shows up in `git log`. Keep it short.
+
+### 5. Store the GitHub token in Script properties
+
+The token never goes in the code. Apps Script encrypts script properties at rest.
+
+1. In the Apps Script editor: **Project Settings** (gear icon in the left sidebar).
+2. Scroll to **Script properties → Add script property**.
+3. Property: `GITHUB_PAT`. Value: the token from step 1.
+4. **Save script properties.**
+
+### 6. Save the project and authorize
+
+1. Save (`Cmd+S`). Name the project, e.g. *"Sync to ef-design-system"*.
+2. In the function dropdown at the top of the editor, select `syncToRepo` → click **Run**.
+3. First run only: Google asks for permissions — Docs read, Drive export, External URL fetch. Approve.
+4. The function runs. You'll see a "Synced" alert with a link to the GitHub commit, or an error you can read.
+
+### 7. Reload the doc to pick up the menu
+
+Close + reopen the doc. A new **Eightfold** menu appears next to **Help**. The **Sync to repo** option is what doc owners click going forward.
+
+### 8. Update the doc → file map in this file
+
+Add the new doc to the table at the top.
+
+### 9. (Optional) Add a time-based trigger
+
+If you'd rather not rely on doc owners remembering to click Sync:
+
+1. Apps Script editor → **Triggers** (clock icon).
+2. **Add Trigger.** Function: `syncToRepo`. Event source: **Time-driven** → **Hour timer** → every 6 hours (or whatever cadence).
+3. Save.
+
+The sync becomes a no-op when nothing changed (same content → same SHA → GitHub accepts but doesn't show a change). Safe to run on a clock.
+
+---
+
+## Rotating the GitHub token
+
+The fine-grained PAT expires in 1 year. Calendar a reminder for ~11 months out.
+
+1. Generate a new token following step 1 above.
+2. For each doc's Apps Script project: **Project Settings → Script properties → edit `GITHUB_PAT` → paste the new token → Save.**
+3. Test by running `syncToRepo` on one doc — verify the commit lands.
+4. **Revoke the old token** in GitHub → Settings → Developer settings → Personal access tokens.
+
+You don't need to touch the script code or re-authorize Google permissions — only the script property changes.
+
+---
+
+## When `.md` and doc drift
+
+Direct edits to an auto-synced `.md` get wiped on the next sync. If a designer commits a hot fix and you want to keep it:
+
+1. Copy the fix from the `.md` into the Google Doc.
+2. Run **Eightfold → Sync to repo** on the doc.
+3. The repo file now reflects the doc, which now reflects the fix.
+
+If a doc and an `.md` disagree and you're not sure which is right, **trust the doc** — and update the `.md` by running Sync.
+
+---
+
+## Troubleshooting
+
+| Symptom | Likely cause | Fix |
+|---|---|---|
+| Apps Script alert: *"Set GITHUB_PAT in Project Settings → Script properties"* | Script property not set | Step 5 above |
+| Apps Script alert: *"Markdown export failed: 403"* | Doc not accessible to the script's Google identity | Ensure the script is owned by an account that has Edit access to the doc |
+| Apps Script alert: *"PUT failed: 401"* | Token wrong or expired | Rotate the token |
+| Apps Script alert: *"PUT failed: 422"* | Stale SHA — the file was edited between read and write | Run Sync again; it'll fetch the latest SHA |
+| Doc was edited but file in repo didn't update | Doc owner didn't click Sync | Click **Eightfold → Sync to repo** in the doc, or set up the hourly trigger |
+| File frontmatter (`name:`, `description:`) disappeared | The frontmatter-preservation block in the script was modified or removed | Restore the `extractFrontmatter_` function from the script template above |
