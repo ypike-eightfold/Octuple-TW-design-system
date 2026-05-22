@@ -178,12 +178,12 @@ export default function WorkflowPage() {
         number={4}
         title="Get added to the design-system repo"
         screenshot="step-04-github-repo.png"
-        caption="The tonyh-2-eightfold/ef-design-system repository on GitHub."
+        caption="The ypike-eightfold/Octuple-TW-design-system repository on GitHub."
       >
         <p>
           Once you're in the Eightfold org (step 1), ask whoever owns the{" "}
           <code className="rounded bg-[var(--card)] px-1 py-0.5 text-[0.9em] font-mono border border-[var(--border)]">
-            tonyh-2-eightfold/ef-design-system
+            ypike-eightfold/Octuple-TW-design-system
           </code>{" "}
           repo to add you as a collaborator with <strong>write</strong> access. You'll get an email.
         </p>
@@ -216,8 +216,8 @@ export default function WorkflowPage() {
           If this is your <strong>first time</strong> on this laptop, ask:
         </p>
         <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
-          <strong>You:</strong> Clone the ef-design-system repo from{" "}
-          <code>tonyh-2-eightfold/ef-design-system</code> to my Desktop.
+          <strong>You:</strong> Clone the design system repo from{" "}
+          <code>ypike-eightfold/Octuple-TW-design-system</code> to my Desktop.
         </blockquote>
         <p>Claude will create a folder on your Desktop with the repo in it.</p>
         <p>If you've used the repo before:</p>
