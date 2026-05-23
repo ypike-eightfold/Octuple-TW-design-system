@@ -8,6 +8,12 @@ description: >
 
 # Publish Design
 
+> ## ⛔ Read before publishing
+>
+> For **live React prototypes** (anything built as a route under `web/app/(prototype)/...`), the gallery `index.html` is a small redirect to the live route — NOT a duplicated static HTML mock. Full conventions for scaffolding the prototype itself, including the dev FAB, localStorage persistence, glassmorphic sticky nav, and the dynamic navbar overflow pattern, live in [`../_shared/prototype-scaffolding.md`](../_shared/prototype-scaffolding.md). Read that before scaffolding any new prototype.
+>
+> The gallery detail page automatically provides: viewport switcher (Desktop / Tablet landscape 1024 / Tablet portrait 800 / Mobile 420), Take screenshot (PNG download via `html-to-image`), Full screen (browser Fullscreen API), and chrome-hiding on prototype routes. You do not — and must not — reimplement any of those at the prototype level.
+
 Takes a finished design — built with either the Tailwind (`design-tw-*`) or OG Octuple (`design-og-*`) skill set — and lands it in the gallery via a pull request that other designers and engineers can review and merge. Once merged, the design appears at the gallery's category page.
 
 The gallery is **PR-merge-driven**: designs only appear in the gallery after a PR merges into `main`. This skill never bypasses that. It assumes:
@@ -83,12 +89,31 @@ If a branch with that name already exists locally or remotely, append `-2`, `-3`
 
 ```
 web/public/content/designs/<category>/<slug>/
-  index.html           # the design itself (copied from source_path)
+  index.html           # iframe entry — static HTML mock OR redirect to a live React route
   meta.json            # see schema below
-  thumbnail.png        # copied from thumbnail_path
+  thumbnail.png        # 1440×900 PNG, used only on the category grid card
 ```
 
-If `source_path` is a directory (React route output with multiple files), copy the whole directory and rename its entry HTML to `index.html` if needed. Preserve relative asset paths.
+There are two valid shapes for `index.html`:
+
+**a) Static HTML mock** — a self-contained `.html` file. Use when the design is a snapshot, not a clickable prototype. Copy from `source_path`. Preserve relative asset paths if `source_path` is a directory.
+
+**b) Redirect to a live React route** — use when the prototype is built under `web/app/(prototype)/<product>/`. The `index.html` is a 30-line file with `<meta http-equiv="refresh">` + a `window.location.replace()` fallback that retargets the iframe at the live route. See `careerhub-continuous-sync/index.html` for the canonical template, and `../_shared/prototype-scaffolding.md` § "The gallery contract" for the why.
+
+For (b), the gallery automatically provides viewport switcher, Take screenshot, Full screen, and chrome-hiding on prototype routes — don't reimplement those at the prototype level.
+
+### 3.5. Capture the thumbnail
+
+```bash
+# 1440×900 — same dimensions as the existing gallery thumbnails.
+"/Applications/Google Chrome.app/Contents/MacOS/Google Chrome" \
+  --headless=new --disable-gpu --hide-scrollbars \
+  --window-size=1440,900 \
+  --screenshot="<path>/thumbnail.png" \
+  "http://localhost:3000/<live-route>"
+```
+
+For live React prototypes, point Chrome at the live `/<product>/<route>` URL (not the gallery `index.html`, since that's just a redirect page).
 
 `meta.json` schema:
 

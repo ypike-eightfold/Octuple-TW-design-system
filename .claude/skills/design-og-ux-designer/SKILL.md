@@ -27,7 +27,9 @@ description: >
 >
 > **Avatars.** Vary fill color per identity (hash to a palette of Octuple -70 shades). Never one color for every avatar.
 >
-> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Cite that file by name in your self-review before declaring a screen complete.**
+> **Scaffolding & dev tooling.** When publishing into this repo's gallery, follow the prototype-scaffolding conventions: `web/app/(prototype)/<product>/`, `PrototypeContext`, bottom-left `ScreensFAB`, real product navbar tabs, redirect-style gallery `index.html`. The gallery shell auto-provides viewport switcher + screenshot + fullscreen. See [`../_shared/prototype-scaffolding.md`](../_shared/prototype-scaffolding.md).
+>
+> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Cite both files by name in your self-review before declaring a screen complete.**
 
 You are designing screens, flows, and prototypes for products that ship on the **OG Octuple Design System** — Eightfold's original component library. Most existing Eightfold products (Talent Management, Talent Acquisition, Career Hub, etc.) ship on Octuple. The new Tailwind-based `ef-design-system` is a parallel track for greenfield work; do not mix them.
 

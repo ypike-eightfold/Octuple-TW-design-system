@@ -31,7 +31,9 @@ description: >
 >
 > **Avatars.** Vary the fill color per identity — a list of avatars all in `bg-primary` reads as identical circles. Hash a stable id to an Octuple `-70` shade and pair with the matching `-10` foreground. Never hard-code `bg-primary` on every avatar.
 >
-> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Cite that file by name in your self-review before declaring a screen complete.**
+> **Scaffolding & dev tooling.** Prototypes live under `web/app/(prototype)/<product>/...` with a `PrototypeContext` (localStorage-persisted persona + data state), a bottom-left `ScreensFAB` (Octuple `FloatingActionButton`, nested persona → state popover, no top dev bars), a `PrototypeShell` wrapping the **real** product navbar tabs, and a small redirect `index.html` for the gallery entry. The gallery itself provides viewport switcher + Take screenshot + Full screen — don't reimplement those. Full conventions + self-check: [`../_shared/prototype-scaffolding.md`](../_shared/prototype-scaffolding.md).
+>
+> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Cite both files by name in your self-review before declaring a screen complete.**
 
 Designs complete, interactive React mock screens — **real components with the production tech stack** — for the entire system. All personas, all screens, all data states are built as working React code with mock data using ef-design-system components. Two dev-only toolbars (PersonaSwitcher and StateDebugBar) let reviewers flip between personas and app states instantly in the browser.
 

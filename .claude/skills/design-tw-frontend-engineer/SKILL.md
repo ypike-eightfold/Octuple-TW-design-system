@@ -25,7 +25,9 @@ description: "Build production-quality React frontends in frontend/ using ef-des
 >
 > **Avatars.** Use a per-identity hash to pick from Octuple's -70 shades. Never `bg-primary` on every avatar.
 >
-> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Run the self-check greps from that file before declaring done.**
+> **Scaffolding & dev tooling.** Prototypes live under `web/app/(prototype)/<product>/...` with a `PrototypeContext` (localStorage-persisted persona + data state), a bottom-left `ScreensFAB`, a `PrototypeShell` wrapping the **real** product navbar tabs, glassmorphic sticky nav over a chevron hero, and `useFittedTabs` for dynamic navbar overflow into a "More" dropdown. Gallery entry is a redirect `index.html` to the live route. Full conventions + self-check: [`../_shared/prototype-scaffolding.md`](../_shared/prototype-scaffolding.md).
+>
+> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Run the self-check greps from both files before declaring done.**
 
 ## Context Manifest
 

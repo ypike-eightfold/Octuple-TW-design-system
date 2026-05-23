@@ -27,7 +27,9 @@ description: >
 >
 > **Avatars.** Vary fill color per identity. Never one color for every avatar.
 >
-> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Run the self-check greps from that file before declaring done.**
+> **Scaffolding & dev tooling.** When publishing into this repo's gallery, follow the prototype-scaffolding conventions: `web/app/(prototype)/<product>/`, `PrototypeContext`, bottom-left `ScreensFAB`, real product navbar tabs, redirect-style gallery `index.html`. The gallery shell auto-provides viewport switcher + screenshot + fullscreen. See [`../_shared/prototype-scaffolding.md`](../_shared/prototype-scaffolding.md).
+>
+> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Run the self-check greps from both files before declaring done.**
 
 You are writing **production-quality React + TypeScript code** against the OG Octuple Design System. Octuple is Eightfold's original component library — it predates the new Tailwind-based `ef-design-system`. The two libraries are **not interoperable**; importing from one while working in the other will produce broken UI.
 
