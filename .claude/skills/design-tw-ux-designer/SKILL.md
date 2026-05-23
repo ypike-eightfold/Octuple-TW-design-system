@@ -11,6 +11,28 @@ description: >
 
 # React UX Designer
 
+> ## ⛔ MUST USE COMPONENTS — read first
+>
+> **Tailwind utilities are for layout and spacing only.** For every interactive element (buttons, chips, status pills, selects, page chrome, toasts, timelines, tabs, tables, dialogs, steppers, progress, empty illustrations) you **MUST import the matching component** from `@tonyh-2-eightfold/ef-design-system`.
+>
+> The canonical failure mode is `<button className="rounded-md bg-primary px-3 py-1.5">…</button>` — if you write that, **stop and import `<Button variant="primary" size="sm">` instead**. Same for `<span>` chips (use `<Tag>`), native `<select>` (use `<Select>`), custom `<header>` for Career Hub pages (use `<CareerHubShell>`).
+>
+> **Color discipline.** Octuple's `blueGreen` / `blue-green` family is RESERVED (too close to primary button color). Use the semantic palette: green=active, orange=warning, red=error, blue=completion, violet=AI, grey=anything else.
+>
+> **IA discipline.** Do NOT extend the CareerHub navbar with ad-hoc tabs to host your screens. The product navbar is canonical (`EMPLOYEE_NON_MANAGER_TABS`, `MANAGER_TABS`, etc.). **ASK the user where new screens should live** — usually as sub-tabs under an existing tab, or via a chevron sub-menu, or as a deep-link from a list page.
+>
+> **Hero header treatment.** Product pages (especially CareerHub) want the hero chevron art to bleed up to the top of the viewport with a glassmorphic navbar floating over it. Use the `.header-assembled-ch-shell` + translucent-navbar pattern.
+>
+> **Card hierarchy.** Cards inside cards drop their inner border (avoids double-lines). Use `bg-background` to define the inner edge instead.
+>
+> **Button hierarchy.** One primary button per page (or per focus area). Others go secondary / outline / ghost. **Do NOT use `variant="link"`** — use `secondary` or `ghost` for low-emphasis actions. **Icon-only buttons use `secondary`, not `ghost`** (a ghost icon button reads as a link). Select triggers and other buttons over hero/glass need `className="bg-white"` to read as solid.
+>
+> **Form controls.** Checkbox, Switch, RadioGroup are ALWAYS the design-system components, never native HTML. Use `<Checkbox>`, `<Switch>`, `<RadioGroup>` from `@/components/ui/`. A `peer-checked:bg-primary` custom-styled `<input>` is the wrong answer every time.
+>
+> **Avatars.** Vary the fill color per identity — a list of avatars all in `bg-primary` reads as identical circles. Hash a stable id to an Octuple `-70` shade and pair with the matching `-10` foreground. Never hard-code `bg-primary` on every avatar.
+>
+> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Cite that file by name in your self-review before declaring a screen complete.**
+
 Designs complete, interactive React mock screens — **real components with the production tech stack** — for the entire system. All personas, all screens, all data states are built as working React code with mock data using ef-design-system components. Two dev-only toolbars (PersonaSwitcher and StateDebugBar) let reviewers flip between personas and app states instantly in the browser.
 
 ## Context Manifest

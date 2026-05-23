@@ -9,6 +9,27 @@ description: >
 
 # Design (OG) — Component Reference
 
+> ## ⛔ MUST USE COMPONENTS — read first
+>
+> This reference exists **so you use the components** — never to admire them from a distance. Every UI element with a doc under `components/` has an Octuple implementation; build with that implementation, not a hand-rolled lookalike. Most-confused-for-Tailwind elements:
+>
+> - **Button** → never `<button className="…bg-…">`
+> - **Tag / SkillTag** (Octuple's name for "chip") → never `<span className="rounded-full bg-muted">`
+> - **Pill** (status with icon) → never custom badge `<div>`
+> - **Select** (dropdown) → never native `<select>`
+> - **Navbar + Header + ProductBackground** (Career Hub chrome) → never a hand-rolled `<header>`
+> - **Snackbar** (action confirmation) → never a styled green `<div>`
+>
+> **Color discipline.** When choosing a `color` / `variant` on Tag, Pill, or Badge: green=active, orange=warning, red=error, blue=completion, violet=AI, grey=neutral. The `blueGreen` / `blue-green` family is RESERVED — do not pick it for routine status.
+>
+> **Form controls.** Checkbox, Toggle/Switch, RadioGroup are ALWAYS Octuple components — never native HTML inputs.
+>
+> **Button affordance.** No `variant="link"` — use `secondary` for low-emphasis. Icon-only buttons use `secondary`, never `ghost`. Buttons over hero/glass backgrounds need solid (white) background.
+>
+> **Avatars.** Vary fill color per identity (hash to a palette).
+>
+> Full rule + the 6 specific past failures + a self-check grep + IA / hero / card / button hierarchy rules: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md).
+
 This skill is a **lookup index** for the OG Octuple Design System. The docs live in two sibling folders:
 
 - `components/<Name>.md` — one file per component (56 components)

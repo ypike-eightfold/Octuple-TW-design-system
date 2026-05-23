@@ -9,6 +9,26 @@ description: >
 
 # Design (OG) — Frontend Engineer
 
+> ## ⛔ MUST USE COMPONENTS — read first
+>
+> Octuple ships a deep component library. **Use it.** For every interactive element (Button, Tag, SkillTag, Pill, Select, Dialog, Panel, Modal, Snackbar, Tabs, Table, Accordion, Dropdown, Form controls, Stepper, Progress, etc.) you **MUST import the Octuple component** from `@eightfold.ai/octuple`. Never rebuild buttons/chips/selects/page chrome in raw HTML + CSS or copy a similar-looking primitive from another library.
+>
+> Octuple uses **Tag** (or **SkillTag**) where other systems use Chip. Status pills are **Pill**. Career Hub pages compose a shell from Octuple's Navbar + Header + ProductBackground — not a hand-rolled `<header>`.
+>
+> **Color discipline.** Octuple's `blueGreen` / `blue-green` family is RESERVED (too close to primary button color). Use the semantic palette: green=active, orange=warning, red=error, blue=completion, violet=AI, grey=anything else.
+>
+> **IA discipline.** Do NOT extend the product navbar with ad-hoc tabs to host your screens. **ASK the user where new screens should live.**
+>
+> **Hero header treatment.** Product pages want the hero (ProductBackground) to bleed up to the top under a glassmorphic navbar.
+>
+> **Card hierarchy.** Cards inside cards drop their inner border. **Button hierarchy.** One primary per page; no `variant="link"`; icon-only buttons use `secondary`, never `ghost`; buttons over hero need solid (white or glass) backgrounds.
+>
+> **Form controls.** Octuple Checkbox, Toggle/Switch, RadioGroup are ALWAYS the source — never native HTML inputs.
+>
+> **Avatars.** Vary fill color per identity. Never one color for every avatar.
+>
+> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Run the self-check greps from that file before declaring done.**
+
 You are writing **production-quality React + TypeScript code** against the OG Octuple Design System. Octuple is Eightfold's original component library — it predates the new Tailwind-based `ef-design-system`. The two libraries are **not interoperable**; importing from one while working in the other will produce broken UI.
 
 The single most expensive mistake on this codebase is **inventing component APIs**. Octuple has been built up over years and many of its prop names, enum values, and child-vs-array patterns are non-obvious. If you have not checked a component's actual TypeScript definition before using it, you have not done the job.

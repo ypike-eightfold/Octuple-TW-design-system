@@ -5,6 +5,28 @@ description: "Build production-quality React frontends in frontend/ using ef-des
 
 # Frontend UI Engineer
 
+> ## ⛔ MUST USE COMPONENTS — read first
+>
+> **Tailwind utilities are for layout and spacing only.** For every interactive element (buttons, chips, status pills, selects, page chrome, toasts, timelines, tabs, tables, dialogs, steppers, progress, empty illustrations) you **MUST import the matching component** from `@tonyh-2-eightfold/ef-design-system`.
+>
+> The canonical failure mode is `<button className="rounded-md bg-primary px-3 py-1.5">…</button>` — if you write that, **stop and import `<Button variant="primary" size="sm">` instead**. Same for `<span>` chips (use `<Tag>`), native `<select>` (use `<Select>`), custom `<header>` for Career Hub pages (use `<CareerHubShell>`).
+>
+> **Color discipline.** Octuple's `blueGreen` / `blue-green` family is RESERVED (too close to primary button color). Use the semantic palette: green=active, orange=warning, red=error, blue=completion, violet=AI, grey=anything else.
+>
+> **IA discipline.** Do NOT extend the CareerHub navbar with ad-hoc tabs to host your screens. The product navbar is canonical (`EMPLOYEE_NON_MANAGER_TABS`, `MANAGER_TABS`, etc.). **ASK the user where new screens should live** — usually as sub-tabs under an existing tab, or via a chevron sub-menu, or as a deep-link from a list page.
+>
+> **Hero header treatment.** Product pages (especially CareerHub) want the hero chevron art to bleed up to the top of the viewport with a glassmorphic navbar floating over it.
+>
+> **Card hierarchy.** Cards inside cards drop their inner border. Use `bg-background` to define the inner edge.
+>
+> **Button hierarchy.** One primary per page. Others go secondary / outline / ghost. **No `variant="link"`** — use secondary or ghost. **Icon-only buttons use `secondary`, never `ghost`** (ghost reads as link). Select triggers / buttons over hero/glass backgrounds need `className="bg-white"`.
+>
+> **Form controls.** Checkbox, Switch, RadioGroup are ALWAYS design-system components from `@/components/ui/{checkbox,switch,radio-group}`, never native HTML. The repo's checkbox.tsx and switch.tsx are Octuple v2.5 themed — they're the correct choice.
+>
+> **Avatars.** Use a per-identity hash to pick from Octuple's -70 shades. Never `bg-primary` on every avatar.
+>
+> Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Run the self-check greps from that file before declaring done.**
+
 ## Context Manifest
 
 This skill's forger-visible contract lives in **`SUBAGENT.md`** in this same directory. Read that file for the manifest YAML, `artifacts:` block, and MODE convention. The body of this file (`SKILL.md`) is inline documentation: patterns, examples, and building guidance for humans and for the subagent itself to read after being invoked.
