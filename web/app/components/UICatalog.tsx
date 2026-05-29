@@ -167,7 +167,7 @@ import { Inbox, FileText, Bell, Tag as TagIcon, X } from 'lucide-react'
 import { Textarea } from '@/components/ui/textarea'
 import { Toggle } from '@/components/ui/toggle'
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group'
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { Empty, EmptyDescription, EmptyHeader, EmptyMedia, EmptyTitle } from '@/components/ui/empty'
 import { Kbd } from '@/components/ui/kbd'
@@ -1690,7 +1690,7 @@ export function UICatalog({
         </Block>
 
         <Block title="Resizable">
-          <ResizablePanelGroup orientation="horizontal" className="max-w-md rounded-lg border">
+          <ResizablePanelGroup direction="horizontal" className="max-w-md rounded-lg border">
             <ResizablePanel defaultSize={50}>Panel 1</ResizablePanel>
             <ResizableHandle />
             <ResizablePanel defaultSize={50}>Panel 2</ResizablePanel>
@@ -2099,12 +2099,14 @@ export function UICatalog({
         </Block>
 
         <Block title="Tooltip">
-          <Tooltip>
-            <TooltipTrigger asChild>
-              <Button variant="outline">Hover for tooltip</Button>
-            </TooltipTrigger>
-            <TooltipContent>Tooltip text</TooltipContent>
-          </Tooltip>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button variant="outline">Hover for tooltip</Button>
+              </TooltipTrigger>
+              <TooltipContent>Tooltip text</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </Block>
 
         {/* ── InfoBar ───────────────────────────────────────────────────── */}
