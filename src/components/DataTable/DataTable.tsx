@@ -90,6 +90,10 @@ function DataTableHead({
   numeric,
   metric,
   shrink,
+  sortable,
+  sorted,
+  onSort,
+  children,
   ...props
 }: React.ComponentProps<'th'> & {
   /** Column alignment. Defaults to 'left'; numeric columns default to 'right'. */
@@ -100,8 +104,15 @@ function DataTableHead({
   metric?: boolean
   /** Collapse width for action columns */
   shrink?: boolean
+  /** Enables sort toggle on this column */
+  sortable?: boolean
+  /** Current sort direction, or false if unsorted */
+  sorted?: 'asc' | 'desc' | false
+  /** Called when the user clicks the sort toggle */
+  onSort?: () => void
 }) {
   const resolvedAlign = align ?? (numeric ? 'right' : 'left')
+  const sortIcon = sorted === 'asc' ? 'arrow_upward' : sorted === 'desc' ? 'arrow_downward' : 'unfold_more'
   return (
     <th
       data-slot="data-table-head"
@@ -110,10 +121,19 @@ function DataTableHead({
         resolvedAlign === 'right' && 'text-right',
         metric && 'min-w-[108px]',
         shrink && 'w-[1%] pl-3 pr-5',
+        sortable && 'cursor-pointer select-none',
         className,
       )}
+      onClick={sortable ? onSort : undefined}
       {...props}
-    />
+    >
+      {sortable ? (
+        <span className="inline-flex items-center gap-1">
+          {children}
+          <span className="material-symbols-outlined" style={{ fontSize: 14, opacity: sorted ? 1 : 0.4 }}>{sortIcon}</span>
+        </span>
+      ) : children}
+    </th>
   )
 }
 
