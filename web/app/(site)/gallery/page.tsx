@@ -55,12 +55,14 @@ export default function HomePage() {
               </div>
               <p className="mt-2 text-sm text-[var(--muted-foreground)]">{c.blurb}</p>
 
-              {/* Recent thumbnails — up to 4 newest, 2x2 grid.
-                  Empty categories skip the strip entirely so the cards
-                  collapse to text-only and stay visually clean. */}
-              {recent.length > 0 && (
-                <div className="mt-4 grid grid-cols-2 gap-2">
-                  {recent.map((d) => (
+              {/* Recent thumbnails — always a 2x2 grid of 4 slots. Fills
+                  with the newest designs the category has; remaining slots
+                  render as dashed-border placeholders so every card has the
+                  same visual footprint. */}
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {Array.from({ length: 4 }).map((_, i) => {
+                  const d = recent[i];
+                  return d ? (
                     <div
                       key={d.slug}
                       className="aspect-[16/10] overflow-hidden rounded-md border border-[var(--border)] bg-[var(--background)]"
@@ -72,9 +74,15 @@ export default function HomePage() {
                         className="h-full w-full object-cover transition group-hover:scale-[1.02]"
                       />
                     </div>
-                  ))}
-                </div>
-              )}
+                  ) : (
+                    <div
+                      key={`placeholder-${i}`}
+                      aria-hidden
+                      className="aspect-[16/10] rounded-md border border-dashed border-[var(--border)] bg-[var(--muted)]"
+                    />
+                  );
+                })}
+              </div>
             </Link>
           );
         })}
