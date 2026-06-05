@@ -384,34 +384,6 @@ export default function WorkflowPage() {
         <p>You're done.</p>
       </Step>
 
-      <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">Browsing existing designs</h2>
-
-      <Step
-        title="Online (after the gallery is deployed)"
-        screenshot="step-14-gallery-online.png"
-        caption="The gallery's 'Browse by product' grid at octuple-tw-design-system-web.vercel.app/gallery."
-      >
-        <p>
-          Visit the gallery URL in your browser. Sign in with your <code>@eightfold.ai</code> Google
-          account (once OAuth is wired). Browse by category.
-        </p>
-      </Step>
-
-      <Step
-        title="Locally (works any time, even offline)"
-      >
-        <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
-          <strong>You:</strong> Start the design gallery so I can browse it.
-        </blockquote>
-        <p>
-          Claude will run the gallery on your laptop. Open <code>http://localhost:3000</code> in your
-          browser. When you're done:
-        </p>
-        <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
-          <strong>You:</strong> Stop the gallery.
-        </blockquote>
-      </Step>
-
       <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">"Just tell Claude" cheat sheet</h2>
       <p className="mb-4 max-w-3xl">
         You almost never need to use a terminal directly. Translate "technical task" to "ask Claude":
