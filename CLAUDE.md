@@ -136,6 +136,61 @@ Every label, button, error, empty state, tooltip, badge, and column header — r
 
 Both `design-tw-ux-designer` and `design-og-ux-designer` reference these. If you're writing UI copy in any skill and you haven't checked the terms list, check it.
 
+### When to check (MUST, not SHOULD)
+
+Run **both** checks before emitting copy or UI in any of these situations — including when no design skill is loaded:
+
+1. **UI labels and copy** — button text, form labels, errors, empty states, tooltips, modal titles, table headers, navigation items, settings labels, status pills, badges.
+2. **Public-facing documentation under `docs/` or `web/app/(site)/docs/`** — designer-facing or user-facing text that ships at a URL.
+3. **README files and any `.md` linked from `README.md` or `CLAUDE.md`**.
+4. **PR titles and PR descriptions** for design / content work — those land in `git log` and the gallery commit history.
+5. **Mock-data string content visible in screenshots / iframes** — names, role titles, project names, fake company names. (Persona names use the approved list in `terms-list.md` § Personas; never real customer names.)
+
+**Skip the check** for: code comments, variable names, internal-only debug strings, dev-tooling output, scripts/CLI tools used only by maintainers.
+
+When in doubt, run the check. The cost is ~5 seconds of grep; the cost of shipping non-compliant copy is rework.
+
+### How to run the check (per-emission, not per-conversation)
+
+For every batch of UI text or doc text you're about to emit:
+
+1. **Identify candidate terms** in what you wrote — branded terms (e.g. Career Hub), feature names, role names (employee / candidate / recruiter / etc.), product nouns (1:1, performance review, skill, role).
+2. **Grep `terms-list.md`** for each candidate. If the entry says "Use: X" use exactly X; if "Don't use: Y" then never Y.
+3. **For non-trivial copy** (more than a one-word label) also check the relevant section of `content-design-standards.md` — voice & tone, capitalization, punctuation, link text rules, error-message patterns.
+4. **Apply Gem instructions** for AI-mediated screens (chat responses, recommendations, anything OH or Companion touches) — see `gems/` for the rubric.
+5. **State what you checked** in one short sentence after emitting the copy: e.g. "Checked Career Hub (branded), 1:1 (not 1-on-1), no banned terms." So the human reviewing your output can spot-check.
+
+---
+
+## Accessibility (WCAG 2.2 AA) is a default, not an opt-in
+
+For any UI you generate — components, screens, prototypes, or doc-pages with interactive elements — apply the WCAG 2.2 AA defaults from `.claude/skills/design-{og,tw}-frontend-engineer/references/accessibility.md` **even when no design skill is loaded**. Specifically:
+
+- Every `<img>` has `alt` (or `alt=""` for decorative). Icon-only buttons / links carry `aria-label`.
+- Use semantic HTML (`<button>`, `<nav>`, `<main>`, `<table>` with `<th>`). No `<div onClick>`.
+- Headings hierarchical, no level skips.
+- Color paired with text/icon — never color as the sole indicator. Status uses Tag/Pill with explicit label.
+- Color contrast: 4.5:1 normal text, 3:1 large text / UI components. Use design-system semantic tokens (`bg-primary`, `text-foreground`, etc.) — they're pre-checked. Never use raw hex / Tailwind `slate-*`.
+- Form fields have visible labels (never placeholder-only). Errors have explicit text + `aria-live`.
+- Interactive targets ≥ 44×44 (mobile) / 24×24 (minimum). ef-design-system Button enforces this; don't override.
+- Keyboard support: focus order matches visual order, `focus-visible` ring on every interactive, no keyboard traps.
+- For Radix-based components: wrap properly (`<TooltipProvider>`, `<RadioGroup>`, etc.) — missing wrappers throw at runtime in React 19.
+
+**State what you applied** when you emit a design, the same way as for content: one short line citing which a11y defaults are in effect.
+
+### What's NOT automatic — call out explicitly when relevant
+
+Some criteria require human verification or per-design decisions. Don't claim them silently; flag them if the design needs them:
+
+- **Captions / audio descriptions** (1.2.x) — required if the design includes video. Add a `<track>` element or note the caption track is missing.
+- **Resize text 200%** (1.4.4) and **reflow at 320px** (1.4.10) — must be tested in browser. Note "designed to be responsive; needs browser verification."
+- **Focus not obscured** (2.4.11, WCAG 2.2 new) — sticky headers/modals must not hide focused elements. Add `scroll-margin-top` on focusable elements where relevant.
+- **Accessible authentication** (3.3.8, WCAG 2.2 new) — login flows allow paste in password fields; CAPTCHA has non-cognitive fallback.
+- **Error prevention for legal/financial/data** (3.3.4) — irreversible actions get a confirmation dialog. Flag when an action is irreversible.
+- **Dragging movements** (2.5.7, WCAG 2.2 new) — drag-and-drop has a click/keyboard alternative.
+
+If you ship a design without verifying these where applicable, say so: "Built with WCAG AA defaults applied; reflow at 320px, captions for the video, and 2.4.11 focus-not-obscured need browser verification before release."
+
 ---
 
 ## Gem instructions — applied when designing AI features
