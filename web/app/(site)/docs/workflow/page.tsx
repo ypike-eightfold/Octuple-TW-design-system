@@ -285,6 +285,8 @@ export default function WorkflowPage() {
       <Step
         number={5}
         title="Check accessibility"
+        screenshot="step-day-05-check-a11y.png"
+        caption="Claude scanning the design for WCAG 2.2 AA issues and reporting which checks ran and what needs a human pass."
       >
         <p>
           Then ask Claude to verify accessibility against WCAG 2.2 AA — the standard most Eightfold
@@ -313,18 +315,6 @@ export default function WorkflowPage() {
 
       <Step
         number={6}
-        title="Capture a thumbnail"
-        screenshot="step-day-06-screenshot-tool.png"
-        caption="macOS Cmd+Shift+4 selection screenshot tool capturing the design."
-      >
-        <p>
-          Take a screenshot of the design (your OS's screenshot tool is fine — <strong>Cmd+Shift+4</strong>{" "}
-          on Mac for a region). Save it somewhere you remember.
-        </p>
-      </Step>
-
-      <Step
-        number={7}
         title="Publish"
         screenshot="step-day-07-publish.png"
         caption="Claude Code running the publish-design skill: asking for title, category, slug, then opening the PR."
@@ -379,7 +369,7 @@ export default function WorkflowPage() {
       </Step>
 
       <Step
-        number={8}
+        number={7}
         title="After the PR merges"
         screenshot="step-13-design-in-gallery.png"
         caption="The published design appearing on the gallery's product-area page."
@@ -409,8 +399,6 @@ export default function WorkflowPage() {
 
       <Step
         title="Locally (works any time, even offline)"
-        screenshot="step-15-gallery-local.png"
-        caption="The gallery running locally at http://localhost:3000."
       >
         <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
           <strong>You:</strong> Start the design gallery so I can browse it.
