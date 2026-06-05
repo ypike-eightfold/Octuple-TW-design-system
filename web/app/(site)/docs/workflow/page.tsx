@@ -233,32 +233,7 @@ export default function WorkflowPage() {
 
       <Step
         number={2}
-        title="Tell Claude which version you're designing for"
-        screenshot="step-day-02-version-question.png"
-        caption="Claude Code asking which design-system version (Tailwind or OG Octuple) the designer wants to use."
-      >
-        <p>At the start of every new design conversation, Claude will ask:</p>
-        <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
-          <strong>Claude:</strong> Which design system are you working in — Tailwind (<code>tw</code>) or
-          OG Octuple (<code>og</code>)?
-        </blockquote>
-        <ul className="ml-6 list-disc space-y-1">
-          <li>
-            <strong>Tailwind (<code>tw</code>)</strong>: New product, greenfield, no existing UI to match.
-          </li>
-          <li>
-            <strong>OG Octuple (<code>og</code>)</strong>: The design lives inside an existing product
-            (Talent Management, Talent Acquisition, Career Hub, etc.).
-          </li>
-        </ul>
-        <p>If you're not sure: tell Claude what you're designing for, and Claude will recommend one.</p>
-      </Step>
-
-      <Step
-        number={3}
         title="Describe the design"
-        screenshot="step-day-03-design-prompt.png"
-        caption="A Claude Code session where the designer describes a manager 1:1 dashboard and Claude starts producing the React mock."
       >
         <p>Just talk. Be specific about persona and what they're trying to do.</p>
         <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
@@ -270,13 +245,20 @@ export default function WorkflowPage() {
           Claude will produce <strong>working React code</strong> with mock data — not Figma frames,
           not static images. You can open it in a browser and click around.
         </p>
+        <p className="rounded-md border border-[var(--border)] bg-[var(--card)] p-4 text-sm">
+          <strong>If you're building a multi-screen interactive prototype</strong> (think Career
+          Hub-style flows, not a single screen), Claude may ask{" "}
+          <em>"Where should the prototype live?"</em> Pick{" "}
+          <strong>Route group in web/Next.js app</strong> — it reuses the gallery's design system
+          setup and is the easiest to make interactive. The other options (fresh standalone app,
+          static gallery entry) are rarely the right choice. You won't see this question for simple
+          single-screen designs.
+        </p>
       </Step>
 
       <Step
-        number={4}
+        number={3}
         title="Iterate"
-        screenshot="step-day-04-iterate.png"
-        caption="Designer asking Claude for a change (e.g. 'show 8 weeks instead of 4') and Claude updating the design."
       >
         <p>Look at what Claude built. Tell it what to change.</p>
         <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
@@ -287,7 +269,7 @@ export default function WorkflowPage() {
       </Step>
 
       <Step
-        number={5}
+        number={4}
         title="Check the copy"
         screenshot="step-day-05-check-copy.png"
         caption="Claude scanning the design's labels and button copy against the Eightfold terms list and reporting any issues."
@@ -301,19 +283,38 @@ export default function WorkflowPage() {
       </Step>
 
       <Step
-        number={6}
-        title="Capture a thumbnail"
-        screenshot="step-day-06-screenshot-tool.png"
-        caption="macOS Cmd+Shift+4 selection screenshot tool capturing the design."
+        number={5}
+        title="Check accessibility"
+        screenshot="step-day-05-check-a11y.png"
+        caption="Claude scanning the design for WCAG 2.2 AA issues and reporting which checks ran and what needs a human pass."
       >
         <p>
-          Take a screenshot of the design (your OS's screenshot tool is fine — <strong>Cmd+Shift+4</strong>{" "}
-          on Mac for a region). Save it somewhere you remember.
+          Then ask Claude to verify accessibility against WCAG 2.2 AA — the standard most Eightfold
+          products target:
+        </p>
+        <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
+          <strong>You:</strong> Check this design against WCAG 2.2 AA. Verify color contrast,
+          keyboard navigation, ARIA labels on icon-only buttons, form labels, target sizes, heading
+          hierarchy, and screen-reader semantics. Flag anything missing.
+        </blockquote>
+        <p>
+          Claude will scan the markup and report. Common fixes: add <code>aria-label</code> to
+          icon-only buttons, swap <code>placeholder</code>-only inputs for visible labels, replace
+          color-only status indicators with a label + icon, ensure heading levels don't skip.
+        </p>
+        <p className="rounded-md border border-[var(--border)] bg-[var(--card)] p-4 text-sm">
+          <strong>What this check covers and what it doesn't.</strong> Claude can verify roughly 80%
+          of WCAG 2.2 AA by reading the code — alt text, semantic HTML, color tokens, form labels,
+          target sizes, focus order, Radix primitives wrapped correctly. The remaining 20% needs you
+          (or a reviewer) to actually open the design in a browser: zoom to 200%, reflow at 320px,
+          tab through with the keyboard, listen with VoiceOver / NVDA, and confirm sticky elements
+          don't obscure the focused element. The skills don't claim what they can't verify — Claude
+          will tell you which checks it ran and which still need a human pass.
         </p>
       </Step>
 
       <Step
-        number={7}
+        number={6}
         title="Publish"
         screenshot="step-day-07-publish.png"
         caption="Claude Code running the publish-design skill: asking for title, category, slug, then opening the PR."
@@ -344,10 +345,31 @@ export default function WorkflowPage() {
           You'll get a link to the PR. <strong>You don't need to merge it yourself</strong> — a
           reviewer will look at it, ask questions if anything's unclear, and then merge.
         </p>
+        <p className="rounded-md border border-[var(--border)] bg-[var(--card)] p-4 text-sm">
+          <strong>For multi-screen interactive prototypes</strong>, Claude may also ask{" "}
+          <em>"Final delivery?"</em> and <em>"Which gallery category should this land in?"</em>
+        </p>
+        <ul className="ml-6 list-disc space-y-1 text-sm">
+          <li>
+            <strong>Final delivery</strong> — pick{" "}
+            <strong>Open a PR to the fork</strong>. That's the standard production path. "Local
+            working prototype" is for when you're still iterating; "Publish to design gallery"
+            only works for single static HTML pages, not interactive prototypes.
+          </li>
+          <li>
+            <strong>Gallery category</strong> — match the product surface you're prototyping.
+            Performance reviews / 1:1s / growth → <code>talent-management</code>. Candidate
+            experience / hiring → <code>talent-acquisition</code>. Generic design system showcase →{" "}
+            <code>octuple</code>. Reference example with no clear product home →{" "}
+            <code>other-example-screens</code>. Not ready to publish? Pick{" "}
+            <strong>Don't publish yet</strong> and Claude builds the prototype without wiring it
+            into the gallery.
+          </li>
+        </ul>
       </Step>
 
       <Step
-        number={8}
+        number={7}
         title="After the PR merges"
         screenshot="step-13-design-in-gallery.png"
         caption="The published design appearing on the gallery's product-area page."
@@ -360,36 +382,6 @@ export default function WorkflowPage() {
           https://&lt;your-gallery-domain&gt;/gallery/&lt;category&gt;/&lt;your-slug&gt;
         </pre>
         <p>You're done.</p>
-      </Step>
-
-      <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">Browsing existing designs</h2>
-
-      <Step
-        title="Online (after the gallery is deployed)"
-        screenshot="step-14-gallery-online.png"
-        caption="The gallery's 'Browse by product' grid at octuple-tw-design-system-web.vercel.app/gallery."
-      >
-        <p>
-          Visit the gallery URL in your browser. Sign in with your <code>@eightfold.ai</code> Google
-          account (once OAuth is wired). Browse by category.
-        </p>
-      </Step>
-
-      <Step
-        title="Locally (works any time, even offline)"
-        screenshot="step-15-gallery-local.png"
-        caption="The gallery running locally at http://localhost:3000."
-      >
-        <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
-          <strong>You:</strong> Start the design gallery so I can browse it.
-        </blockquote>
-        <p>
-          Claude will run the gallery on your laptop. Open <code>http://localhost:3000</code> in your
-          browser. When you're done:
-        </p>
-        <blockquote className="border-l-4 border-[var(--primary)] bg-[var(--card)] py-2 pl-4 italic text-[var(--muted-foreground)]">
-          <strong>You:</strong> Stop the gallery.
-        </blockquote>
       </Step>
 
       <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">"Just tell Claude" cheat sheet</h2>
