@@ -249,9 +249,9 @@ export default function WorkflowPage() {
           <strong>If you're building a multi-screen interactive prototype</strong> (think Career
           Hub-style flows, not a single screen), Claude may ask{" "}
           <em>"Where should the prototype live?"</em> Pick{" "}
-          <strong>Route group in web/Next.js app</strong> — it reuses the gallery's design-system
+          <strong>Route group in web/Next.js app</strong> — it reuses the gallery's design system
           setup and is the easiest to make interactive. The other options (fresh standalone app,
-          static gallery entry) are rarely the right call. You won't see this question for simple
+          static gallery entry) are rarely the right choice. You won't see this question for simple
           single-screen designs.
         </p>
       </Step>
@@ -339,8 +339,8 @@ export default function WorkflowPage() {
           </li>
           <li>
             <strong>Gallery category</strong> — match the product surface you're prototyping.
-            Performance reviews / 1-on-1s / growth → <code>talent-management</code>. Candidate
-            experience / hiring → <code>talent-acquisition</code>. Generic design-system showcase →{" "}
+            Performance reviews / 1:1s / growth → <code>talent-management</code>. Candidate
+            experience / hiring → <code>talent-acquisition</code>. Generic design system showcase →{" "}
             <code>octuple</code>. Reference example with no clear product home →{" "}
             <code>other-example-screens</code>. Not ready to publish? Pick{" "}
             <strong>Don't publish yet</strong> and Claude builds the prototype without wiring it
