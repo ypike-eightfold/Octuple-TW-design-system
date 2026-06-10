@@ -29,9 +29,11 @@ type DraftPin = { x: number; y: number };
 function PinBadge({
   n,
   active,
+  resolved = false,
 }: {
   n: number;
   active: boolean;
+  resolved?: boolean;
 }) {
   return (
     <span
@@ -39,10 +41,14 @@ function PinBadge({
         "flex h-7 w-7 items-center justify-center rounded-full rounded-bl-none border-2 text-xs font-semibold shadow-md transition-transform " +
         (active
           ? "scale-110 border-[var(--primary)] bg-[var(--primary)] text-white"
-          : "border-white bg-[#054D7B] text-white hover:scale-110")
+          : resolved
+            ? "border-white bg-[#94a3b8] text-white opacity-70 hover:opacity-100 hover:scale-110"
+            : "border-white bg-[#054D7B] text-white hover:scale-110")
       }
     >
-      {n}
+      {/* Resolved threads show a check instead of their number — done is
+          done; the number only matters while the thread needs attention. */}
+      {resolved ? "✓" : n}
     </span>
   );
 }
@@ -124,11 +130,14 @@ function Pins({
       role="application"
       aria-label="Comment layer — click anywhere to leave a comment"
     >
-      {/* Existing thread pins */}
+      {/* Existing thread pins — resolved ones render dimmed with a check
+          so "done" reads at a glance, but stay clickable for reference
+          (and to un-resolve from the thread header). */}
       {threads.map((thread, i) => {
         const { x, y } = thread.metadata;
         if (typeof x !== "number" || typeof y !== "number") return null;
         const isOpen = openThreadId === thread.id;
+        const resolved = thread.resolved;
         return (
           <div
             key={thread.id}
@@ -137,8 +146,9 @@ function Pins({
           >
             <button
               type="button"
-              aria-label={`Comment thread ${i + 1}${isOpen ? " (open)" : ""}`}
+              aria-label={`Comment thread ${i + 1}${resolved ? " (resolved)" : ""}${isOpen ? " (open)" : ""}`}
               aria-expanded={isOpen}
+              title={resolved ? "Resolved thread" : undefined}
               onClick={(e) => {
                 e.stopPropagation();
                 setDraft(null);
@@ -147,7 +157,7 @@ function Pins({
               }}
               className="block cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] rounded-full"
             >
-              <PinBadge n={i + 1} active={isOpen} />
+              <PinBadge n={i + 1} active={isOpen} resolved={resolved} />
             </button>
           </div>
         );
@@ -239,5 +249,7 @@ function ThreadCountInner({
   render: (count: number) => React.ReactNode;
 }) {
   const { threads } = useThreads();
-  return <>{render(threads.length)}</>;
+  // The badge is "things needing attention" — resolved threads drop out.
+  const open = threads.filter((t) => !t.resolved).length;
+  return <>{render(open)}</>;
 }
