@@ -14,6 +14,14 @@ import type { Flow } from "@/lib/flows";
  * - Click a screen card → onOpenScreen(href): the parent flips back to
  *   Prototype view with the iframe at that screen.
  *
+ * Keyboard (WCAG 2.1.1 + 2.5.7 — drag and scroll-zoom both need
+ * non-pointer alternatives):
+ * - Canvas is focusable; arrow keys pan (Shift = larger steps).
+ * - + / − zoom at the viewport center, 0 fits the whole flow.
+ * - Tab reaches every screen card; focusing a card pans it into view
+ *   (the canvas moves by transform, not scroll, so the browser can't
+ *   do this for us), Enter/Space opens it.
+ *
  * Implementation: one inner div carrying translate+scale; no canvas/2D
  * context, no graph library — we don't need edges or drag-rearrange.
  */
@@ -131,16 +139,82 @@ export function FlowCanvas({
     onOpenScreen(href);
   }
 
+  /* Keyboard pan/zoom — the non-pointer alternative to drag and
+     scroll-zoom. Handled on the viewport so it also works while a
+     screen card inside has focus. */
+  function onKeyDown(e: React.KeyboardEvent) {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const step = e.shiftKey ? 240 : 60;
+    const center = () => {
+      const r = vp.getBoundingClientRect();
+      return [r.left + r.width / 2, r.top + r.height / 2] as const;
+    };
+    switch (e.key) {
+      case "ArrowLeft":
+        setTransform((t) => ({ ...t, x: t.x + step }));
+        break;
+      case "ArrowRight":
+        setTransform((t) => ({ ...t, x: t.x - step }));
+        break;
+      case "ArrowUp":
+        setTransform((t) => ({ ...t, y: t.y + step }));
+        break;
+      case "ArrowDown":
+        setTransform((t) => ({ ...t, y: t.y - step }));
+        break;
+      case "+":
+      case "=": {
+        const [cx, cy] = center();
+        zoomAt(cx, cy, 1.25);
+        break;
+      }
+      case "-":
+      case "_": {
+        const [cx, cy] = center();
+        zoomAt(cx, cy, 1 / 1.25);
+        break;
+      }
+      case "0":
+        fit();
+        break;
+      default:
+        return; // unhandled — let it through
+    }
+    e.preventDefault();
+  }
+
+  /* Pan a focused screen card into view. The canvas pans by CSS
+     transform, not scroll, so focus alone never reveals an off-screen
+     card — without this a keyboard user can focus a card they can't
+     see (2.4.11 territory). */
+  function ensureCardVisible(el: HTMLElement) {
+    const vp = viewportRef.current;
+    if (!vp) return;
+    const pad = 24;
+    const r = el.getBoundingClientRect();
+    const v = vp.getBoundingClientRect();
+    let dx = 0;
+    let dy = 0;
+    if (r.left < v.left + pad) dx = v.left + pad - r.left;
+    else if (r.right > v.right - pad) dx = v.right - pad - r.right;
+    if (r.top < v.top + pad) dy = v.top + pad - r.top;
+    else if (r.bottom > v.bottom - pad) dy = v.bottom - pad - r.bottom;
+    if (dx || dy) setTransform((t) => ({ ...t, x: t.x + dx, y: t.y + dy }));
+  }
+
   return (
     <div
       ref={viewportRef}
-      className="relative h-full w-full overflow-hidden bg-[#1e2530] select-none"
+      className="relative h-full w-full overflow-hidden bg-[#1e2530] select-none focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-[#B0F3FE]"
       onPointerDown={onPointerDown}
       onPointerMove={onPointerMove}
       onPointerUp={onPointerUp}
       onPointerCancel={onPointerUp}
+      onKeyDown={onKeyDown}
+      tabIndex={0}
       role="application"
-      aria-label="Flow canvas — drag to pan, scroll to zoom, click a screen to open it in the prototype"
+      aria-label="Flow canvas. Drag or use arrow keys to pan, scroll or plus and minus to zoom, 0 to fit. Tab to a screen and press Enter to open it in the prototype."
       style={{ cursor: dragging ? "grabbing" : "grab", touchAction: "none" }}
     >
       <div
@@ -178,6 +252,7 @@ export function FlowCanvas({
                         <button
                           type="button"
                           onClick={() => openScreen(screen.href)}
+                          onFocus={(e) => ensureCardVisible(e.currentTarget)}
                           aria-label={`Open "${screen.caption}" in the prototype`}
                           className="block w-full cursor-pointer overflow-hidden rounded-md border border-white/15 bg-white shadow-lg transition hover:border-[#B0F3FE] hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B0F3FE]"
                         >

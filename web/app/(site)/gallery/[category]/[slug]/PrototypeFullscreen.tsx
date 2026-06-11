@@ -21,13 +21,18 @@ import type { Flow } from "@/lib/flows";
    loads /content/designs/<slug>/index.html from the host app), and
    sandbox="allow-same-origin allow-scripts" preserves that access. */
 
-type Viewport = "desktop" | "tablet-landscape" | "tablet-portrait" | "mobile";
+type Viewport = "desktop" | "tablet-landscape" | "tablet-portrait" | "mobile" | "reflow";
 
 const VIEWPORTS: { id: Viewport; label: string; width: number | null; icon: string }[] = [
   { id: "desktop", label: "Desktop", width: null, icon: "desktop_windows" },
   { id: "tablet-landscape", label: "Tablet landscape", width: 1024, icon: "tablet" },
   { id: "tablet-portrait", label: "Tablet portrait", width: 800, icon: "tablet_android" },
   { id: "mobile", label: "Mobile", width: 420, icon: "smartphone" },
+  /* WCAG 2.2 § 1.4.10 Reflow: content must work at 320 CSS px with no
+     horizontal scrolling. One click here replaces the manual check.
+     Named to match the "Responsive reflow" item in the Figma Include
+     plugin checklist designers already use. */
+  { id: "reflow", label: "Responsive reflow", width: 320, icon: "crop_portrait" },
 ];
 
 export function PrototypeFullscreen({

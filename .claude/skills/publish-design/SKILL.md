@@ -133,6 +133,26 @@ For live React prototypes, point Chrome at the live `/<product>/<route>` URL (no
 
 Write `meta.json` last so any partial copy can be detected.
 
+### 3.6. Accessibility self-check (WCAG 2.2 AA)
+
+Before committing, walk the design against the ten-category checklist in
+`.github/PULL_REQUEST_TEMPLATE/design.md` § Accessibility — it mirrors the
+Figma Include plugin checklist the design team uses, so Figma annotation
+and PR review check the same boxes: landmarks, headings, reading & focus
+order, alternative text, contrast, color, text resizing, responsive
+reflow, touch target, complex gestures.
+
+Two of them have one-click tooling in the gallery:
+
+- **Responsive reflow** — open the design in the gallery and switch the
+  viewport to "Responsive reflow" (320px). No horizontal scroll allowed.
+- **Complex gestures** — if the prototype has any drag interaction,
+  verify a click or keyboard alternative exists before publishing.
+
+Tick the boxes honestly in the PR body. An unticked box with a one-line
+reason ("needs browser verification at 200% zoom") is acceptable; a
+silently ticked box that fails review is not.
+
 ### 4. Commit
 
 ```bash
