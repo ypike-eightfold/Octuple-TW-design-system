@@ -107,15 +107,17 @@ export function FlowCanvas({
   }
 
   function onPointerMove(e: React.PointerEvent) {
-    if (!drag.current) return;
-    const dx = e.clientX - drag.current.startX;
-    const dy = e.clientY - drag.current.startY;
+    const d = drag.current;
+    if (!d) return;
+    const dx = e.clientX - d.startX;
+    const dy = e.clientY - d.startY;
     if (!dragging && Math.hypot(dx, dy) > 4) setDragging(true);
-    setTransform((t) => ({
-      ...t,
-      x: drag.current!.baseX + dx,
-      y: drag.current!.baseY + dy,
-    }));
+    /* Compute the next position eagerly — the updater must not read
+       drag.current, which onPointerUp nulls before React (possibly)
+       runs the queued updater during the next render. */
+    const x = d.baseX + dx;
+    const y = d.baseY + dy;
+    setTransform((t) => ({ ...t, x, y }));
   }
 
   function onPointerUp() {
