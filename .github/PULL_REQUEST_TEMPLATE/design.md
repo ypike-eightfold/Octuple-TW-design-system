@@ -37,12 +37,20 @@ For code changes (components, build, gallery infrastructure), use the default PR
 - [ ] Error copy is calm and actionable
 - [ ] No marketing voice in data-heavy views (tables, reports)
 
-## Accessibility
+## Accessibility (WCAG 2.2 AA — mirrors the Figma Include plugin checklist)
 
-- [ ] Headings are in a logical hierarchy (no skipped levels)
-- [ ] Form fields have visible labels (not placeholder-only)
-- [ ] Icon-only buttons have an `aria-label`
-- [ ] Color is not the sole conveyor of meaning (status, errors)
+<!-- Same ten categories the Include plugin annotates, so the Figma review and the code review check identical boxes. Form fields additionally need visible labels (never placeholder-only). -->
+
+- [ ] **Landmarks** — page regions use semantic elements (`<main>`, `<nav>`, `<header>`, `<footer>`)
+- [ ] **Headings** — logical hierarchy, no skipped levels
+- [ ] **Reading & focus order** — Tab order matches visual order; no keyboard traps; visible focus on every interactive element
+- [ ] **Alternative text** — every `<img>` has `alt` (or `alt=""` if decorative); icon-only buttons have an `aria-label`
+- [ ] **Contrast** — 4.5:1 body text, 3:1 large text / UI components (semantic tokens are pre-checked)
+- [ ] **Color** — never the sole conveyor of meaning (status and errors get icon + text)
+- [ ] **Text resizing** — readable at 200% browser zoom, no clipped or overlapping text
+- [ ] **Responsive reflow** — no horizontal scroll at 320px (use the gallery's "Responsive reflow" viewport)
+- [ ] **Touch target** — interactive targets ≥ 24×24 px (44×44 on mobile-first surfaces)
+- [ ] **Complex gestures** — drag / multi-point gestures have a click or keyboard alternative
 
 ## Reviewer notes
 
