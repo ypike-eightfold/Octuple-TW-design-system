@@ -1,0 +1,124 @@
+{
+  "lanes": [
+    {
+      "title": "Recruiter · Create a new posting",
+      "sections": [
+        {
+          "title": "Start",
+          "screens": [
+            {
+              "id": "dashboard-new",
+              "caption": "Dashboard — Hi Du",
+              "thumbnail": "flow/dashboard.png",
+              "href": "index.html#dashboard"
+            }
+          ]
+        },
+        {
+          "title": "Define the role",
+          "screens": [
+            {
+              "id": "create-position",
+              "caption": "Wizard — hiring type, seniority, schedule, title, details",
+              "thumbnail": "flow/create-position.png",
+              "href": "index.html#create-position"
+            },
+            {
+              "id": "create-overview-new",
+              "caption": "Posting overview · EN/DE editor + MARA chat",
+              "thumbnail": "flow/create-overview.png",
+              "href": "index.html#create-overview"
+            }
+          ]
+        },
+        {
+          "title": "Open to candidates",
+          "screens": [
+            {
+              "id": "candidates-new",
+              "caption": "Candidate pipeline · review applicants",
+              "thumbnail": "flow/candidates.png",
+              "href": "index.html#candidates"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Recruiter · Manage an existing posting",
+      "sections": [
+        {
+          "title": "Browse postings",
+          "screens": [
+            {
+              "id": "postings-manage",
+              "caption": "Postings — all open & closed jobs",
+              "thumbnail": "flow/postings.png",
+              "href": "index.html#postings"
+            }
+          ]
+        },
+        {
+          "title": "Edit a posting",
+          "screens": [
+            {
+              "id": "create-overview-edit",
+              "caption": "Posting overview · update sections",
+              "thumbnail": "flow/create-overview.png",
+              "href": "index.html#create-overview"
+            }
+          ]
+        },
+        {
+          "title": "Move candidates through the pipeline",
+          "screens": [
+            {
+              "id": "candidates-manage",
+              "caption": "Candidate pipeline · stages from Lead → Onboarding",
+              "thumbnail": "flow/candidates.png",
+              "href": "index.html#candidates"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Recruiter · Daily review",
+      "sections": [
+        {
+          "title": "Triage from home",
+          "screens": [
+            {
+              "id": "dashboard-daily",
+              "caption": "Dashboard — KPIs, notifications, Your Jobs",
+              "thumbnail": "flow/dashboard.png",
+              "href": "index.html#dashboard"
+            }
+          ]
+        },
+        {
+          "title": "Open the right posting",
+          "screens": [
+            {
+              "id": "postings-daily",
+              "caption": "Postings list",
+              "thumbnail": "flow/postings.png",
+              "href": "index.html#postings"
+            }
+          ]
+        },
+        {
+          "title": "Act on MARA nudges",
+          "screens": [
+            {
+              "id": "candidates-daily",
+              "caption": "Candidate pipeline · agent nudges in sidebar",
+              "thumbnail": "flow/candidates.png",
+              "href": "index.html#candidates"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
