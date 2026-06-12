@@ -20,13 +20,43 @@ export interface Hero {
 }
 
 export const HEROES: Hero[] = [
+  // Cyberpunk theme — angular geometric illustrations on warm pink → purple
+  // gradients with dark outlines. Same family aesthetic across all four
+  // variants, so they're labelled as the home screen + three alternates.
   {
-    id: "comic-rocks",
-    label: "Comic rocks",
-    description: "Angular pink → purple geometry. Works in light and dark.",
+    id: "cyberpunk",
+    label: "Cyberpunk",
+    description: "Angular geometry on warm pink → purple gradients. Home-screen default.",
     src: {
       light: "/heroes/comic-rocks.svg",
       dark: "/heroes/comic-rocks.svg",
+    },
+  },
+  {
+    id: "cyberpunk-ocean-waves",
+    label: "Cyberpunk · Ocean waves",
+    description: "Triangular wave geometry, same gradient palette.",
+    src: {
+      light: "/heroes/ocean-waves.svg",
+      dark: "/heroes/ocean-waves.svg",
+    },
+  },
+  {
+    id: "cyberpunk-burning-lands",
+    label: "Cyberpunk · Burning lands",
+    description: "Mountainous geometry in the Cyberpunk gradient family.",
+    src: {
+      light: "/heroes/burning-lands.svg",
+      dark: "/heroes/burning-lands.svg",
+    },
+  },
+  {
+    id: "cyberpunk-cloudy-wind",
+    label: "Cyberpunk · Cloudy wind",
+    description: "Layered cloud forms with a deeper burgundy palette.",
+    src: {
+      light: "/heroes/cloudy-wind.svg",
+      dark: "/heroes/cloudy-wind.svg",
     },
   },
   {
@@ -41,7 +71,7 @@ export const HEROES: Hero[] = [
   },
 ];
 
-export const DEFAULT_HERO_ID = "comic-rocks";
+export const DEFAULT_HERO_ID = "cyberpunk";
 
 export function getHeroById(id: string | null | undefined): Hero {
   return HEROES.find((h) => h.id === id) ?? HEROES[0];
