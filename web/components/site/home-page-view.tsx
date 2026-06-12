@@ -57,7 +57,7 @@ export function HomePageView({
         <div className="px-6">
           <div className="mx-auto max-w-6xl pt-28 pb-14">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-white">
+              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--foreground)]">
                 <span
                   className="material-symbols-outlined"
                   style={{ fontSize: 16 }}
@@ -67,10 +67,10 @@ export function HomePageView({
                 </span>
                 For everyone designing for Eightfold AI
               </div>
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
                 Design at Eightfold&nbsp;AI
               </h1>
-              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white">
+              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--foreground)]">
                 The design system, the approved designs, and what the team shipped
                 lately &mdash; {totalDesigns} {totalDesigns === 1 ? "design" : "designs"} across{" "}
                 {categoryCount} product areas and counting.
