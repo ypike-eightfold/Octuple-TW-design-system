@@ -41,29 +41,18 @@ export function HomePageView({
           turns the top edge into a frosted glass band. Kept short — the
           page is a dashboard now, and the feeds below are the point. */}
       <section className="relative -mt-16">
-        {/* One hero illustration in both modes. The comic-rocks SVG is
-            transparent outside its angular shapes, so the colored panels
-            ride on top of whatever body background is behind. Using
-            background-size: 100% auto (full width, natural height) so
-            the illustration is never vertically cropped, and the section
-            drops overflow-hidden for the same reason. */}
-        <div
-          className="absolute inset-0 -z-10"
+        {/* Hero illustration as an <img> rather than a CSS background.
+            CSS background-image is always clipped to its element's box
+            (there's no overflow:visible equivalent), which kept cutting
+            the bottom of the SVG. An <img> with absolute positioning
+            renders at its full natural aspect at any width and is free
+            to extend beyond the section — pointer-events:none so it
+            doesn't block clicks on content layered above it. */}
+        <img
+          src="/octuple-hero.svg"
+          alt=""
           aria-hidden
-          style={{
-            backgroundImage: "url('/octuple-hero.svg')",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center top",
-            backgroundSize: "100% auto",
-            // Mask the bottom ~40% of the image so the SVG dissolves into
-            // the page background instead of cutting off in a hard band.
-            // Same gradient on both -webkit-mask-image and mask-image for
-            // older Safari + modern browsers.
-            WebkitMaskImage:
-              "linear-gradient(to bottom, black 55%, transparent 100%)",
-            maskImage:
-              "linear-gradient(to bottom, black 55%, transparent 100%)",
-          }}
+          className="absolute top-0 left-0 w-full -z-10 pointer-events-none select-none"
         />
         <div className="px-6">
           <div className="mx-auto max-w-6xl pt-28 pb-14">
