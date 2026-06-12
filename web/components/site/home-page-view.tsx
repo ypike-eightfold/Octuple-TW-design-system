@@ -71,12 +71,7 @@ export function HomePageView({
         />
         <div className="px-6">
           <div className="mx-auto max-w-6xl pt-28 pb-14">
-            {/* Glass card behind the hero copy. CSS can't auto-pick a
-                contrast colour from a multi-colour illustration, so we
-                give the text a frosted backdrop that reads consistently
-                regardless of what the hero is showing — same pattern as
-                the top-nav glass. */}
-            <div className="max-w-3xl rounded-2xl border border-white/30 bg-white/40 p-8 backdrop-blur-md dark:border-white/10 dark:bg-black/30">
+            <div className="max-w-3xl">
               <div className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--muted-foreground)]">
                 <span
                   className="material-symbols-outlined"
@@ -90,7 +85,7 @@ export function HomePageView({
               <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
                 Design at Eightfold&nbsp;AI
               </h1>
-              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--foreground)]/80">
+              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--muted-foreground)]">
                 The design system, the approved designs, and what the team shipped
                 lately &mdash; {totalDesigns} {totalDesigns === 1 ? "design" : "designs"} across{" "}
                 {categoryCount} product areas and counting.
@@ -102,10 +97,9 @@ export function HomePageView({
                     <ArrowRight aria-hidden className="ml-1 h-4 w-4" />
                   </Link>
                 </Button>
-                {/* Glassmorphic secondary CTAs that read against any hero
-                    illustration. Wrap each Button so we can layer the
-                    blur + translucent fill without fighting Octuple's
-                    .btn--outline classes. */}
+                {/* Glassmorphic secondary CTAs — translucent + backdrop
+                    blur so they stay legible against any hero artwork.
+                    Plain anchors so we don't fight Octuple's btn--outline. */}
                 <Link
                   href="/gallery"
                   className="inline-flex h-11 items-center rounded-full border border-white/50 bg-white/40 px-5 text-base font-semibold text-[var(--foreground)] backdrop-blur-md transition hover:bg-white/60 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/15"
