@@ -2,7 +2,9 @@
 
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import { useTheme } from "next-themes";
 import { Button } from "@tonyh-2-eightfold/ef-design-system";
+import { useHero } from "@/components/site/hero-provider";
 import type { ActivityEntry } from "@/lib/github-activity";
 
 export interface LatestDesign {
@@ -34,6 +36,14 @@ export function HomePageView({
   octupleUpdates,
   teamActivity,
 }: Props) {
+  // Hero illustration is user-selectable from the top nav. The provider
+  // hands us back the active hero record; we pick the light or dark src
+  // based on the resolved theme. resolvedTheme can be undefined on first
+  // render — fall back to the light variant.
+  const { hero } = useHero();
+  const { resolvedTheme } = useTheme();
+  const heroSrc = resolvedTheme === "dark" ? hero.src.dark : hero.src.light;
+
   return (
     <div>
       {/* SLIM HERO ---------------------------------------------------------
@@ -49,9 +59,12 @@ export function HomePageView({
             to extend beyond the section — pointer-events:none so it
             doesn't block clicks on content layered above it. */}
         <img
-          src="/octuple-hero.svg"
+          src={heroSrc}
           alt=""
           aria-hidden
+          // key forces a remount when the user picks a different hero,
+          // so the browser swaps the SVG without any cached-paint flash.
+          key={heroSrc}
           className="absolute top-0 left-0 w-full -z-10 pointer-events-none select-none"
         />
         <div className="px-6">

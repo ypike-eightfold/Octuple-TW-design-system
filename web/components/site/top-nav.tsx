@@ -5,6 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import type { Session } from "next-auth";
 import { Tabs, TabsList, TabsTrigger } from "@tonyh-2-eightfold/ef-design-system";
 import { ThemeSwitcher } from "./theme-switcher";
+import { HeroSwitcher } from "./hero-switcher";
 
 interface Props {
   session: Session | null;
@@ -81,6 +82,7 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
         </div>
 
         <div className="flex items-center gap-3 text-sm text-[var(--muted-foreground)]">
+          <HeroSwitcher />
           <ThemeSwitcher />
           {!authEnabled ? null : session?.user ? (
             <>
