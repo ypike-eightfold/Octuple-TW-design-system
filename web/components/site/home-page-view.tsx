@@ -41,26 +41,23 @@ export function HomePageView({
           turns the top edge into a frosted glass band. Kept short — the
           page is a dashboard now, and the feeds below are the point. */}
       <section className="relative -mt-16">
-        {/* One hero illustration in both modes. The comic-rocks SVG is
-            transparent outside its angular shapes, so the colored panels
-            ride on top of whatever body background is behind. Using
-            background-size: 100% auto (full width, natural height) so
-            the illustration is never vertically cropped; section drops
-            overflow-hidden for the same reason. */}
-        <div
-          className="absolute inset-0 -z-10"
+        {/* Hero illustration as an <img> rather than a CSS background.
+            CSS background-image is always clipped to its element's box
+            (there's no overflow:visible equivalent), which kept cutting
+            the bottom of the SVG. An <img> with absolute positioning
+            renders at its full natural aspect at any width and is free
+            to extend beyond the section — pointer-events:none so it
+            doesn't block clicks on content layered above it. */}
+        <img
+          src="/octuple-hero.svg"
+          alt=""
           aria-hidden
-          style={{
-            backgroundImage: "url('/octuple-hero.svg')",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center top",
-            backgroundSize: "100% auto",
-          }}
+          className="absolute top-0 left-0 w-full -z-10 pointer-events-none select-none"
         />
         <div className="px-6">
           <div className="mx-auto max-w-6xl pt-28 pb-14">
             <div className="max-w-3xl">
-              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-white">
+              <div className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--foreground)]">
                 <span
                   className="material-symbols-outlined"
                   style={{ fontSize: 16 }}
@@ -70,10 +67,10 @@ export function HomePageView({
                 </span>
                 For everyone designing for Eightfold AI
               </div>
-              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white sm:text-5xl">
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
                 Design at Eightfold&nbsp;AI
               </h1>
-              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-white">
+              <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--foreground)]">
                 The design system, the approved designs, and what the team shipped
                 lately &mdash; {totalDesigns} {totalDesigns === 1 ? "design" : "designs"} across{" "}
                 {categoryCount} product areas and counting.
