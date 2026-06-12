@@ -41,29 +41,16 @@ export function HomePageView({
           turns the top edge into a frosted glass band. Kept short — the
           page is a dashboard now, and the feeds below are the point. */}
       <section className="relative -mt-16 overflow-hidden">
-        {/* Two brand-art hero variants. octuple-hero.svg is the light
-            "comic rocks" geometric illustration (warm pink → purple
-            angular shapes). octuple-hero-dark.svg is the official dark
-            variant from the design team — same gradient palette, dark
-            #1A212E base. Each variant is paired with a Tailwind dark:
-            visibility class so only one shows at a time once the theme
-            switcher is in place; both are committed so future hero
-            tweaks edit the SVG directly. */}
+        {/* One hero illustration in both modes. The comic-rocks SVG is
+            transparent outside its angular shapes, so the colored panels
+            ride on top of whatever body background is behind — pale
+            cream in light, near-black in dark — and the visual identity
+            stays consistent across themes. */}
         <div
-          className="absolute inset-0 -z-10 dark:hidden"
+          className="absolute inset-0 -z-10"
           aria-hidden
           style={{
             backgroundImage: "url('/octuple-hero.svg')",
-            backgroundRepeat: "no-repeat",
-            backgroundPosition: "center top",
-            backgroundSize: "cover",
-          }}
-        />
-        <div
-          className="absolute inset-0 -z-10 hidden dark:block"
-          aria-hidden
-          style={{
-            backgroundImage: "url('/octuple-hero-dark.svg')",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center top",
             backgroundSize: "cover",
