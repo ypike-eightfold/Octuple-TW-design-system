@@ -132,7 +132,29 @@ For live React prototypes, point Chrome at the live `/<product>/<route>` URL (no
 
 Write `meta.json` last so any partial copy can be detected.
 
-### 3.6. Accessibility self-check (WCAG 2.2 AA)
+### 3.6. Flow coverage check (MANDATORY for multi-screen prototypes)
+
+Before continuing, answer for the user: **how many distinct screens does this prototype have?** A "screen" is a meaningfully different visual state — a new route, a new tab/panel that shows different content, a wizard step, a separate pipeline view. Loading states, hover states, and chrome-only changes do NOT count.
+
+| Screen count | What to do |
+|---|---|
+| 1 | Skip — the gallery synthesizes a one-tile flow from `meta.json`. |
+| 2+ | **STOP.** Author `flow.json` + `flow/*.png` thumbnails in the design folder before opening the PR. |
+
+`flow.json` schema, capture commands, and worked examples: [`../_shared/prototype-scaffolding.md`](../_shared/prototype-scaffolding.md) § "Flows view".
+
+Self-check before continuing past this step:
+
+```bash
+# If the prototype has >1 screen, BOTH of these must be present.
+test -f web/public/content/designs/<category>/<slug>/flow.json && \
+  ls web/public/content/designs/<category>/<slug>/flow/*.png >/dev/null 2>&1 && \
+  echo "Flow coverage OK" || echo "MISSING flow.json or flow/ thumbnails — author them before continuing"
+```
+
+If the prototype's screens are React state (not URLs), you also need a hash-based entry point so the canvas can deep-link — each `flow.json` `href` looks like `index.html#<screen-id>`. Make the prototype read `window.location.hash` on mount and respond to `hashchange`. See `mara-telekom` for the canonical pattern.
+
+### 3.7. Accessibility self-check (WCAG 2.2 AA)
 
 Before committing, walk the design against the ten-category checklist in
 `.github/PULL_REQUEST_TEMPLATE/design.md` § Accessibility — it mirrors the
