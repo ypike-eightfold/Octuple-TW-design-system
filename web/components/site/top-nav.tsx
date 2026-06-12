@@ -43,16 +43,17 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
     <header
       className={
         "sticky top-0 z-50 h-16 backdrop-blur-xl " +
-        // Light mode (default) — original glass over the hero illustration
-        "border-b border-white/30 bg-white/40 supports-[backdrop-filter]:bg-white/30 " +
-        // Dark mode — same glass effect but inverted so the nav reads against a dark background
-        "dark:border-white/10 dark:bg-[var(--background)]/60 dark:supports-[backdrop-filter]:bg-[var(--background)]/50"
+        // Glass tint as a vertical gradient — denser at the top where the
+        // logo / tabs need a stable backdrop, fading to ~5% at the bottom
+        // so the nav smoothly dissolves into the hero illustration below
+        // instead of cutting it off with a hard band.
+        "bg-gradient-to-b from-white/40 to-white/5 " +
+        "dark:from-[var(--background)]/60 dark:to-[var(--background)]/5"
       }
     >
-      {/* Glassmorphism: translucent fill + backdrop-blur so the hero
-          illustration on /  shows through the nav. On routes without
-          a hero behind it, the card-color underlay still reads as a
-          clean header thanks to the body background. */}
+      {/* Glassmorphism: translucent gradient fill + backdrop-blur so the
+          hero illustration on / shows through the nav. backdrop-blur
+          stays uniform across the band; only the tint fades. */}
       <div className="flex h-full w-full items-center justify-between gap-4 px-6">
         <Link href="/" className="flex items-center gap-3">
           <img
