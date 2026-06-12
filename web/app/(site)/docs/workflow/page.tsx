@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { PageHero } from "@/components/site/page-hero";
 
 export const revalidate = 60;
 
@@ -86,6 +87,7 @@ export default function WorkflowPage() {
     // stay aligned at this width on every viewport — no side-by-side squish,
     // no images blowing up to fill 1152px on wide monitors.
     <article className="mx-auto max-w-4xl">
+      <PageHero src="/heroes/ocean-waves.svg" />
       <header className="mb-10">
         <h1 className="text-4xl font-semibold tracking-tight">Designer workflow</h1>
         <p className="mt-3 text-lg text-[var(--muted-foreground)]">

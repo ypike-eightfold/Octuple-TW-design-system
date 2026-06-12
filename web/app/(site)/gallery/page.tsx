@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { CATEGORIES } from "@/lib/categories";
 import { getAllDesigns, type Design } from "@/lib/designs";
+import { PageHero } from "@/components/site/page-hero";
 
 export const revalidate = 60;
 
@@ -31,6 +32,7 @@ export default function HomePage() {
 
   return (
     <div>
+      <PageHero src="/heroes/burning-lands.svg" />
       <div className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight">Browse by product</h1>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">

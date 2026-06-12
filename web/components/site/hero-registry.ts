@@ -19,10 +19,13 @@ export interface Hero {
   src: { light: string; dark: string };
 }
 
+// Heroes available for the HOME PAGE picker. Section pages (Octuple,
+// Gallery, How to use) have their own assigned hero banners rendered
+// via <PageHero src="..." /> with files committed under public/heroes/
+// (cloudy-wind / burning-lands / ocean-waves respectively) — they are
+// intentionally NOT in this registry so the home switcher stays scoped
+// to home-screen choices.
 export const HEROES: Hero[] = [
-  // Cyberpunk theme — angular geometric illustrations on warm pink → purple
-  // gradients with dark outlines. Same family aesthetic across all four
-  // variants, so they're labelled as the home screen + three alternates.
   {
     id: "cyberpunk",
     label: "Cyberpunk",
@@ -30,33 +33,6 @@ export const HEROES: Hero[] = [
     src: {
       light: "/heroes/comic-rocks.svg",
       dark: "/heroes/comic-rocks.svg",
-    },
-  },
-  {
-    id: "cyberpunk-ocean-waves",
-    label: "Cyberpunk · Ocean waves",
-    description: "Triangular wave geometry, same gradient palette.",
-    src: {
-      light: "/heroes/ocean-waves.svg",
-      dark: "/heroes/ocean-waves.svg",
-    },
-  },
-  {
-    id: "cyberpunk-burning-lands",
-    label: "Cyberpunk · Burning lands",
-    description: "Mountainous geometry in the Cyberpunk gradient family.",
-    src: {
-      light: "/heroes/burning-lands.svg",
-      dark: "/heroes/burning-lands.svg",
-    },
-  },
-  {
-    id: "cyberpunk-cloudy-wind",
-    label: "Cyberpunk · Cloudy wind",
-    description: "Layered cloud forms with a deeper burgundy palette.",
-    src: {
-      light: "/heroes/cloudy-wind.svg",
-      dark: "/heroes/cloudy-wind.svg",
     },
   },
   {

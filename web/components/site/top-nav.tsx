@@ -82,7 +82,9 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
         </div>
 
         <div className="flex items-center gap-3 text-sm text-[var(--muted-foreground)]">
-          <HeroSwitcher />
+          {/* HeroSwitcher only on the home page — other section pages have
+              their own assigned banner (see web/components/site/page-hero.tsx). */}
+          {pathname === "/" && <HeroSwitcher />}
           <ThemeSwitcher />
           {!authEnabled ? null : session?.user ? (
             <>
