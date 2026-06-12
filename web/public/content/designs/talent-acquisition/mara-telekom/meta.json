@@ -1,0 +1,9 @@
+{
+  "title": "MARA · Magenta Recruiting Assistant (Deutsche Telekom)",
+  "description": "A Telekom-branded recruiter web app powered by Eightfold's TalentForge APIs. Shows what a customer's own UI looks like when it sits on top of Eightfold's data, matching, and AI agent layer rather than using Talent Acquisition directly. Four end-to-end MARA 2.0 surfaces: Dashboard (Hi Du greeting, ask-MARA input, Your Jobs with status pills, KPI tiles, German notifications), Create-position multi-step wizard (hiring type → seniority → schedule → bilingual titles → details), Create-overview (collapsible sections, real EN/DE language tabs on rich-text editor, contextual MARA chat sidebar), and Candidate management pipeline (stage tabs Leads → Shortlist → Interview → Assessment → Offer → Contract → Hired → Onboarding → Reject with stage-aware action buttons + agent nudges in German).",
+  "category": "talent-acquisition",
+  "version": "tailwind",
+  "slug": "mara-telekom",
+  "author": "ypike-eightfold",
+  "createdAt": "2026-06-11T00:00:00Z"
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import { Component, Fragment, useEffect, useState, type ReactNode } from 'react'
-import { Menu, Palette, LayoutGrid, PanelTop, ExternalLink, FileText, ChevronRight } from 'lucide-react'
+import { Menu, Palette, LayoutGrid, PanelTop, ExternalLink, FileText, ChevronRight, Home, Shapes, Image as ImageIcon, Download } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 
@@ -156,19 +156,31 @@ const TOKEN_SECTIONS = [
 
 const TOKEN_SECTION_IDS = TOKEN_SECTIONS.map((s) => s.id)
 
-const CONTENT_PAGES = [
+/** Markdown documents served by the Documents sidebar section. Ids must
+    match DOCUMENT_SOURCES in page.tsx, which reads the files (the shared
+    content guidelines plus the Gem docs auto-synced from Google Docs). */
+const DOCUMENT_PAGES = [
   { id: 'content-design-standards', label: 'Content design standards' },
   { id: 'terms-list', label: 'Terms list' },
+  { id: 'response-confidence-score', label: 'Response confidence score' },
+  { id: 'guidance-layer', label: 'Guidance layer' },
+  { id: 'oh-prompt-instructions', label: 'OH prompt instructions' },
+  { id: 'oh-content-quality-framework', label: 'OH content quality framework' },
 ] as const
 
-const CONTENT_PAGE_IDS = CONTENT_PAGES.map((c) => c.id)
-
 const SIDEBAR_GROUPS = [
+  {
+    label: 'Overview',
+    items: [
+      { id: 'home', label: 'Home', icon: Home, href: undefined as string | undefined },
+    ],
+  },
   {
     label: 'Tokens',
     items: [
       ...TOKEN_SECTIONS.map((s) => ({ id: s.id, label: s.label, icon: Palette, href: undefined as string | undefined })),
-      ...CONTENT_PAGES.map((c) => ({ id: c.id, label: c.label, icon: FileText, href: undefined as string | undefined })),
+      { id: 'iconography', label: 'Iconography', icon: Shapes, href: undefined as string | undefined },
+      { id: 'illustration', label: 'Illustration', icon: ImageIcon, href: undefined as string | undefined },
     ],
   },
   {
@@ -185,9 +197,12 @@ const SIDEBAR_GROUPS = [
     ],
   },
   {
+    label: 'Documents',
+    items: DOCUMENT_PAGES.map((c) => ({ id: c.id, label: c.label, icon: FileText, href: undefined as string | undefined })),
+  },
+  {
     label: 'Examples',
     items: [
-      { id: 'ex-overview', label: 'Talent Forge overview', icon: ExternalLink, href: '/gallery/other-example-screens/talent-forge-overview' },
       { id: 'ex-growth-hub', label: 'Employee growth hub', icon: ExternalLink, href: '/gallery/other-example-screens/employee-growth-hub' },
       { id: 'ex-teams-agent', label: 'Hiring pipeline agent', icon: ExternalLink, href: '/gallery/other-example-screens/teams-hm-agent' },
       { id: 'ex-perform-360', label: 'Perform 360', icon: ExternalLink, href: '/gallery/other-example-screens/perform-360' },
@@ -374,6 +389,30 @@ function TokensShowcase({ scrollToId }: { scrollToId?: string }) {
           >
             Gilroy, Inter, system-ui
           </span>
+        </div>
+        {/* Font downloads — Gilroy is licensed (internal Drive share);
+            Poppins is the open-source companion on Google Fonts. */}
+        <div className="mt-4 flex flex-wrap gap-3">
+          <Button asChild variant="outline" size="sm">
+            <a
+              href="https://drive.google.com/file/d/10M96QtImNrVz_xzolMww9VBwyXmmI082/view"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Download aria-hidden className="h-4 w-4" />
+              Download Gilroy
+            </a>
+          </Button>
+          <Button asChild variant="outline" size="sm">
+            <a
+              href="https://fonts.google.com/specimen/Poppins"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Download aria-hidden className="h-4 w-4" />
+              Get Poppins on Google Fonts
+            </a>
+          </Button>
         </div>
         <div className="mt-8 space-y-12">
           {TYPOGRAPHY_GROUPS.map(({ title, tokens }) => (
@@ -1411,17 +1450,214 @@ function MarkdownDoc({ source }: { source: string }) {
   )
 }
 
+/** Catalog landing page — the default view, so the catalog no longer
+    opens straight onto the Typography token table. */
+function CatalogHome({ onNavigate }: { onNavigate: (page: string) => void }) {
+  const tiles = [
+    { page: 'typography', title: 'Tokens', body: 'Typography, spacing, corner radius, and the full Octuple color system.' },
+    { page: 'ui-button', title: 'Components', body: 'Every primitive and Eightfold-specific component, with live examples.' },
+    { page: 'iconography', title: 'Iconography', body: 'Material Design Icons — browse the library and download the webfont.' },
+    { page: 'illustration', title: 'Illustration', body: 'unDraw library plus the usage guidance for Octuple-style illustration.' },
+    { page: 'content-design-standards', title: 'Documents', body: 'Content design standards, the terms list, and the Gem instruction docs.' },
+  ]
+  return (
+    <div>
+      <h2 className="text-3xl font-semibold tracking-tight text-foreground">Octuple design system</h2>
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
+        Everything you need to design and build for Eightfold AI: design tokens,
+        components with live examples, iconography and illustration resources, and
+        the content documents the whole team writes against. Pick a section here or
+        in the sidebar.
+      </p>
+      <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-2">
+        {tiles.map((t) => (
+          <button
+            key={t.page}
+            type="button"
+            onClick={() => onNavigate(t.page)}
+            className="rounded-xl border border-border bg-card p-5 text-left transition hover:border-[var(--primary)] hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+          >
+            <span className="block font-semibold text-foreground">{t.title}</span>
+            <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">{t.body}</span>
+          </button>
+        ))}
+        <a
+          href="/docs/workflow"
+          className="rounded-xl border border-border bg-card p-5 text-left transition hover:border-[var(--primary)] hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
+        >
+          <span className="block font-semibold text-foreground">How to use</span>
+          <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
+            The designer workflow — from prompt to published gallery design.
+          </span>
+        </a>
+      </div>
+    </div>
+  )
+}
+
+/** External-resource page shell: intro + actions on top, embedded browser
+    below, with an open-in-new-tab escape hatch since embedded sites can't
+    be deep-linked or may block framing in the future. */
+function EmbeddedResource({ src, title }: { src: string; title: string }) {
+  return (
+    <div className="mt-6">
+      <iframe
+        src={src}
+        title={title}
+        className="h-[720px] w-full rounded-lg border border-border bg-white"
+        loading="lazy"
+      />
+      <p className="mt-2 text-xs text-muted-foreground">
+        <a className="underline" href={src} target="_blank" rel="noopener noreferrer">
+          Open {title} in a new tab ↗
+        </a>
+      </p>
+    </div>
+  )
+}
+
+function IconographyPage() {
+  return (
+    <div>
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground">Iconography</h2>
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
+        Octuple products use the Material Design Icons (MDI) set. Browse the full
+        library below to find an icon by name or keyword, and download the webfont
+        files to use them in design files and prototypes.
+      </p>
+      <div className="mt-5">
+        <Button asChild variant="outline">
+          <a
+            href="https://github.com/Templarian/MaterialDesign-Webfont/tree/master/fonts"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Download aria-hidden className="h-4 w-4" />
+            Download the MDI webfont
+          </a>
+        </Button>
+      </div>
+      <EmbeddedResource src="https://pictogrammers.com/library/mdi/" title="the MDI icon library" />
+    </div>
+  )
+}
+
+/** Illustration usage guidance — content from the ODS Illustration doc,
+    collapsed by default above the unDraw browser. */
+function IllustrationPage() {
+  return (
+    <div>
+      <h2 className="text-2xl font-semibold tracking-tight text-foreground">Illustration</h2>
+      <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
+        We use the open-source unDraw library. Read the usage guidance first —
+        illustrations should be used with focus and purpose, not decoration.
+      </p>
+
+      <details className="group mt-5 rounded-lg border border-border bg-card">
+        <summary className="flex cursor-pointer items-center gap-2 rounded-lg px-5 py-4 font-semibold text-foreground transition hover:bg-muted/50 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]">
+          <ChevronRight aria-hidden className="h-4 w-4 shrink-0 transition-transform group-open:rotate-90" />
+          Usage guidance for illustrations
+        </summary>
+        <div className="space-y-5 border-t border-border px-5 py-5 text-sm leading-relaxed text-foreground">
+          <section>
+            <h3 className="font-semibold">1. Use illustrations to add context and simplify complex ideas</h3>
+            <ul className="mt-2 ml-5 list-disc space-y-1">
+              <li>Clarify complex processes, such as onboarding steps or feature explanations.</li>
+              <li>Visually represent abstract concepts that are hard to describe with text alone.</li>
+              <li>Guide users toward their next action — empty states, success and error pages.</li>
+            </ul>
+          </section>
+          <section>
+            <h3 className="font-semibold">2. Avoid overusing illustrations</h3>
+            <ul className="mt-2 ml-5 list-disc space-y-1">
+              <li>Skip them when they don&apos;t contribute to understanding or decision-making.</li>
+              <li>Skip them when they overwhelm the interface, compete with core content, or slow loading.</li>
+              <li>Never purely decorative — excessive use makes the product feel cluttered rather than purposeful.</li>
+            </ul>
+          </section>
+          <section>
+            <h3 className="font-semibold">3. Ensure context relevance</h3>
+            <p className="mt-2">
+              Every illustration should serve a purpose that enhances the user experience. If it
+              feels disconnected from the content or functionality, reconsider adding it. Use a
+              helpful onboarding visual that explains, not decorates; avoid unnecessary visuals on
+              task-heavy interfaces where clarity is key.
+            </p>
+          </section>
+          <section>
+            <h3 className="font-semibold">4. Prioritize visual consistency</h3>
+            <ul className="mt-2 ml-5 list-disc space-y-1">
+              <li>Use consistent styles, shapes, and proportions across all illustrations in the product.</li>
+              <li>Ensure colors, themes, and tone align with the brand&apos;s visual language.</li>
+              <li>Avoid mixing artistic styles — it disrupts the cohesive experience.</li>
+            </ul>
+          </section>
+          <section>
+            <h3 className="font-semibold">5. Keep users front and center</h3>
+            <ul className="mt-2 ml-5 list-disc space-y-1">
+              <li>Ask if the visual solves a user&apos;s problem or makes their task easier.</li>
+              <li>Avoid self-indulgent or overly artistic illustrations that prioritize aesthetics over practicality.</li>
+            </ul>
+          </section>
+          <section>
+            <h3 className="font-semibold">6. Think of empty states and moments of delight</h3>
+            <ul className="mt-2 ml-5 list-disc space-y-1">
+              <li>Empty states (&quot;No data found&quot;) gain value with simple, encouraging visuals.</li>
+              <li>Feedback screens — completion or success messages — can celebrate the user&apos;s progress.</li>
+            </ul>
+          </section>
+          <section>
+            <h3 className="font-semibold">7. Evaluate performance impact</h3>
+            <p className="mt-2">
+              Illustrations must not increase loading times or hinder accessibility. Prioritize
+              optimized SVGs and scalable formats.
+            </p>
+          </section>
+          <section>
+            <h3 className="font-semibold">Checklist before adding an illustration</h3>
+            <ul className="mt-2 ml-5 list-disc space-y-1">
+              <li>Is this solving a problem for the user, or just decorative?</li>
+              <li>Does it complement surrounding interface elements without competing with them?</li>
+              <li>Is it consistent with our visual and brand style?</li>
+              <li>Does it add clarity, simplify a process, or reduce user confusion?</li>
+            </ul>
+          </section>
+          <section>
+            <h3 className="font-semibold">Creating an Octuple-style illustration</h3>
+            <ol className="mt-2 ml-5 list-decimal space-y-1">
+              <li>Start from the primary use case — have a clear vision of what you want to create.</li>
+              <li>
+                Don&apos;t download unDraw images and use them as-is. Combine multiple unDraw
+                illustrations into a unique piece that doesn&apos;t closely resemble the originals —
+                for example, merge 2–3 images of people working together into one new composition.
+              </li>
+              <li>
+                Adjust all colors to the Octuple background, tertiary, secondary, and primary colors
+                for optimal color mapping. Only then is the illustration suitable for our product.
+              </li>
+            </ol>
+          </section>
+        </div>
+      </details>
+
+      <EmbeddedResource src="https://undraw.co/illustrations" title="the unDraw library" />
+    </div>
+  )
+}
+
 function DemoContent({
   page,
-  contentDesignStandards,
-  termsList,
+  documents,
+  onNavigate,
 }: {
   page: string
-  contentDesignStandards: string
-  termsList: string
+  documents: Record<string, { source: string; headings: SidebarHeading[] }>
+  onNavigate: (page: string) => void
 }) {
-  if (page === 'content-design-standards') return <MarkdownDoc source={contentDesignStandards} />
-  if (page === 'terms-list') return <MarkdownDoc source={termsList} />
+  if (page === 'home') return <CatalogHome onNavigate={onNavigate} />
+  if (page === 'iconography') return <IconographyPage />
+  if (page === 'illustration') return <IllustrationPage />
+  if (documents[page]) return <MarkdownDoc source={documents[page].source} />
   if ((TOKEN_SECTION_IDS as readonly string[]).includes(page)) return <TokensShowcase scrollToId={page} />
   if (page === 'header') {
     return (
@@ -1483,19 +1719,11 @@ function getPageTitle(page: string): { title: string; description: string } {
 }
 
 interface AppProps {
-  contentDesignStandards: string
-  termsList: string
-  contentDesignStandardsHeadings: SidebarHeading[]
-  termsListHeadings: SidebarHeading[]
+  documents: Record<string, { source: string; headings: SidebarHeading[] }>
 }
 
-export default function App({
-  contentDesignStandards,
-  termsList,
-  contentDesignStandardsHeadings,
-  termsListHeadings,
-}: AppProps) {
-  const [page, setPage] = useState<string>('typography')
+export default function App({ documents }: AppProps) {
+  const [page, setPage] = useState<string>('home')
 
   // Per-content-page expand state for the new "Content design standards" /
   // "Terms list" sidebar entries. Starts collapsed; toggled by the chevron.
@@ -1505,11 +1733,9 @@ export default function App({
   // AFTER the MarkdownDoc has rendered with the new content + ids in the DOM.
   const [pendingScrollId, setPendingScrollId] = useState<string | null>(null)
 
-  // Returns the sub-headings for a given content page id, or [] for everything else.
+  // Returns the sub-headings for a given document page id, or [] for everything else.
   const getSubItems = (itemId: string): SidebarHeading[] => {
-    if (itemId === 'content-design-standards') return contentDesignStandardsHeadings
-    if (itemId === 'terms-list') return termsListHeadings
-    return []
+    return documents[itemId]?.headings ?? []
   }
 
   // Distance from the viewport top to land the target heading at — enough
@@ -1657,8 +1883,8 @@ export default function App({
           <div className="mx-auto max-w-3xl">
             <DemoContent
               page={page}
-              contentDesignStandards={contentDesignStandards}
-              termsList={termsList}
+              documents={documents}
+              onNavigate={handlePageClick}
             />
           </div>
         </div>

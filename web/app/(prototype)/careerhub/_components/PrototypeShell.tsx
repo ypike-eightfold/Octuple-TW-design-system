@@ -62,7 +62,10 @@ function NavLink({
   className?: string
 }) {
   return (
-    <NextLink href={to} className={className}>
+    /* prefetch={false}: the navbar shows the real product tabs, but only
+       the Team routes exist in this prototype — prefetching the rest
+       fills the console with 404s on the deployed site. */
+    <NextLink href={to} className={className} prefetch={false}>
       {children}
     </NextLink>
   )

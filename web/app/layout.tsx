@@ -3,6 +3,7 @@ import "./globals.css";
 import { auth, signOut } from "@/auth";
 import { TopNav } from "@/components/site/top-nav";
 import { SiteFooter } from "@/components/site/site-footer";
+import { ThemeProvider } from "@/components/site/theme-provider";
 
 export const metadata: Metadata = {
   title: "Design at Eightfold AI",
@@ -21,7 +22,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const session = authEnabled ? await auth() : null;
 
   return (
-    <html lang="en">
+    /* suppressHydrationWarning is required by next-themes: it sets the
+       theme class on <html> before React hydrates, which would otherwise
+       trip the hydration mismatch warning. */
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Material Symbols Outlined — ef-design-system's Pill, InsightCard,
             StatCard, etc. render icons via <span class="material-symbols-outlined">.
@@ -32,19 +36,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         />
       </head>
       <body>
-        <TopNav
-          session={session}
-          authEnabled={authEnabled}
-          signOutAction={async () => {
-            "use server";
-            await signOut({ redirectTo: "/" });
-          }}
-        />
-        {/* No width constraint here — the (site) route group constrains
-            landing/gallery/docs/signin. /components is outside the group
-            so it can render full-width (catalog has full-width Navbar examples). */}
-        <main>{children}</main>
-        <SiteFooter />
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+          <TopNav
+            session={session}
+            authEnabled={authEnabled}
+            signOutAction={async () => {
+              "use server";
+              await signOut({ redirectTo: "/" });
+            }}
+          />
+          {/* No width constraint here — the (site) route group constrains
+              landing/gallery/docs/signin. /components is outside the group
+              so it can render full-width (catalog has full-width Navbar examples). */}
+          <main>{children}</main>
+          <SiteFooter />
+        </ThemeProvider>
       </body>
     </html>
   );

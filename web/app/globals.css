@@ -532,3 +532,16 @@ body::-webkit-scrollbar,
   width: 0 !important;
   height: 0 !important;
 }
+
+/* ── Liveblocks floating UI stacking fix ──────────────────────────────
+   The Comments feature (gallery prototypes) portals its emoji picker,
+   comment-action dropdowns, and tooltips into a CLASSLESS fixed-position
+   wrapper appended to <body> by Floating UI — with z-index:auto. Our
+   thread popover sits at z-30 inside the comment overlay, so with
+   z-index:auto the portaled menus paint BEHIND the popover that opened
+   them and can't be clicked. Raise the wrapper above all comment UI
+   (and the z-50 sticky TopNav, so pickers near the top stay usable). */
+body > div:has(> .lb-portal) {
+  /* !important: the wrapper is a Radix popper that sets z-index inline. */
+  z-index: 60 !important;
+}

@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import type { Session } from "next-auth";
 import { Tabs, TabsList, TabsTrigger } from "@tonyh-2-eightfold/ef-design-system";
+import { ThemeSwitcher } from "./theme-switcher";
 
 interface Props {
   session: Session | null;
@@ -39,7 +40,15 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
   if (pathname.startsWith("/careerhub")) return null;
 
   return (
-    <header className="sticky top-0 z-50 h-16 border-b border-white/30 bg-white/40 backdrop-blur-xl supports-[backdrop-filter]:bg-white/30">
+    <header
+      className={
+        "sticky top-0 z-50 h-16 backdrop-blur-xl " +
+        // Light mode (default) — original glass over the hero illustration
+        "border-b border-white/30 bg-white/40 supports-[backdrop-filter]:bg-white/30 " +
+        // Dark mode — same glass effect but inverted so the nav reads against a dark background
+        "dark:border-white/10 dark:bg-[var(--background)]/60 dark:supports-[backdrop-filter]:bg-[var(--background)]/50"
+      }
+    >
       {/* Glassmorphism: translucent fill + backdrop-blur so the hero
           illustration on /  shows through the nav. On routes without
           a hero behind it, the card-color underlay still reads as a
@@ -55,12 +64,10 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
           <span className="font-semibold whitespace-nowrap">Design at Eightfold AI</span>
         </Link>
 
-        {/* Design system's Tabs primitive (line variant). Wrapped in a
-            bottom-aligned flex container with pb-[5px] so the underline
-            indicator — which TabsTrigger renders at bottom:-5px relative
-            to the button — coincides exactly with the header's bottom
-            border (otherwise it floats mid-header). */}
-        <div className="flex h-full items-end pb-[5px]">
+        {/* Design system's Tabs primitive (line variant). Bottom-aligned
+            so the trigger's underline (rendered at bottom:-5px) touches
+            the header's border-b instead of floating above it. */}
+        <div className="flex h-full items-end">
           <Tabs value={active} onValueChange={(v) => router.push(v)}>
             <TabsList variant="line">
               {TABS.map((tab) => (
@@ -73,6 +80,7 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
         </div>
 
         <div className="flex items-center gap-3 text-sm text-[var(--muted-foreground)]">
+          <ThemeSwitcher />
           {!authEnabled ? null : session?.user ? (
             <>
               <span className="hidden sm:inline">{session.user.email}</span>

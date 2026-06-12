@@ -359,9 +359,8 @@ export default function WorkflowPage() {
           <li>
             <strong>Gallery category</strong> — match the product surface you're prototyping.
             Performance reviews / 1:1s / growth → <code>talent-management</code>. Candidate
-            experience / hiring → <code>talent-acquisition</code>. Generic design system showcase →{" "}
-            <code>octuple</code>. Reference example with no clear product home →{" "}
-            <code>other-example-screens</code>. Not ready to publish? Pick{" "}
+            experience / hiring → <code>talent-acquisition</code>. Reference example with no
+            clear product home → <code>other-example-screens</code>. Not ready to publish? Pick{" "}
             <strong>Don't publish yet</strong> and Claude builds the prototype without wiring it
             into the gallery.
           </li>

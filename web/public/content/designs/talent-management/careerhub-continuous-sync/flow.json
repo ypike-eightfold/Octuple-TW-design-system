@@ -1,0 +1,61 @@
+{
+  "lanes": [
+    {
+      "title": "Manager flow",
+      "sections": [
+        {
+          "title": "Team tab",
+          "screens": [
+            {
+              "id": "team",
+              "caption": "Team overview",
+              "thumbnail": "flow/team.png",
+              "href": "/careerhub/team"
+            },
+            {
+              "id": "team-sync",
+              "caption": "Continuous sync",
+              "thumbnail": "flow/team-sync.png",
+              "href": "/careerhub/team/sync"
+            },
+            {
+              "id": "team-review",
+              "caption": "Reviews",
+              "thumbnail": "flow/team-review.png",
+              "href": "/careerhub/team/review"
+            },
+            {
+              "id": "team-meeting",
+              "caption": "Team meeting",
+              "thumbnail": "flow/team-meeting.png",
+              "href": "/careerhub/team/meeting"
+            }
+          ]
+        },
+        {
+          "title": "Member detail",
+          "screens": [
+            {
+              "id": "member-sync",
+              "caption": "Member continuous sync",
+              "thumbnail": "flow/member-sync.png",
+              "href": "/careerhub/team/members/alex/sync"
+            },
+            {
+              "id": "member-review",
+              "caption": "Member review",
+              "thumbnail": "flow/member-review.png",
+              "href": "/careerhub/team/members/alex/review"
+            },
+            {
+              "id": "member-meeting",
+              "caption": "Member 1:1 meeting",
+              "thumbnail": "flow/member-meeting.png",
+              "href": "/careerhub/team/members/alex/meeting"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

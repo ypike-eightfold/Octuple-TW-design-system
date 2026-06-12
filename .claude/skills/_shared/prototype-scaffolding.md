@@ -236,3 +236,81 @@ If you bypass the npm script hooks by setting `buildCommand: "next build"`, the 
 - [ ] Verified the prototype reads correctly at all 4 viewports via the gallery's switcher (Desktop / Tablet landscape / Tablet portrait / Mobile).
 - [ ] Verified the navbar stays sticky when scrolling inside the gallery iframe.
 - [ ] Ran the `must-use-components.md` self-check greps — zero raw-Tailwind buttons / chip spans / native selects / native inputs.
+
+---
+
+## Flows view (MANDATORY for every prototype)
+
+The gallery detail page has a **Prototype | Flows** toggle. Flows renders a
+zoomable, pannable canvas (InVision-board style) mapping every screen in the
+prototype; clicking a screen thumbnail opens that exact route in the
+Prototype view. The canvas reads `flow.json` from the design folder:
+
+```
+web/public/content/designs/<category>/<slug>/
+├── index.html        # redirect into the live route
+├── meta.json
+├── thumbnail.png
+├── flow.json         # ← REQUIRED for multi-screen prototypes
+└── flow/             # ← per-screen thumbnails, 1440×900 PNG
+    ├── team.png
+    └── …
+```
+
+### flow.json schema
+
+```json
+{
+  "lanes": [
+    {
+      "title": "Manager flow",
+      "sections": [
+        {
+          "title": "Team tab",
+          "screens": [
+            {
+              "id": "team",
+              "caption": "Team overview",
+              "thumbnail": "flow/team.png",
+              "href": "/careerhub/team"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
+```
+
+- **lanes** — horizontal bands (e.g. "Happy flow" / "Edge cases", or one
+  per persona). One lane is fine for simple prototypes.
+- **sections** — columns within a lane, dash-divided (group by area of the
+  product: "Team tab", "Member detail", …).
+- **screens** — `caption` in sentence case (terms-list-checked), `thumbnail`
+  relative to the design folder, `href` = the live route the gallery iframe
+  loads when the screen is clicked.
+
+### How to produce it
+
+1. List every routable screen in the prototype (one per `page.tsx`,
+   using a real mock-data id for dynamic segments).
+2. Warm each route on the dev server, then headless-capture each at
+   1440×900 into `flow/<id>.png` (same Chrome invocation as the design
+   thumbnail).
+3. Author `flow.json` grouping the screens into sections that match the
+   product's IA. Captions follow content-design-standards (sentence case,
+   terms-list-checked — e.g. `1:1`, never `1-on-1`).
+4. Verify in the gallery: toggle to Flows, confirm every screen appears and
+   clicking each thumbnail opens the right route in Prototype view.
+
+Designs WITHOUT a flow.json automatically get a synthesized one-node flow
+(title + thumbnail + previewUrl) from `web/lib/flows.ts` — so single-screen
+designs need no authoring. Multi-screen prototypes that skip flow.json ship
+a misleading one-node canvas; that's a review blocker.
+
+### Self-check additions
+
+- [ ] `flow.json` exists and parses (multi-screen prototypes).
+- [ ] One `flow/<id>.png` (1440×900) per screen in flow.json.
+- [ ] Every `href` resolves to a live route (no 404s).
+- [ ] Flows toggle verified in the gallery: all screens visible, click-through lands on the right screen.

@@ -48,30 +48,36 @@ function extractHeadings(md: string): HeadingItem[] {
   return out;
 }
 
-function readContent() {
-  const root = path.resolve(process.cwd(), "..", ".claude", "skills", "_content");
-  const contentDesignStandards = cleanMarkdown(
-    fs.readFileSync(path.join(root, "content-design-standards.md"), "utf8"),
-  );
-  const termsList = cleanMarkdown(fs.readFileSync(path.join(root, "terms-list.md"), "utf8"));
-  return {
-    contentDesignStandards,
-    termsList,
-    contentDesignStandardsHeadings: extractHeadings(contentDesignStandards),
-    termsListHeadings: extractHeadings(termsList),
-  };
+/** Every markdown document the catalog's Documents section serves.
+    The first two are the shared content guidelines; the rest are the
+    Gem instruction docs auto-synced from Google Docs (see
+    docs/CONTENT-SYNC.md). Ids must match DOCUMENT_PAGES in App.tsx. */
+const DOCUMENT_SOURCES: { id: string; file: string[] }[] = [
+  { id: "content-design-standards", file: [".claude", "skills", "_content", "content-design-standards.md"] },
+  { id: "terms-list", file: [".claude", "skills", "_content", "terms-list.md"] },
+  { id: "response-confidence-score", file: ["gems", "response-confidence-score.md"] },
+  { id: "guidance-layer", file: ["gems", "guidance-layer.md"] },
+  { id: "oh-prompt-instructions", file: ["gems", "OH", "prompt-instructions.md"] },
+  { id: "oh-content-quality-framework", file: ["gems", "OH", "content-quality-framework.md"] },
+];
+
+export interface CatalogDocument {
+  source: string;
+  headings: HeadingItem[];
+}
+
+function readDocuments(): Record<string, CatalogDocument> {
+  const repoRoot = path.resolve(process.cwd(), "..");
+  const out: Record<string, CatalogDocument> = {};
+  for (const doc of DOCUMENT_SOURCES) {
+    const source = cleanMarkdown(fs.readFileSync(path.join(repoRoot, ...doc.file), "utf8"));
+    out[doc.id] = { source, headings: extractHeadings(source) };
+  }
+  return out;
 }
 
 // Renders the catalog full-width. The route is outside the (site) route group,
 // so it isn't constrained by the max-w-6xl wrapper that landing/gallery use.
 export default function ComponentsPage() {
-  const data = readContent();
-  return (
-    <App
-      contentDesignStandards={data.contentDesignStandards}
-      termsList={data.termsList}
-      contentDesignStandardsHeadings={data.contentDesignStandardsHeadings}
-      termsListHeadings={data.termsListHeadings}
-    />
-  );
+  return <App documents={readDocuments()} />;
 }

@@ -234,9 +234,9 @@ Gallery categories:
 ```
 Talent Management        Personal Career Site
 Talent Acquisition       Resource Management
-Octuple                  Talent Flex
-Talent Forge             Job Intelligence Engine
-Workforce Exchange       Admin Console
+Talent Forge             Talent Flex
+Workforce Exchange       Job Intelligence Engine
+                         Admin Console
                          Analytics
 ```
 

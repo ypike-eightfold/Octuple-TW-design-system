@@ -2,14 +2,18 @@
    Kept dependency-free — no date-fns import — so the prototype stays
    light. */
 
+/* timeZone is pinned to UTC: the mock timestamps are fixed, and without
+   it the server (UTC on Vercel) and the browser (user's zone) format
+   different text — a React hydration mismatch (error #418). */
+
 export function formatDateLong(iso: string): string {
   const d = new Date(iso)
-  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' })
+  return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric', timeZone: 'UTC' })
 }
 
 export function formatTime(iso: string): string {
   const d = new Date(iso)
-  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+  return d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', timeZone: 'UTC' })
 }
 
 export function formatRelativeFromNow(iso: string, now: Date = new Date('2026-05-22T12:00:00Z')): string {

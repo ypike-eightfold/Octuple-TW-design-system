@@ -2,6 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { CATEGORY_SLUGS, getCategory, type CategorySlug } from "@/lib/categories";
 import { getAllDesigns, getDesign } from "@/lib/designs";
+import { CommentsRoom } from "@/components/comments/comments-room";
+import { getFlow } from "@/lib/flows";
 import { PrototypeFullscreen } from "./PrototypeFullscreen";
 
 export const revalidate = 60;
@@ -63,11 +65,15 @@ export default async function DesignDetailPage({ params }: { params: Params }) {
         )}
       </dl>
 
-      <PrototypeFullscreen
-        previewUrl={design.previewUrl}
-        title={design.title}
-        slug={design.slug}
-      />
+      {/* Comment threads are scoped per design via the Liveblocks room id. */}
+      <CommentsRoom roomId={`gallery:${category}/${slug}`}>
+        <PrototypeFullscreen
+          previewUrl={design.previewUrl}
+          title={design.title}
+          slug={design.slug}
+          flow={getFlow(design)}
+        />
+      </CommentsRoom>
       <p className="mt-2 text-xs text-[var(--muted-foreground)]">
         <a className="underline" href={design.previewUrl} target="_blank" rel="noopener noreferrer">
           Open prototype in a new tab ↗
