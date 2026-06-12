@@ -47,8 +47,8 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
         // logo / tabs need a stable backdrop, fading to ~5% at the bottom
         // so the nav smoothly dissolves into the hero illustration below
         // instead of cutting it off with a hard band.
-        "bg-gradient-to-b from-white/40 to-white/5 " +
-        "dark:from-[var(--background)]/60 dark:to-[var(--background)]/5"
+        "bg-gradient-to-b from-white/40 to-transparent " +
+        "dark:from-[var(--background)]/60 dark:to-transparent"
       }
     >
       {/* Glassmorphism: translucent gradient fill + backdrop-blur so the

@@ -40,12 +40,13 @@ export function HomePageView({
           The illustration sits BEHIND the sticky top nav; its backdrop-blur
           turns the top edge into a frosted glass band. Kept short — the
           page is a dashboard now, and the feeds below are the point. */}
-      <section className="relative -mt-16 overflow-hidden">
+      <section className="relative -mt-16">
         {/* One hero illustration in both modes. The comic-rocks SVG is
             transparent outside its angular shapes, so the colored panels
-            ride on top of whatever body background is behind — pale
-            cream in light, near-black in dark — and the visual identity
-            stays consistent across themes. */}
+            ride on top of whatever body background is behind. Using
+            background-size: 100% auto (full width, natural height) so
+            the illustration is never vertically cropped, and the section
+            drops overflow-hidden for the same reason. */}
         <div
           className="absolute inset-0 -z-10"
           aria-hidden
@@ -53,7 +54,7 @@ export function HomePageView({
             backgroundImage: "url('/octuple-hero.svg')",
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center top",
-            backgroundSize: "cover",
+            backgroundSize: "100% auto",
           }}
         />
         <div className="px-6">
