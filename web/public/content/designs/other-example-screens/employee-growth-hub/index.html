@@ -1409,11 +1409,26 @@
     (() => {
       const body = document.body;
 
-      // Manager-view toggle
+      // Manager-view toggle. Hash deep-links (#employee, #manager) let
+      // the gallery's Flows view open each persona on its own canvas
+      // tile; toggle changes also rewrite the hash so the chosen view
+      // survives reload.
       const managerToggle = document.getElementById('manager-toggle');
+
+      function applyViewFromHash() {
+        const isManager = window.location.hash === '#manager';
+        body.classList.toggle('manager-mode', isManager);
+        if (managerToggle) managerToggle.checked = isManager;
+      }
+      applyViewFromHash();
+      window.addEventListener('hashchange', applyViewFromHash);
+
       managerToggle.addEventListener('change', (e) => {
         const on = e.target.checked;
         body.classList.toggle('manager-mode', on);
+        if (window.location.hash !== (on ? '#manager' : '#employee')) {
+          history.replaceState(null, '', on ? '#manager' : '#employee');
+        }
         showToast(
           on
             ? { icon: 'visibility', text: 'Manager view on — private coaching notes are visible.' }
