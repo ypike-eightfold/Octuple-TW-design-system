@@ -1,0 +1,31 @@
+{
+  "lanes": [
+    {
+      "title": "Growth hub · two personas",
+      "sections": [
+        {
+          "title": "Employee view",
+          "screens": [
+            {
+              "id": "employee",
+              "caption": "Employee — own growth profile",
+              "thumbnail": "flow/employee.png",
+              "href": "index.html#employee"
+            }
+          ]
+        },
+        {
+          "title": "Manager view",
+          "screens": [
+            {
+              "id": "manager",
+              "caption": "Manager — private coaching notes revealed",
+              "thumbnail": "flow/manager.png",
+              "href": "index.html#manager"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
