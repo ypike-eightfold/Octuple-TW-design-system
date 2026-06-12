@@ -55,6 +55,14 @@ export function HomePageView({
             backgroundRepeat: "no-repeat",
             backgroundPosition: "center top",
             backgroundSize: "100% auto",
+            // Mask the bottom ~40% of the image so the SVG dissolves into
+            // the page background instead of cutting off in a hard band.
+            // Same gradient on both -webkit-mask-image and mask-image for
+            // older Safari + modern browsers.
+            WebkitMaskImage:
+              "linear-gradient(to bottom, black 55%, transparent 100%)",
+            maskImage:
+              "linear-gradient(to bottom, black 55%, transparent 100%)",
           }}
         />
         <div className="px-6">
