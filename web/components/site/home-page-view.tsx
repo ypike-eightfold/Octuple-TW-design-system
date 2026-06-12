@@ -52,7 +52,7 @@ export function HomePageView({
           src="/octuple-hero.svg"
           alt=""
           aria-hidden
-          className="absolute top-0 left-0 w-full -z-10 pointer-events-none select-none"
+          className="absolute top-0 left-0 w-full -z-10 pointer-events-none select-none opacity-80"
         />
         <div className="px-6">
           <div className="mx-auto max-w-6xl pt-28 pb-14">
