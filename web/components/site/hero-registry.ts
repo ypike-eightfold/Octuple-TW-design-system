@@ -16,6 +16,8 @@ export interface Hero {
   id: string;
   label: string;
   description: string;
+  /** Material Symbols icon name shown in the segmented switcher. */
+  icon: string;
   src: { light: string; dark: string };
 }
 
@@ -30,6 +32,7 @@ export const HEROES: Hero[] = [
     id: "cyberpunk",
     label: "Cyberpunk",
     description: "Angular geometry on warm pink → purple gradients. Home-screen default.",
+    icon: "diamond",
     src: {
       light: "/heroes/comic-rocks.svg",
       dark: "/heroes/comic-rocks.svg",
@@ -40,6 +43,7 @@ export const HEROES: Hero[] = [
     label: "Gradient",
     description:
       "The original Octuple gradient hero. Ships a dedicated dark variant.",
+    icon: "gradient",
     src: {
       light: "/heroes/gradient-light.svg",
       dark: "/heroes/gradient-dark.svg",
