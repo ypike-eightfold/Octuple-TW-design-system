@@ -17,7 +17,7 @@ const TABS = [
   { value: "/", label: "Home" },
   { value: "/components", label: "Octuple" },
   { value: "/gallery", label: "Gallery" },
-  { value: "/docs/workflow", label: "How to use" },
+  { value: "/docs/workflow", label: "Claude setup" },
 ] as const;
 
 /** Map the current URL to one of the four tab values. Prefix-matched
