@@ -16,9 +16,15 @@
 /** The four top-level surfaces that ship a hero banner. */
 export type HeroPage = "home" | "gallery" | "docs" | "components";
 
-interface HeroImage {
+export interface HeroImage {
   light: string;
   dark: string;
+  /** Flip the illustration upside-down when rendered. Useful for SVGs
+   *  drawn with their dense geometry at the BOTTOM (mountain peaks,
+   *  wave crests) so the visual weight sits against the top edge of
+   *  the hero band. Lives on the SVG, not the page — different themes
+   *  may need flipping on the same surface (or not at all). */
+  flipY?: boolean;
 }
 
 export interface Hero {
@@ -52,10 +58,14 @@ export const HEROES: Hero[] = [
       gallery: {
         light: "/heroes/burning-lands.svg",
         dark: "/heroes/burning-lands.svg",
+        // Peaks drawn at the bottom — flip so they hang from the top edge.
+        flipY: true,
       },
       docs: {
         light: "/heroes/ocean-waves.svg",
         dark: "/heroes/ocean-waves.svg",
+        // Wave crests drawn at the bottom — flip so they sit at the top.
+        flipY: true,
       },
       components: {
         light: "/heroes/octuple.svg",
@@ -88,4 +98,12 @@ export function getHeroById(id: string | null | undefined): Hero {
 export function srcFor(hero: Hero, page: HeroPage, resolvedTheme: string | undefined): string {
   const img = hero.pages[page];
   return resolvedTheme === "dark" ? img.dark : img.light;
+}
+
+/** Resolve the full image record (src + flipY) for a given page. Use
+ *  this in PageHero so theme-specific flipping is honored — e.g. the
+ *  Cyberpunk gallery hero is upside-down by design, but the Gradient
+ *  gallery hero on the same page should NOT flip. */
+export function imageFor(hero: Hero, page: HeroPage): HeroImage {
+  return hero.pages[page];
 }

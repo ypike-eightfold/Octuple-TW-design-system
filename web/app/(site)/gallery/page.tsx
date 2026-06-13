@@ -32,7 +32,7 @@ export default function HomePage() {
 
   return (
     <div>
-      <PageHero page="gallery" flipY>
+      <PageHero page="gallery">
         <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
           Browse by product
         </h1>
