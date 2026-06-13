@@ -86,7 +86,7 @@ export default function WorkflowPage() {
     // Matches the home + gallery width (max-w-6xl + px-6) so the three
     // top-level surfaces share a consistent content column.
     <article>
-      <PageHero src="/heroes/ocean-waves.svg" flipY>
+      <PageHero page="docs" flipY>
         <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
           Designer workflow
         </h1>
