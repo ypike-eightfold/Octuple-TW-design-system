@@ -62,10 +62,7 @@ export function HomePageView({
           src={heroSrc}
           alt=""
           aria-hidden
-          // key forces a remount when the user picks a different hero,
-          // so the browser swaps the SVG without any cached-paint flash.
-          key={heroSrc}
-          className="absolute top-0 left-0 w-full opacity-80 -z-10 pointer-events-none select-none"
+          className="absolute top-0 left-0 w-full -z-10 pointer-events-none select-none opacity-80"
         />
         {/* Same wrapper pattern as PageHero on /gallery, /docs/workflow:
             max-w-6xl + px-6 + max-w-3xl inner, so the title block
