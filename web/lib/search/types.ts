@@ -93,11 +93,15 @@ export interface SearchIndex {
  *  more annoying than misses. Tune in one place. */
 export const FUSE_OPTIONS = {
   keys: [
-    { name: "title", weight: 0.6 },
-    { name: "description", weight: 0.3 },
-    { name: "breadcrumb", weight: 0.1 },
+    { name: "title", weight: 0.85 },
+    { name: "description", weight: 0.1 },
+    { name: "breadcrumb", weight: 0.05 },
   ],
-  threshold: 0.35,
+  // Tight threshold favors precision: "button" should surface Button at
+  // the top, not a gallery item whose description happens to contain a
+  // close substring. We trade a few fuzzy misses for far fewer false
+  // positives.
+  threshold: 0.3,
   ignoreLocation: true,
   minMatchCharLength: 2,
 } as const;
