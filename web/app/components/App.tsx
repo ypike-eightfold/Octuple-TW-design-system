@@ -1462,6 +1462,16 @@ function CatalogHome({ onNavigate }: { onNavigate: (page: string) => void }) {
   ]
   return (
     <div>
+      {/* Hero illustration for the Octuple catalog landing view. Lives
+          INSIDE the content area (not at the page level) so it doesn't
+          collide with the catalog's sticky left sidebar. opacity-80 +
+          rounded corners match the section-page heroes. */}
+      <img
+        src="/heroes/octuple.svg"
+        alt=""
+        aria-hidden
+        className="mb-8 block w-full rounded-xl opacity-80 pointer-events-none select-none"
+      />
       <h2 className="text-3xl font-semibold tracking-tight text-foreground">Octuple design system</h2>
       <p className="mt-3 max-w-2xl leading-relaxed text-muted-foreground">
         Everything you need to design and build for Eightfold AI: design tokens,
