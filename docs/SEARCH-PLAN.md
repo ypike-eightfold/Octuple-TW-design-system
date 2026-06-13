@@ -49,7 +49,7 @@ text by regex at build time.
   `ThemeSwitcher`: an Octuple secondary icon button with a `search` Material
   Symbol and a faint `⌘K` chip beside it on `sm:` and up. `Cmd+K` /
   `Ctrl+K` opens the modal from anywhere on the site. `/` also opens it
-  (matches GitHub, Linear, Vercel).
+  (matches GitHub).
 - **Modal.** `cmdk` dialog, centered, ~640 px wide, max-h `70vh`. Uses
   Octuple's `--card`, `--border`, `--foreground` tokens so it themes
   light/dark automatically.
@@ -116,16 +116,14 @@ server-side for the copilot's tool call) and a chat composer that uses
 Octuple's `Input shape="pill"` + AI agent `InfoBar`. The plan deliberately
 puts the index behind a stable boundary so Phase 2 is purely additive.
 
-## Open questions
+## Decided
 
-1. **Workflow page headings: annotate vs extract?** Adding `id="…"` to the
-   `<h2>`s in `workflow/page.tsx` is one line of edit and gives us stable
-   deep-links forever. Regex-extracting them at build is more fragile but
-   needs no edit. Recommend annotation.
-2. **Recents storage key.** Suggest `ef-gallery:search-recents` matching
+1. **Workflow page headings → annotate.** Add stable `id="…"` to each
+   `<h2>` in `workflow/page.tsx`. Deep-links are forever, no build-time
+   regex extraction.
+2. **`/` opens the modal**, alongside `Cmd+K` / `Ctrl+K`. Matches GitHub.
+3. **Recents localStorage key:** `ef-gallery:search-recents`, mirroring
    the existing `ef-gallery:hero` and theme keys.
-3. **Should `/` open the modal?** GitHub does; Linear doesn't. Soft yes —
-   it's a single keydown listener and easy to remove.
 
 ## Out of scope, but worth noting
 
