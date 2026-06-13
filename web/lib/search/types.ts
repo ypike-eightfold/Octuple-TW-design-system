@@ -8,6 +8,7 @@
  */
 
 export type SearchKind =
+  | "category"
   | "design"
   | "token-section"
   | "component"
@@ -31,6 +32,15 @@ interface BaseItem {
   /** Breadcrumb chip on the right of the row, e.g. "Gallery › Talent
    *  management" or "Octuple › Tokens". */
   breadcrumb: string;
+}
+
+export interface CategoryItem extends BaseItem {
+  kind: "category";
+  /** Category slug — `talent-management`, `talent-acquisition`, etc. */
+  slug: string;
+  /** Number of designs in this category — surfaced in the description
+   *  so a "1 design / 5 designs" count appears in the result row. */
+  count: number;
 }
 
 export interface DesignItem extends BaseItem {
@@ -71,6 +81,7 @@ export interface WorkflowSectionItem extends BaseItem {
 }
 
 export type SearchableItem =
+  | CategoryItem
   | DesignItem
   | TokenSectionItem
   | ComponentItem
@@ -94,10 +105,15 @@ export interface SearchIndex {
 export const FUSE_OPTIONS = {
   keys: [
     { name: "title", weight: 0.6 },
-    { name: "description", weight: 0.3 },
-    { name: "breadcrumb", weight: 0.1 },
+    { name: "breadcrumb", weight: 0.3 },
+    { name: "description", weight: 0.1 },
   ],
-  threshold: 0.35,
+  // Tight threshold favors precision: "button" surfaces Button at the
+  // top, not a gallery item whose description happens to contain a close
+  // substring. Multi-word queries are further constrained by the
+  // post-rerank in search-dialog (items must cover all query tokens).
+  threshold: 0.3,
   ignoreLocation: true,
   minMatchCharLength: 2,
+  includeScore: true,
 } as const;

@@ -84,92 +84,14 @@ import {
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
 import { UICatalog } from './UICatalog'
-
-/** shadcn components shown in UICatalog; id slug used for scroll target */
-const SHADCN_COMPONENTS = [
-  'Accordion',
-  'Alert',
-  'Alert Dialog',
-  'Aspect Ratio',
-  'Avatar',
-  'Breadcrumb',
-  'Button',
-  'Calendar',
-  'Card',
-  'Checkbox',
-  'Chip',
-  'Collapsible',
-  'Context Menu',
-  'DateTimePicker',
-  'Dialog',
-  'Dropdown Menu',
-  'Empty',
-  'FloatingActionButton',
-  'Hover Card',
-  'InfoBar',
-  'Input',
-  'Insight Cards',
-  'Kbd',
-  'MessageBar',
-  'Navigation Menu',
-  'Number Badge',
-  'Object Cards',
-  'Pagination',
-  'Panel',
-  'Popover',
-  'Progress',
-  'Radio Group',
-  'Resizable',
-  'Scroll Area',
-  'SegmentedProgress',
-  'Select',
-  'Separator',
-  'Sheet',
-  'Skill Tag',
-  'Skeleton',
-  'Slider',
-  'Snackbar',
-  'Stat Card',
-  'Stepper',
-  'Switch',
-  'Table',
-  'Tabs',
-  'Tag',
-  'Textarea',
-  'Timeline',
-  'Toggle',
-  'Toggle Group',
-  'Tooltip',
-  'Uploader',
-] as const
-
-function slug(title: string) {
-  return title.toLowerCase().replace(/\s+/g, '-')
-}
-
-/** Token page section ids for sidebar and scroll targets */
-const TOKEN_SECTIONS = [
-  { id: 'typography', label: 'Typography' },
-  { id: 'spacing', label: 'Spacing' },
-  { id: 'corner-radius', label: 'Corner radius' },
-  { id: 'colors', label: 'Colors' },
-  { id: 'semantic-colors', label: 'Semantic colors' },
-  { id: 'palette', label: 'Palette' },
-] as const
+import {
+  SHADCN_COMPONENTS,
+  TOKEN_SECTIONS,
+  DOCUMENT_PAGES,
+  componentSlug as slug,
+} from '@/lib/search/catalog-meta'
 
 const TOKEN_SECTION_IDS = TOKEN_SECTIONS.map((s) => s.id)
-
-/** Markdown documents served by the Documents sidebar section. Ids must
-    match DOCUMENT_SOURCES in page.tsx, which reads the files (the shared
-    content guidelines plus the Gem docs auto-synced from Google Docs). */
-const DOCUMENT_PAGES = [
-  { id: 'content-design-standards', label: 'Content design standards' },
-  { id: 'terms-list', label: 'Terms list' },
-  { id: 'response-confidence-score', label: 'Response confidence score' },
-  { id: 'guidance-layer', label: 'Guidance layer' },
-  { id: 'oh-prompt-instructions', label: 'OH prompt instructions' },
-  { id: 'oh-content-quality-framework', label: 'OH content quality framework' },
-] as const
 
 const SIDEBAR_GROUPS = [
   {
@@ -1502,7 +1424,7 @@ function CatalogHome({ onNavigate }: { onNavigate: (page: string) => void }) {
           href="/docs/workflow"
           className="rounded-xl border border-border bg-card p-5 text-left transition hover:border-[var(--primary)] hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
         >
-          <span className="block font-semibold text-foreground">How to use</span>
+          <span className="block font-semibold text-foreground">Claude setup</span>
           <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
             The designer workflow — from prompt to published gallery design.
           </span>
@@ -1740,7 +1662,40 @@ interface AppProps {
 }
 
 export default function App({ documents }: AppProps) {
+  // Server-rendered initial state is always 'home' to avoid a hydration
+  // mismatch (server has no window). The mount effect below adopts the
+  // URL hash on the client immediately after hydration, so deep links
+  // like /components#ui-button still land on the right page.
   const [page, setPage] = useState<string>('home')
+
+  // Adopt the URL hash on mount (after hydration) so deep-linked entries
+  // from the search modal land on the right page. Runs once.
+  useEffect(() => {
+    const initial = window.location.hash.replace(/^#/, '')
+    if (initial) setPage(initial)
+  }, [])
+
+  // Keep the URL hash in sync with `page` so reload + copy-paste preserve
+  // the current entry. Use replaceState so sidebar clicks don't pollute
+  // the back stack.
+  useEffect(() => {
+    if (typeof window === 'undefined') return
+    const desired = page === 'home' ? '' : `#${page}`
+    if (window.location.hash !== desired) {
+      window.history.replaceState(null, '', `${window.location.pathname}${window.location.search}${desired}`)
+    }
+  }, [page])
+
+  // Browser back/forward navigation between catalog pages: listen for
+  // hashchange and mirror it into local state.
+  useEffect(() => {
+    const onHashChange = () => {
+      const next = window.location.hash.replace(/^#/, '') || 'home'
+      setPage(next)
+    }
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
 
   // Per-content-page expand state for the new "Content design standards" /
   // "Terms list" sidebar entries. Starts collapsed; toggled by the chevron.

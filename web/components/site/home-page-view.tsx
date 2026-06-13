@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@tonyh-2-eightfold/ef-design-system";
+import { Button, Pill, type PillVariant } from "@tonyh-2-eightfold/ef-design-system";
 import { useHero } from "@/components/site/hero-provider";
 import { srcFor } from "@/components/site/hero-registry";
-import type { ActivityEntry } from "@/lib/github-activity";
+import type { ActivityEntry, CommitType } from "@/lib/github-activity";
 
 export interface LatestDesign {
   title: string;
@@ -29,6 +29,42 @@ const AREA_LABELS: Record<ActivityEntry["area"], string> = {
   docs: "Docs",
   skills: "Skills",
 };
+
+/** Pill color per activity area — picked so the "Recent team activity"
+ *  card scans by color: cool for design, warm for docs, red for skills.
+ *  Each variant is one of the Octuple-supported set. */
+const AREA_PILL_VARIANT: Record<ActivityEntry["area"], PillVariant> = {
+  octuple: "blueGreen",
+  gallery: "blueGreen",
+  docs: "orange",
+  skills: "critical",
+};
+
+/** Pill color per conventional-commit type — picked so the eye can spot
+ *  fixes vs. features at a glance: green for new work, red for fixes,
+ *  neutral for housekeeping. */
+const TYPE_PILL_VARIANT: Record<CommitType, PillVariant> = {
+  feat: "blueGreen",
+  fix: "critical",
+  refactor: "orange",
+  perf: "orange",
+  chore: "neutral",
+  docs: "neutral",
+  style: "neutral",
+  test: "neutral",
+};
+
+/** Synced markdown documents shown as quick-link chips in the Octuple
+ *  card. Ids match DOCUMENT_PAGES in the catalog so the hash routes
+ *  there. Pill variants picked to give the row visual texture. */
+const SYNCED_DOCS: { id: string; label: string; variant: PillVariant }[] = [
+  { id: "content-design-standards", label: "Content design standards", variant: "blueGreen" },
+  { id: "terms-list", label: "Terms list", variant: "orange" },
+  { id: "response-confidence-score", label: "Response confidence score", variant: "neutral" },
+  { id: "guidance-layer", label: "Guidance layer", variant: "critical" },
+  { id: "oh-prompt-instructions", label: "OH prompt instructions", variant: "orange" },
+  { id: "oh-content-quality-framework", label: "OH content quality framework", variant: "blueGreen" },
+];
 
 export function HomePageView({
   totalDesigns,
@@ -110,7 +146,7 @@ export function HomePageView({
                   href="/docs/workflow"
                   className="inline-flex h-11 items-center rounded-full border border-white/50 bg-white/40 px-5 text-base font-semibold text-[var(--foreground)] backdrop-blur-md transition hover:bg-white/60 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/15"
                 >
-                  How to use
+                  Claude setup
                 </Link>
               </div>
           </div>
@@ -120,7 +156,12 @@ export function HomePageView({
       <div className="mx-auto max-w-6xl px-6">
         {/* Latest designs — fed by the same filesystem index as the stats,
             so every merged design PR updates this strip with no manual
-            upkeep. Hidden entirely while the gallery is empty. */}
+            upkeep. Hidden entirely while the gallery is empty.
+
+            Magazine layout: the newest design takes a wide hero card
+            (image left, title block right), and the next three sit in a
+            3-column row underneath. Lays out as a single column on
+            mobile. */}
         {latestDesigns.length > 0 && (
           <section className="mt-8">
             <div className="mb-6 flex items-end justify-between">
@@ -133,32 +174,73 @@ export function HomePageView({
                 <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
             </div>
-            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {latestDesigns.map((d) => (
-                <li key={d.href}>
+
+            {(() => {
+              const [hero, ...rest] = latestDesigns;
+              return (
+                <div className="space-y-6">
+                  {/* Hero card — wide rectangle, image on the left, title
+                      block on the right. lg:grid-cols-[7fr_5fr] gives the
+                      image roughly 60% of the row so the artwork stays
+                      the focal point but the title block doesn't crowd. */}
                   <Link
-                    href={d.href}
-                    className="group block overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] transition hover:border-[var(--primary)] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                    href={hero.href}
+                    className="group grid grid-cols-1 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] transition hover:border-[var(--primary)] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] lg:grid-cols-2"
                   >
-                    {/* Decorative: the title below names the design. */}
-                    <img
-                      src={d.thumbnailUrl}
-                      alt=""
-                      loading="lazy"
-                      className="block aspect-[16/10] w-full border-b border-[var(--border)] object-cover object-top"
-                    />
-                    <div className="p-4">
-                      <div className="truncate font-medium group-hover:text-[var(--primary)]">
-                        {d.title}
+                    <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto">
+                      <img
+                        src={hero.thumbnailUrl}
+                        alt=""
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover object-top transition group-hover:scale-[1.01]"
+                      />
+                    </div>
+                    <div className="flex flex-col justify-center gap-3 border-t border-[var(--border)] p-6 lg:border-t-0 lg:border-l lg:p-8">
+                      <div className="text-xs font-medium text-[var(--muted-foreground)]">
+                        Just published · {hero.categoryName}
                       </div>
-                      <div className="mt-0.5 text-sm text-[var(--muted-foreground)]">
-                        {d.categoryName}
+                      <h3 className="text-2xl font-semibold tracking-tight group-hover:text-[var(--primary)] sm:text-3xl">
+                        {hero.title}
+                      </h3>
+                      <div className="inline-flex items-center gap-1 text-sm font-medium text-[var(--primary)]">
+                        Open the design
+                        <ArrowRight aria-hidden className="h-4 w-4" />
                       </div>
                     </div>
                   </Link>
-                </li>
-              ))}
-            </ul>
+
+                  {/* Supporting trio — same card pattern as before, just
+                      laid out 3-up so the hero above stays dominant. */}
+                  {rest.length > 0 && (
+                    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {rest.map((d) => (
+                        <li key={d.href}>
+                          <Link
+                            href={d.href}
+                            className="group block overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] transition hover:border-[var(--primary)] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                          >
+                            <img
+                              src={d.thumbnailUrl}
+                              alt=""
+                              loading="lazy"
+                              className="block aspect-[16/10] w-full border-b border-[var(--border)] object-cover object-top"
+                            />
+                            <div className="p-4">
+                              <div className="truncate font-medium group-hover:text-[var(--primary)]">
+                                {d.title}
+                              </div>
+                              <div className="mt-0.5 text-sm text-[var(--muted-foreground)]">
+                                {d.categoryName}
+                              </div>
+                            </div>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })()}
           </section>
         )}
 
@@ -168,11 +250,13 @@ export function HomePageView({
         <section className="mt-14 mb-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <ActivityCard
             title="What's new in Octuple"
-            subtitle="Recent changes to the component library."
+            subtitle="Recent changes to the component library, plus the design documents the whole team writes against."
             entries={octupleUpdates}
             footerHref="/components"
             footerLabel="Open the component catalog"
             showArea={false}
+            showCommitPills
+            docs={SYNCED_DOCS}
           />
           <ActivityCard
             title="Recent team activity"
@@ -195,6 +279,8 @@ function ActivityCard({
   footerHref,
   footerLabel,
   showArea,
+  showCommitPills,
+  docs,
 }: {
   title: string;
   subtitle: string;
@@ -202,6 +288,12 @@ function ActivityCard({
   footerHref: string;
   footerLabel: string;
   showArea: boolean;
+  /** Render type + scope pills next to each commit headline. The team
+   *  activity card hides these to keep the row compact. */
+  showCommitPills?: boolean;
+  /** Optional "Design documents" row appended after the entries list —
+   *  used by the Octuple card to surface the synced markdown documents. */
+  docs?: { id: string; label: string; variant: PillVariant }[];
 }) {
   return (
     <section className="flex flex-col rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6">
@@ -214,17 +306,34 @@ function ActivityCard({
       ) : (
         <ul className="mt-5 flex-1 divide-y divide-[var(--border)]">
           {entries.map((e) => (
-            <li key={e.sha} className="flex items-baseline gap-3 py-2.5 first:pt-0">
+            <li key={e.sha} className="flex items-start gap-3 py-3 first:pt-0">
               {showArea && (
-                <span className="shrink-0 rounded border border-[var(--border)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--muted-foreground)]">
-                  {AREA_LABELS[e.area]}
-                </span>
+                <div className="shrink-0 pt-0.5">
+                  <Pill variant={AREA_PILL_VARIANT[e.area]} size="small">
+                    {AREA_LABELS[e.area]}
+                  </Pill>
+                </div>
               )}
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
+                {showCommitPills && (e.type || e.scope) && (
+                  <div className="mb-1 flex flex-wrap items-center gap-1.5">
+                    {e.type && (
+                      <Pill variant={TYPE_PILL_VARIANT[e.type]} size="small">
+                        {e.type}
+                      </Pill>
+                    )}
+                    {e.scope && (
+                      <Pill variant="empty" size="small">
+                        {e.scope}
+                      </Pill>
+                    )}
+                  </div>
+                )}
                 <a
                   href={e.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  title={e.rawHeadline}
                   className="block truncate text-sm font-medium hover:text-[var(--primary)] hover:underline"
                 >
                   {e.headline}
@@ -236,6 +345,31 @@ function ActivityCard({
             </li>
           ))}
         </ul>
+      )}
+      {docs && docs.length > 0 && (
+        <div className="mt-5 border-t border-[var(--border)] pt-4">
+          <div className="text-xs font-semibold text-[var(--foreground)]">
+            Design documents
+          </div>
+          <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+            Synced from Google Docs. Authored once, read everywhere Claude renders them.
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {docs.map((d) => (
+              <li key={d.id}>
+                <Link
+                  href={`/components#${d.id}`}
+                  className="inline-flex items-center rounded-full transition hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                  title={d.label}
+                >
+                  <Pill variant={d.variant} size="small">
+                    {d.label}
+                  </Pill>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       <div className="mt-5 border-t border-[var(--border)] pt-4">
         <Link

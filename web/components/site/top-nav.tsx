@@ -6,6 +6,7 @@ import type { Session } from "next-auth";
 import { Tabs, TabsList, TabsTrigger } from "@tonyh-2-eightfold/ef-design-system";
 import { ThemeSwitcher } from "./theme-switcher";
 import { HeroSwitcher } from "./hero-switcher";
+import { SearchTrigger } from "./search/search-trigger";
 
 interface Props {
   session: Session | null;
@@ -17,7 +18,7 @@ const TABS = [
   { value: "/", label: "Home" },
   { value: "/components", label: "Octuple" },
   { value: "/gallery", label: "Gallery" },
-  { value: "/docs/workflow", label: "How to use" },
+  { value: "/docs/workflow", label: "Claude setup" },
 ] as const;
 
 /** Map the current URL to one of the four tab values. Prefix-matched
@@ -82,6 +83,7 @@ export function TopNav({ session, authEnabled, signOutAction }: Props) {
         </div>
 
         <div className="flex items-center gap-3 text-sm text-[var(--muted-foreground)]">
+          <SearchTrigger />
           <HeroSwitcher />
           <ThemeSwitcher />
           {!authEnabled ? null : session?.user ? (

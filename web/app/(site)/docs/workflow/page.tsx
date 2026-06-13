@@ -106,7 +106,7 @@ export default function WorkflowPage() {
         command by hand.
       </p>
 
-      <h2 className="mb-3 text-2xl font-semibold tracking-tight">
+      <h2 id="one-time-setup" className="mb-3 scroll-mt-24 text-2xl font-semibold tracking-tight">
         One-time setup (10 minutes, once per laptop)
       </h2>
       <p className="mb-2 max-w-3xl">
@@ -205,7 +205,7 @@ export default function WorkflowPage() {
         <p>You'll never have to do this again on this laptop.</p>
       </Step>
 
-      <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">
+      <h2 id="day-to-day" className="mb-3 mt-16 scroll-mt-24 text-2xl font-semibold tracking-tight">
         Day-to-day: designing something new
       </h2>
 
@@ -386,7 +386,7 @@ export default function WorkflowPage() {
         <p>You're done.</p>
       </Step>
 
-      <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">"Just tell Claude" cheat sheet</h2>
+      <h2 id="cheat-sheet" className="mb-3 mt-16 scroll-mt-24 text-2xl font-semibold tracking-tight">"Just tell Claude" cheat sheet</h2>
       <p className="mb-4 max-w-3xl">
         You almost never need to use a terminal directly. Translate "technical task" to "ask Claude":
       </p>
@@ -417,7 +417,7 @@ export default function WorkflowPage() {
         </table>
       </div>
 
-      <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">How to prompt Claude</h2>
+      <h2 id="how-to-prompt" className="mb-3 mt-16 scroll-mt-24 text-2xl font-semibold tracking-tight">How to prompt Claude</h2>
       <p className="mb-4 max-w-3xl">
         You may have read that you should write long, structured prompts with a role, tech stack,
         constraints, and step-by-step rules. <strong>You don't need to do that here.</strong> All of
@@ -529,7 +529,7 @@ quick-filter sidebar.`}</pre>
         <em>Step 2 — Tell Claude which version</em> above.
       </p>
 
-      <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">The two rules you should not break</h2>
+      <h2 id="rules" className="mb-3 mt-16 scroll-mt-24 text-2xl font-semibold tracking-tight">The two rules you should not break</h2>
       <ol className="ml-6 list-decimal space-y-3">
         <li>
           <strong>Pick one design system per design and stick to it.</strong> Don't mix Tailwind
@@ -542,7 +542,7 @@ quick-filter sidebar.`}</pre>
         </li>
       </ol>
 
-      <h2 className="mb-3 mt-16 text-2xl font-semibold tracking-tight">When something goes wrong</h2>
+      <h2 id="troubleshooting" className="mb-3 mt-16 scroll-mt-24 text-2xl font-semibold tracking-tight">When something goes wrong</h2>
       <ul className="ml-6 list-disc space-y-3">
         <li>
           <strong>"Claude says my GitHub credentials aren't working."</strong> Ask Claude to run{" "}

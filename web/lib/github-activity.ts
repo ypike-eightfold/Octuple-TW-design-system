@@ -18,9 +18,22 @@ const REVALIDATE_SECONDS = 300;
 
 export type ActivityArea = "octuple" | "gallery" | "docs" | "skills";
 
+/** Recognized conventional-commit prefixes. Surfaces as a colored pill
+ *  next to the headline so the card scans at a glance. Everything else
+ *  falls through to undefined and the row shows no type pill. */
+export type CommitType = "feat" | "fix" | "chore" | "docs" | "refactor" | "style" | "perf" | "test";
+
 export interface ActivityEntry {
   sha: string;
+  /** The headline minus any conventional-commit prefix — render this
+   *  on its own; render `type` and `scope` separately as pills. */
   headline: string;
+  /** Original headline including the prefix, kept for tooltips and a11y. */
+  rawHeadline: string;
+  /** Parsed conventional-commit type, e.g. "fix" / "feat" / "chore". */
+  type?: CommitType;
+  /** Parsed scope, e.g. "DataTable" / "components" / "search". */
+  scope?: string;
   author: string;
   /** Human label like "today" / "3 days ago" / "May 28" — server-computed. */
   dateLabel: string;
@@ -28,6 +41,20 @@ export interface ActivityEntry {
   date: string;
   url: string;
   area: ActivityArea;
+}
+
+const CONVENTIONAL_RE = /^(feat|fix|chore|docs|refactor|style|perf|test)(?:\(([^)]+)\))?:\s+(.+)$/;
+const KNOWN_TYPES: ReadonlySet<CommitType> = new Set([
+  "feat", "fix", "chore", "docs", "refactor", "style", "perf", "test",
+]);
+
+function parseConventional(headline: string): { type?: CommitType; scope?: string; rest: string } {
+  const m = headline.match(CONVENTIONAL_RE);
+  if (!m) return { rest: headline };
+  const type = m[1] as CommitType;
+  return KNOWN_TYPES.has(type)
+    ? { type, scope: m[2]?.trim() || undefined, rest: m[3].trim() }
+    : { rest: headline };
 }
 
 const AREA_PATHS: Record<ActivityArea, string> = {
@@ -82,9 +109,14 @@ async function fetchAreaCommits(area: ActivityArea, perPage: number): Promise<Ac
       .filter((c) => !isMergeCommit(c.commit.message))
       .map((c) => {
         const date = c.commit.author?.date ?? "";
+        const rawHeadline = c.commit.message.split("\n")[0];
+        const { type, scope, rest } = parseConventional(rawHeadline);
         return {
           sha: c.sha,
-          headline: c.commit.message.split("\n")[0],
+          headline: rest,
+          rawHeadline,
+          type,
+          scope,
           author: c.commit.author?.name ?? c.author?.login ?? "Unknown",
           dateLabel: date ? relativeLabel(date, now) : "",
           date,
