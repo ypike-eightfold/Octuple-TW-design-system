@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
-import { Button } from "@tonyh-2-eightfold/ef-design-system";
+import { Button, Pill, type PillVariant } from "@tonyh-2-eightfold/ef-design-system";
 import { useHero } from "@/components/site/hero-provider";
 import { srcFor } from "@/components/site/hero-registry";
-import type { ActivityEntry } from "@/lib/github-activity";
+import type { ActivityEntry, CommitType } from "@/lib/github-activity";
 
 export interface LatestDesign {
   title: string;
@@ -29,6 +29,42 @@ const AREA_LABELS: Record<ActivityEntry["area"], string> = {
   docs: "Docs",
   skills: "Skills",
 };
+
+/** Pill color per activity area — picked so the "Recent team activity"
+ *  card scans by color: cool for design, warm for docs, red for skills.
+ *  Each variant is one of the Octuple-supported set. */
+const AREA_PILL_VARIANT: Record<ActivityEntry["area"], PillVariant> = {
+  octuple: "blueGreen",
+  gallery: "blueGreen",
+  docs: "orange",
+  skills: "critical",
+};
+
+/** Pill color per conventional-commit type — picked so the eye can spot
+ *  fixes vs. features at a glance: green for new work, red for fixes,
+ *  neutral for housekeeping. */
+const TYPE_PILL_VARIANT: Record<CommitType, PillVariant> = {
+  feat: "blueGreen",
+  fix: "critical",
+  refactor: "orange",
+  perf: "orange",
+  chore: "neutral",
+  docs: "neutral",
+  style: "neutral",
+  test: "neutral",
+};
+
+/** Synced markdown documents shown as quick-link chips in the Octuple
+ *  card. Ids match DOCUMENT_PAGES in the catalog so the hash routes
+ *  there. Pill variants picked to give the row visual texture. */
+const SYNCED_DOCS: { id: string; label: string; variant: PillVariant }[] = [
+  { id: "content-design-standards", label: "Content design standards", variant: "blueGreen" },
+  { id: "terms-list", label: "Terms list", variant: "orange" },
+  { id: "response-confidence-score", label: "Response confidence score", variant: "neutral" },
+  { id: "guidance-layer", label: "Guidance layer", variant: "critical" },
+  { id: "oh-prompt-instructions", label: "OH prompt instructions", variant: "orange" },
+  { id: "oh-content-quality-framework", label: "OH content quality framework", variant: "blueGreen" },
+];
 
 export function HomePageView({
   totalDesigns,
@@ -214,11 +250,13 @@ export function HomePageView({
         <section className="mt-14 mb-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <ActivityCard
             title="What's new in Octuple"
-            subtitle="Recent changes to the component library."
+            subtitle="Recent changes to the component library, plus the design documents the whole team writes against."
             entries={octupleUpdates}
             footerHref="/components"
             footerLabel="Open the component catalog"
             showArea={false}
+            showCommitPills
+            docs={SYNCED_DOCS}
           />
           <ActivityCard
             title="Recent team activity"
@@ -241,6 +279,8 @@ function ActivityCard({
   footerHref,
   footerLabel,
   showArea,
+  showCommitPills,
+  docs,
 }: {
   title: string;
   subtitle: string;
@@ -248,6 +288,12 @@ function ActivityCard({
   footerHref: string;
   footerLabel: string;
   showArea: boolean;
+  /** Render type + scope pills next to each commit headline. The team
+   *  activity card hides these to keep the row compact. */
+  showCommitPills?: boolean;
+  /** Optional "Design documents" row appended after the entries list —
+   *  used by the Octuple card to surface the synced markdown documents. */
+  docs?: { id: string; label: string; variant: PillVariant }[];
 }) {
   return (
     <section className="flex flex-col rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6">
@@ -260,17 +306,34 @@ function ActivityCard({
       ) : (
         <ul className="mt-5 flex-1 divide-y divide-[var(--border)]">
           {entries.map((e) => (
-            <li key={e.sha} className="flex items-baseline gap-3 py-2.5 first:pt-0">
+            <li key={e.sha} className="flex items-start gap-3 py-3 first:pt-0">
               {showArea && (
-                <span className="shrink-0 rounded border border-[var(--border)] px-1.5 py-0.5 text-[11px] font-medium text-[var(--muted-foreground)]">
-                  {AREA_LABELS[e.area]}
-                </span>
+                <div className="shrink-0 pt-0.5">
+                  <Pill variant={AREA_PILL_VARIANT[e.area]} size="small">
+                    {AREA_LABELS[e.area]}
+                  </Pill>
+                </div>
               )}
-              <div className="min-w-0">
+              <div className="min-w-0 flex-1">
+                {showCommitPills && (e.type || e.scope) && (
+                  <div className="mb-1 flex flex-wrap items-center gap-1.5">
+                    {e.type && (
+                      <Pill variant={TYPE_PILL_VARIANT[e.type]} size="small">
+                        {e.type}
+                      </Pill>
+                    )}
+                    {e.scope && (
+                      <Pill variant="empty" size="small">
+                        {e.scope}
+                      </Pill>
+                    )}
+                  </div>
+                )}
                 <a
                   href={e.url}
                   target="_blank"
                   rel="noopener noreferrer"
+                  title={e.rawHeadline}
                   className="block truncate text-sm font-medium hover:text-[var(--primary)] hover:underline"
                 >
                   {e.headline}
@@ -282,6 +345,31 @@ function ActivityCard({
             </li>
           ))}
         </ul>
+      )}
+      {docs && docs.length > 0 && (
+        <div className="mt-5 border-t border-[var(--border)] pt-4">
+          <div className="text-xs font-semibold text-[var(--foreground)]">
+            Design documents
+          </div>
+          <p className="mt-1 text-xs text-[var(--muted-foreground)]">
+            Synced from Google Docs. Authored once, read everywhere Claude renders them.
+          </p>
+          <ul className="mt-3 flex flex-wrap gap-2">
+            {docs.map((d) => (
+              <li key={d.id}>
+                <Link
+                  href={`/components#${d.id}`}
+                  className="inline-flex items-center rounded-full transition hover:opacity-80 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                  title={d.label}
+                >
+                  <Pill variant={d.variant} size="small">
+                    {d.label}
+                  </Pill>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       )}
       <div className="mt-5 border-t border-[var(--border)] pt-4">
         <Link
