@@ -78,6 +78,9 @@ function readDocuments(): Record<string, CatalogDocument> {
 
 // Renders the catalog full-width. The route is outside the (site) route group,
 // so it isn't constrained by the max-w-6xl wrapper that landing/gallery use.
+// No PageHero here — the catalog has a sticky sidebar that occludes the
+// overlay text; the section's identity comes through via its own header
+// in App.tsx. (cloudy-wind.svg lives under public/heroes/ for future use.)
 export default function ComponentsPage() {
   return <App documents={readDocuments()} />;
 }

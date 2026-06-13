@@ -1,5 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
+import { PageHero } from "@/components/site/page-hero";
 
 export const revalidate = 60;
 
@@ -82,26 +83,28 @@ export const metadata = {
 
 export default function WorkflowPage() {
   return (
-    // Constrain the article to a readable width (~896px). Text and screenshots
-    // stay aligned at this width on every viewport — no side-by-side squish,
-    // no images blowing up to fill 1152px on wide monitors.
-    <article className="mx-auto max-w-4xl">
-      <header className="mb-10">
-        <h1 className="text-4xl font-semibold tracking-tight">Designer workflow</h1>
-        <p className="mt-3 text-lg text-[var(--muted-foreground)]">
+    // Matches the home + gallery width (max-w-6xl + px-6) so the three
+    // top-level surfaces share a consistent content column.
+    <article>
+      <PageHero src="/heroes/ocean-waves.svg" flipY>
+        <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
+          Designer workflow
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--foreground)]">
           How to use this repo to design, get feedback, and ship designs to the gallery — without
           writing code or living in a terminal.
         </p>
-        <p className="mt-3">
-          Everything here is built around the idea that{" "}
-          <strong>you talk to Claude in plain English and Claude runs the technical commands for you.</strong>{" "}
-          You should rarely need to type a{" "}
-          <code className="rounded bg-[var(--card)] px-1.5 py-0.5 text-[0.9em] font-mono border border-[var(--border)]">
-            git
-          </code>{" "}
-          command by hand.
-        </p>
-      </header>
+      </PageHero>
+      <div className="mx-auto max-w-6xl px-6">
+      <p className="mt-3 mb-10">
+        Everything here is built around the idea that{" "}
+        <strong>you talk to Claude in plain English and Claude runs the technical commands for you.</strong>{" "}
+        You should rarely need to type a{" "}
+        <code className="rounded bg-[var(--card)] px-1.5 py-0.5 text-[0.9em] font-mono border border-[var(--border)]">
+          git
+        </code>{" "}
+        command by hand.
+      </p>
 
       <h2 className="mb-3 text-2xl font-semibold tracking-tight">
         One-time setup (10 minutes, once per laptop)
@@ -568,6 +571,7 @@ quick-filter sidebar.`}</pre>
           reminder).
         </li>
       </ul>
+      </div>
     </article>
   );
 }

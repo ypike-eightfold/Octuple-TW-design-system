@@ -4,6 +4,7 @@ import { auth, signOut } from "@/auth";
 import { TopNav } from "@/components/site/top-nav";
 import { SiteFooter } from "@/components/site/site-footer";
 import { ThemeProvider } from "@/components/site/theme-provider";
+import { HeroProvider } from "@/components/site/hero-provider";
 
 export const metadata: Metadata = {
   title: "Design at Eightfold AI",
@@ -37,19 +38,21 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
-          <TopNav
-            session={session}
-            authEnabled={authEnabled}
-            signOutAction={async () => {
-              "use server";
-              await signOut({ redirectTo: "/" });
-            }}
-          />
-          {/* No width constraint here — the (site) route group constrains
-              landing/gallery/docs/signin. /components is outside the group
-              so it can render full-width (catalog has full-width Navbar examples). */}
-          <main>{children}</main>
-          <SiteFooter />
+          <HeroProvider>
+            <TopNav
+              session={session}
+              authEnabled={authEnabled}
+              signOutAction={async () => {
+                "use server";
+                await signOut({ redirectTo: "/" });
+              }}
+            />
+            {/* No width constraint here — the (site) route group constrains
+                landing/gallery/docs/signin. /components is outside the group
+                so it can render full-width (catalog has full-width Navbar examples). */}
+            <main>{children}</main>
+            <SiteFooter />
+          </HeroProvider>
         </ThemeProvider>
       </body>
     </html>
