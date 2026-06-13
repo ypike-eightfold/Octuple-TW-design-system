@@ -1,30 +1,45 @@
+"use client";
+
+import { useTheme } from "next-themes";
+import { useHero } from "./hero-provider";
+import { srcFor, type HeroPage } from "./hero-registry";
+
 /**
  * Section-page hero banner. Full-bleed across the viewport, bleeding
  * under the sticky top nav. Children (typically `<h1>` + intro `<p>`)
  * render on top of the illustration inside the same max-w-6xl reading
  * column the rest of the site uses — matching the home hero exactly.
  *
+ * Takes a `page` id and reads the active hero theme from useHero() to
+ * resolve the SVG, so picking a theme in the HeroSwitcher swaps every
+ * page's hero at once.
+ *
  * - Parent page-level max-w wrappers are escaped via
  *   `left-1/2 -ml-[50vw] w-screen` on the bleeding image so the SVG
  *   spans the viewport edges even when called from inside a
  *   max-w-N container.
- * - Children sit in a `relative` wrapper with `pt-28 pb-14`, scoped to
- *   `max-w-3xl` (same as the home title block) so titles + intros
- *   wrap at the same width across home / gallery / docs.
+ * - Children sit in a wrapper with `pt-28 pb-14`, scoped to `max-w-3xl`
+ *   (same as the home title block) so titles + intros wrap at the
+ *   same width across home / gallery / docs.
  */
 export function PageHero({
-  src,
+  page,
   flipY = false,
   children,
 }: {
-  src: string;
+  /** Which page this banner is for — drives the SVG lookup against
+   *  the active hero theme. */
+  page: HeroPage;
   /** Flip the illustration upside-down. Useful for SVGs designed to
-   *  sit at the BOTTOM of a hero (mountain peaks etc.) — flipping
-   *  puts the dense shapes against the top of the band. */
+   *  sit at the BOTTOM of a hero (mountain peaks etc.). */
   flipY?: boolean;
   /** Eyebrow, h1, intro paragraph(s) — rendered on top of the SVG. */
   children: React.ReactNode;
 }) {
+  const { hero } = useHero();
+  const { resolvedTheme } = useTheme();
+  const src = srcFor(hero, page, resolvedTheme);
+
   return (
     <section className="relative -mt-16">
       {/* Full-bleed illustration, behind the children. -ml-[50vw] +
@@ -35,6 +50,9 @@ export function PageHero({
         src={src}
         alt=""
         aria-hidden
+        // key forces a remount when the user picks a different hero
+        // theme so the browser swaps the SVG without a cached-paint flash.
+        key={src}
         style={flipY ? { transform: "scaleY(-1)" } : undefined}
         // max-w-none is required: Tailwind's preflight resets img to
         // `max-width: 100%`, which caps w-screen to the parent's width
