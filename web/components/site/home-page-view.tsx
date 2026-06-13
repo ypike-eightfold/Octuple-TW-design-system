@@ -5,6 +5,7 @@ import { ArrowRight } from "lucide-react";
 import { useTheme } from "next-themes";
 import { Button } from "@tonyh-2-eightfold/ef-design-system";
 import { useHero } from "@/components/site/hero-provider";
+import { srcFor } from "@/components/site/hero-registry";
 import type { ActivityEntry } from "@/lib/github-activity";
 
 export interface LatestDesign {
@@ -36,13 +37,12 @@ export function HomePageView({
   octupleUpdates,
   teamActivity,
 }: Props) {
-  // Hero illustration is user-selectable from the top nav. The provider
-  // hands us back the active hero record; we pick the light or dark src
-  // based on the resolved theme. resolvedTheme can be undefined on first
-  // render — fall back to the light variant.
+  // Hero illustration is driven by the active theme picked in the
+  // HeroSwitcher. srcFor() resolves the home-page SVG against the
+  // resolved color theme (light/dark) within that theme.
   const { hero } = useHero();
   const { resolvedTheme } = useTheme();
-  const heroSrc = resolvedTheme === "dark" ? hero.src.dark : hero.src.light;
+  const heroSrc = srcFor(hero, "home", resolvedTheme);
 
   return (
     <div>

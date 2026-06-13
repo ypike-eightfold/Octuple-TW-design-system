@@ -4,6 +4,9 @@ import { Component, Fragment, useEffect, useState, type ReactNode } from 'react'
 import { Menu, Palette, LayoutGrid, PanelTop, ExternalLink, FileText, ChevronRight, Home, Shapes, Image as ImageIcon, Download } from 'lucide-react'
 import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
+import { useTheme } from 'next-themes'
+import { useHero } from '@/components/site/hero-provider'
+import { srcFor } from '@/components/site/hero-registry'
 
 /** GitHub-style slug: matches the same algorithm used server-side in page.tsx
     when extracting headings for the sidebar's sub-items. So clicking
@@ -1453,6 +1456,9 @@ function MarkdownDoc({ source }: { source: string }) {
 /** Catalog landing page — the default view, so the catalog no longer
     opens straight onto the Typography token table. */
 function CatalogHome({ onNavigate }: { onNavigate: (page: string) => void }) {
+  const { hero } = useHero()
+  const { resolvedTheme } = useTheme()
+  const heroSrc = srcFor(hero, 'components', resolvedTheme)
   const tiles = [
     { page: 'typography', title: 'Tokens', body: 'Typography, spacing, corner radius, and the full Octuple color system.' },
     { page: 'ui-button', title: 'Components', body: 'Every primitive and Eightfold-specific component, with live examples.' },
@@ -1467,9 +1473,10 @@ function CatalogHome({ onNavigate }: { onNavigate: (page: string) => void }) {
           collide with the catalog's sticky left sidebar. opacity-80 +
           rounded corners match the section-page heroes. */}
       <img
-        src="/heroes/octuple.svg"
+        src={heroSrc}
         alt=""
         aria-hidden
+        key={heroSrc}
         className="mb-8 block w-full rounded-xl opacity-80 pointer-events-none select-none"
       />
       <h2 className="text-3xl font-semibold tracking-tight text-foreground">Octuple design system</h2>
