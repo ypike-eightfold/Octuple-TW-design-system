@@ -19,10 +19,77 @@ const PER_GROUP = 8;
 /** Section ordering + display labels. Anything not in this list falls
  *  through to "Other" at the bottom. */
 const GROUPS: { id: string; label: string; matches: (k: SearchableItem["kind"]) => boolean }[] = [
-  { id: "designs", label: "Designs", matches: (k) => k === "design" },
+  { id: "designs", label: "Designs", matches: (k) => k === "category" || k === "design" },
   { id: "octuple", label: "Octuple", matches: (k) => k === "component" || k === "token-section" },
   { id: "docs", label: "Docs", matches: (k) => k === "document" || k === "doc-heading" || k === "workflow-section" },
 ];
+
+/** Tokenize the query into words >= 2 chars, lowercase, deduped. Used
+ *  by the post-Fuse re-rank to demote items that don't cover all
+ *  query tokens. */
+function tokenize(q: string): string[] {
+  const seen = new Set<string>();
+  for (const tok of q.toLowerCase().split(/\s+/)) {
+    if (tok.length >= 2) seen.add(tok);
+  }
+  return Array.from(seen);
+}
+
+/** Re-rank a Fuse result set so that items containing query tokens as
+ *  case-insensitive substrings in their indexed fields outrank fuzzy
+ *  partial matches. This is what makes "talent management" surface the
+ *  Talent Management category instead of "Talent Agent · Slack", and
+ *  what keeps "workflow" pointing at the workflow page instead of
+ *  fuzz-bait like "Workforce categories".
+ *
+ *  Ranking criteria (each higher beats the next):
+ *  1. coverage         — # of query tokens present in any indexed field
+ *  2. category bonus   — category items first when a category name matches
+ *  3. title + crumb hits — strong signals over description-only matches
+ *  4. Fuse fuzzy score — last resort tiebreak
+ */
+function rerank(
+  hits: { item: SearchableItem; score?: number }[],
+  query: string,
+): SearchableItem[] {
+  const tokens = tokenize(query);
+  if (tokens.length === 0) return hits.map((h) => h.item);
+  type Scored = {
+    item: SearchableItem;
+    coverage: number;
+    kindBonus: number;
+    strongHits: number;
+    fuse: number;
+  };
+  const scored: Scored[] = hits.map(({ item, score }) => {
+    const title = item.title.toLowerCase();
+    const crumb = item.breadcrumb.toLowerCase();
+    const desc = item.description.toLowerCase();
+    let coverage = 0;
+    let titleHits = 0;
+    let crumbHits = 0;
+    for (const t of tokens) {
+      const inTitle = title.includes(t);
+      const inCrumb = crumb.includes(t);
+      const inDesc = desc.includes(t);
+      if (inTitle) titleHits++;
+      if (inCrumb) crumbHits++;
+      if (inTitle || inCrumb || inDesc) coverage++;
+    }
+    // Category items get a bonus when their title fully matches the query
+    // — so "talent acquisition" lands the category above "Talent Agent ·
+    // Inside Talent Acquisition" even though both contain both tokens.
+    const kindBonus = item.kind === "category" && titleHits === tokens.length ? 1 : 0;
+    return { item, coverage, kindBonus, strongHits: titleHits + crumbHits, fuse: score ?? 1 };
+  });
+  scored.sort((a, b) => {
+    if (a.coverage !== b.coverage) return b.coverage - a.coverage;
+    if (a.kindBonus !== b.kindBonus) return b.kindBonus - a.kindBonus;
+    if (a.strongHits !== b.strongHits) return b.strongHits - a.strongHits;
+    return a.fuse - b.fuse;
+  });
+  return scored.map((s) => s.item);
+}
 
 function loadRecents(): string[] {
   if (typeof window === "undefined") return [];
@@ -99,7 +166,7 @@ export function SearchDialog() {
       return recents.map((id) => byId.get(id)).filter(Boolean) as SearchableItem[];
     }
     if (!fuse) return [];
-    return fuse.search(trimmed).map((r) => r.item);
+    return rerank(fuse.search(trimmed), trimmed);
   }, [index, fuse, query, recents]);
 
   function handlePick(item: SearchableItem) {

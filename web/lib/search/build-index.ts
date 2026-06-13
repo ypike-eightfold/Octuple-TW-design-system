@@ -19,6 +19,7 @@ import {
   componentSlug,
 } from "./catalog-meta";
 import type {
+  CategoryItem,
   ComponentItem,
   DesignItem,
   DocHeadingItem,
@@ -77,9 +78,30 @@ function safeReadFile(parts: string[]): string | null {
   }
 }
 
-function buildDesignItems(): DesignItem[] {
+function buildCategoryItems(designsByCategory: Map<string, number>): CategoryItem[] {
+  return CATEGORIES.map((c) => {
+    const count = designsByCategory.get(c.slug) ?? 0;
+    return {
+      id: `category:${c.slug}`,
+      kind: "category",
+      title: c.name,
+      // `c.name` repeats in the description on purpose — Fuse hits the
+      // word twice for a stronger score on category-name queries like
+      // "talent management".
+      description: `${c.name} — ${count} ${count === 1 ? "design" : "designs"}. ${c.blurb}`,
+      href: `/gallery/${c.slug}`,
+      breadcrumb: "Gallery",
+      slug: c.slug,
+      count,
+    } satisfies CategoryItem;
+  });
+}
+
+function buildDesignItems(): { items: DesignItem[]; designsByCategory: Map<string, number> } {
   const categoryNameBySlug = new Map(CATEGORIES.map((c) => [c.slug, c.name] as const));
-  return getAllDesigns().map((d) => {
+  const designsByCategory = new Map<string, number>();
+  const items = getAllDesigns().map((d) => {
+    designsByCategory.set(d.category, (designsByCategory.get(d.category) ?? 0) + 1);
     const categoryName = categoryNameBySlug.get(d.category) ?? d.category;
     return {
       id: `design:${d.category}:${d.slug}`,
@@ -92,6 +114,7 @@ function buildDesignItems(): DesignItem[] {
       author: d.author,
     } satisfies DesignItem;
   });
+  return { items, designsByCategory };
 }
 
 function buildTokenItems(): TokenSectionItem[] {
@@ -178,8 +201,10 @@ function buildWorkflowItems(): WorkflowSectionItem[] {
 }
 
 export function buildSearchIndex(): SearchIndex {
+  const designs = buildDesignItems();
   const items: SearchableItem[] = [
-    ...buildDesignItems(),
+    ...buildCategoryItems(designs.designsByCategory),
+    ...designs.items,
     ...buildTokenItems(),
     ...buildComponentItems(),
     ...buildDocumentItems(),
