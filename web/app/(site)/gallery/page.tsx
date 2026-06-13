@@ -32,7 +32,7 @@ export default function HomePage() {
 
   return (
     <div>
-      <PageHero src="/heroes/burning-lands.svg" />
+      <PageHero src="/heroes/burning-lands.svg" flipY />
       <div className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight">Browse by product</h1>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">
