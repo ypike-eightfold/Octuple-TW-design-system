@@ -146,7 +146,7 @@ export function HomePageView({
                   href="/docs/workflow"
                   className="inline-flex h-11 items-center rounded-full border border-white/50 bg-white/40 px-5 text-base font-semibold text-[var(--foreground)] backdrop-blur-md transition hover:bg-white/60 dark:border-white/20 dark:bg-white/10 dark:hover:bg-white/15"
                 >
-                  How to use
+                  Claude setup
                 </Link>
               </div>
           </div>

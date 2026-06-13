@@ -1424,7 +1424,7 @@ function CatalogHome({ onNavigate }: { onNavigate: (page: string) => void }) {
           href="/docs/workflow"
           className="rounded-xl border border-border bg-card p-5 text-left transition hover:border-[var(--primary)] hover:shadow-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--ring)]"
         >
-          <span className="block font-semibold text-foreground">How to use</span>
+          <span className="block font-semibold text-foreground">Claude setup</span>
           <span className="mt-1 block text-sm leading-relaxed text-muted-foreground">
             The designer workflow — from prompt to published gallery design.
           </span>
