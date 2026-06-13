@@ -120,7 +120,12 @@ export function HomePageView({
       <div className="mx-auto max-w-6xl px-6">
         {/* Latest designs — fed by the same filesystem index as the stats,
             so every merged design PR updates this strip with no manual
-            upkeep. Hidden entirely while the gallery is empty. */}
+            upkeep. Hidden entirely while the gallery is empty.
+
+            Magazine layout: the newest design takes a wide hero card
+            (image left, title block right), and the next three sit in a
+            3-column row underneath. Lays out as a single column on
+            mobile. */}
         {latestDesigns.length > 0 && (
           <section className="mt-8">
             <div className="mb-6 flex items-end justify-between">
@@ -133,32 +138,73 @@ export function HomePageView({
                 <ArrowRight aria-hidden className="h-4 w-4" />
               </Link>
             </div>
-            <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {latestDesigns.map((d) => (
-                <li key={d.href}>
+
+            {(() => {
+              const [hero, ...rest] = latestDesigns;
+              return (
+                <div className="space-y-6">
+                  {/* Hero card — wide rectangle, image on the left, title
+                      block on the right. lg:grid-cols-[7fr_5fr] gives the
+                      image roughly 60% of the row so the artwork stays
+                      the focal point but the title block doesn't crowd. */}
                   <Link
-                    href={d.href}
-                    className="group block overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] transition hover:border-[var(--primary)] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                    href={hero.href}
+                    className="group grid grid-cols-1 overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] transition hover:border-[var(--primary)] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)] lg:grid-cols-2"
                   >
-                    {/* Decorative: the title below names the design. */}
-                    <img
-                      src={d.thumbnailUrl}
-                      alt=""
-                      loading="lazy"
-                      className="block aspect-[16/10] w-full border-b border-[var(--border)] object-cover object-top"
-                    />
-                    <div className="p-4">
-                      <div className="truncate font-medium group-hover:text-[var(--primary)]">
-                        {d.title}
+                    <div className="relative aspect-[16/10] overflow-hidden lg:aspect-auto">
+                      <img
+                        src={hero.thumbnailUrl}
+                        alt=""
+                        loading="lazy"
+                        className="absolute inset-0 h-full w-full object-cover object-top transition group-hover:scale-[1.01]"
+                      />
+                    </div>
+                    <div className="flex flex-col justify-center gap-3 border-t border-[var(--border)] p-6 lg:border-t-0 lg:border-l lg:p-8">
+                      <div className="text-xs font-medium text-[var(--muted-foreground)]">
+                        Just published · {hero.categoryName}
                       </div>
-                      <div className="mt-0.5 text-sm text-[var(--muted-foreground)]">
-                        {d.categoryName}
+                      <h3 className="text-2xl font-semibold tracking-tight group-hover:text-[var(--primary)] sm:text-3xl">
+                        {hero.title}
+                      </h3>
+                      <div className="inline-flex items-center gap-1 text-sm font-medium text-[var(--primary)]">
+                        Open the design
+                        <ArrowRight aria-hidden className="h-4 w-4" />
                       </div>
                     </div>
                   </Link>
-                </li>
-              ))}
-            </ul>
+
+                  {/* Supporting trio — same card pattern as before, just
+                      laid out 3-up so the hero above stays dominant. */}
+                  {rest.length > 0 && (
+                    <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                      {rest.map((d) => (
+                        <li key={d.href}>
+                          <Link
+                            href={d.href}
+                            className="group block overflow-hidden rounded-xl border border-[var(--border)] bg-[var(--card)] transition hover:border-[var(--primary)] hover:shadow-md focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--primary)]"
+                          >
+                            <img
+                              src={d.thumbnailUrl}
+                              alt=""
+                              loading="lazy"
+                              className="block aspect-[16/10] w-full border-b border-[var(--border)] object-cover object-top"
+                            />
+                            <div className="p-4">
+                              <div className="truncate font-medium group-hover:text-[var(--primary)]">
+                                {d.title}
+                              </div>
+                              <div className="mt-0.5 text-sm text-[var(--muted-foreground)]">
+                                {d.categoryName}
+                              </div>
+                            </div>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              );
+            })()}
           </section>
         )}
 
