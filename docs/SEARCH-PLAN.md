@@ -45,15 +45,26 @@ text by regex at build time.
 
 ## UX
 
-- **Trigger.** A small button in `TopNav` between `HeroSwitcher` and
-  `ThemeSwitcher`: an Octuple secondary icon button with a `search` Material
-  Symbol and a faint `⌘K` chip beside it on `sm:` and up. `Cmd+K` /
-  `Ctrl+K` opens the modal from anywhere on the site. `/` also opens it
-  (matches GitHub).
+- **Where it appears.** Top nav, right-side control cluster, just to the
+  **left** of `HeroSwitcher` — so the order reading right-to-left is
+  search · hero · theme · user. Visible on every route (home, gallery,
+  docs, Octuple catalog). The prototype-fullscreen route still hides the
+  whole top nav, so search is unavailable inside a prototype iframe by
+  design — Esc to gallery, then search.
+- **Trigger style.** A compact pill, not an icon-only button:
+  `[ 🔍  Search…   ⌘K ]`. Auto width, ~180 px wide on `sm:` and up; on
+  mobile it collapses to icon-only. Uses Octuple's `--card` background +
+  `--border` border + `--muted-foreground` text, matching the rest of the
+  nav cluster.
+- **Keyboard.** `Cmd+K` / `Ctrl+K` from anywhere. `/` also opens it,
+  unless the user is already typing in an input. `Esc` closes.
+- **Modal.** Centered `cmdk` dialog, ~640 px wide, max-h `70vh`, dimmed
+  backdrop. Mounted once at the root site layout so the shortcut works
+  from every route.
 - **Modal.** `cmdk` dialog, centered, ~640 px wide, max-h `70vh`. Uses
   Octuple's `--card`, `--border`, `--foreground` tokens so it themes
   light/dark automatically.
-- **Results.** Grouped by section: _Designs_, _Octuple_, _Docs_. Up to 8
+- **Results inside the modal.** Grouped by section: _Designs_, _Octuple_, _Docs_. Up to 8
   rows per group, then "Show more in <section>" → routes to the section.
   Each row: title (semibold), 1-line snippet from description, breadcrumb
   on the right (e.g. `Gallery › Talent management`).
@@ -61,8 +72,9 @@ text by regex at build time.
   + a small "Try: tokens, table, mara" hint.
 - **Empty result.** Single line: "No matches for _query_. Tabs above still
   work."
-- **Keyboard.** Arrow keys + Enter to navigate; `Esc` closes; result rows
-  are real `<Link>`s so right-click/middle-click open in a new tab.
+- **Keyboard inside the modal.** Arrow keys + Enter to navigate; `Esc`
+  closes; result rows are real `<Link>`s so right-click/middle-click open
+  in a new tab.
 
 ## Tech
 
