@@ -36,7 +36,13 @@ export function PageHero({
         alt=""
         aria-hidden
         style={flipY ? { transform: "scaleY(-1)" } : undefined}
-        className="absolute top-0 left-1/2 -ml-[50vw] w-screen -z-10 pointer-events-none select-none block"
+        // max-w-none is required: Tailwind's preflight resets img to
+        // `max-width: 100%`, which caps w-screen to the parent's width
+        // and breaks the viewport-breakout trick when PageHero is
+        // called from inside a max-w-N wrapper.
+        // opacity-80 softens the illustration so the foreground copy
+        // stays legible without a translucent card behind it.
+        className="absolute top-0 left-1/2 -ml-[50vw] w-screen max-w-none opacity-80 -z-10 pointer-events-none select-none block"
       />
       <div className="mx-auto max-w-6xl px-6 pt-28 pb-14">
         <div className="max-w-3xl">{children}</div>

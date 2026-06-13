@@ -90,7 +90,7 @@ export default function WorkflowPage() {
         <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
           Designer workflow
         </h1>
-        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--muted-foreground)]">
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--foreground)]">
           How to use this repo to design, get feedback, and ship designs to the gallery — without
           writing code or living in a terminal.
         </p>

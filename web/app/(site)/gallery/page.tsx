@@ -36,7 +36,7 @@ export default function HomePage() {
         <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
           Browse by product
         </h1>
-        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--muted-foreground)]">
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--foreground)]">
           {all.length} {all.length === 1 ? "design" : "designs"} across {CATEGORIES.length} product areas.
           Designs are submitted via pull request and appear here once merged.
         </p>

@@ -1,7 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
 import App from "./App";
-import { PageHero } from "@/components/site/page-hero";
 
 export const metadata = {
   title: "Octuple — Eightfold Design System",
@@ -79,18 +78,9 @@ function readDocuments(): Record<string, CatalogDocument> {
 
 // Renders the catalog full-width. The route is outside the (site) route group,
 // so it isn't constrained by the max-w-6xl wrapper that landing/gallery use.
+// No PageHero here — the catalog has a sticky sidebar that occludes the
+// overlay text; the section's identity comes through via its own header
+// in App.tsx. (cloudy-wind.svg lives under public/heroes/ for future use.)
 export default function ComponentsPage() {
-  return (
-    <>
-      <PageHero src="/heroes/cloudy-wind.svg">
-        <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
-          Octuple
-        </h1>
-        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--muted-foreground)]">
-          The component library, design tokens, and content guidelines for everything we ship.
-        </p>
-      </PageHero>
-      <App documents={readDocuments()} />
-    </>
-  );
+  return <App documents={readDocuments()} />;
 }
