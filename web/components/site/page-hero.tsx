@@ -2,7 +2,7 @@
 
 import { useTheme } from "next-themes";
 import { useHero } from "./hero-provider";
-import { srcFor, type HeroPage } from "./hero-registry";
+import { imageFor, srcFor, type HeroPage } from "./hero-registry";
 
 /**
  * Section-page hero banner. Full-bleed across the viewport, bleeding
@@ -24,21 +24,21 @@ import { srcFor, type HeroPage } from "./hero-registry";
  */
 export function PageHero({
   page,
-  flipY = false,
   children,
 }: {
   /** Which page this banner is for — drives the SVG lookup against
    *  the active hero theme. */
   page: HeroPage;
-  /** Flip the illustration upside-down. Useful for SVGs designed to
-   *  sit at the BOTTOM of a hero (mountain peaks etc.). */
-  flipY?: boolean;
   /** Eyebrow, h1, intro paragraph(s) — rendered on top of the SVG. */
   children: React.ReactNode;
 }) {
   const { hero } = useHero();
   const { resolvedTheme } = useTheme();
   const src = srcFor(hero, page, resolvedTheme);
+  // flipY lives on the image record now — each theme can declare which
+  // pages need their SVG flipped. Cyberpunk's gallery + docs SVGs flip;
+  // Gradient's don't, even on the same surfaces.
+  const flipY = imageFor(hero, page).flipY ?? false;
 
   return (
     <section className="relative -mt-16">
