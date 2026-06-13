@@ -82,7 +82,14 @@ function readDocuments(): Record<string, CatalogDocument> {
 export default function ComponentsPage() {
   return (
     <>
-      <PageHero src="/heroes/cloudy-wind.svg" />
+      <PageHero src="/heroes/cloudy-wind.svg">
+        <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
+          Octuple
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--muted-foreground)]">
+          The component library, design tokens, and content guidelines for everything we ship.
+        </p>
+      </PageHero>
       <App documents={readDocuments()} />
     </>
   );

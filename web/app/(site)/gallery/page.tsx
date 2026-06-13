@@ -32,16 +32,17 @@ export default function HomePage() {
 
   return (
     <div>
-      <PageHero src="/heroes/burning-lands.svg" flipY />
-      {/* Readable wrapper — same width as the home page (max-w-6xl + px-6). */}
-      <div className="mx-auto max-w-6xl px-6">
-      <div className="mb-10">
-        <h1 className="text-3xl font-semibold tracking-tight">Browse by product</h1>
-        <p className="mt-2 text-sm text-[var(--muted-foreground)]">
+      <PageHero src="/heroes/burning-lands.svg" flipY>
+        <h1 className="text-4xl font-semibold tracking-tight text-[var(--foreground)] sm:text-5xl">
+          Browse by product
+        </h1>
+        <p className="mt-4 max-w-2xl text-lg leading-relaxed text-[var(--muted-foreground)]">
           {all.length} {all.length === 1 ? "design" : "designs"} across {CATEGORIES.length} product areas.
           Designs are submitted via pull request and appear here once merged.
         </p>
-      </div>
+      </PageHero>
+      {/* Cards grid below the hero — same readable column as home. */}
+      <div className="mx-auto max-w-6xl px-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {CATEGORIES.map((c) => {
           const designs = byCategory.get(c.slug) ?? [];
