@@ -67,9 +67,14 @@ export function HomePageView({
           key={heroSrc}
           className="absolute top-0 left-0 w-full opacity-80 -z-10 pointer-events-none select-none"
         />
-        <div className="px-6">
-          <div className="mx-auto max-w-6xl pt-28 pb-14">
-            <div className="max-w-3xl">
+        {/* Same wrapper pattern as PageHero on /gallery, /docs/workflow:
+            max-w-6xl + px-6 + max-w-3xl inner, so the title block
+            starts at the same x-coordinate across every top-level
+            surface. Was previously `<div px-6><div max-w-6xl>` which
+            put the title block 24px further left than the section
+            pages — visible misalignment between Home and the rest. */}
+        <div className="mx-auto max-w-6xl px-6 pt-28 pb-14">
+          <div className="max-w-3xl">
               <div className="inline-flex items-center gap-1.5 text-sm font-medium text-[var(--foreground)]">
                 <span
                   className="material-symbols-outlined"
@@ -111,7 +116,6 @@ export function HomePageView({
                   How to use
                 </Link>
               </div>
-            </div>
           </div>
         </div>
       </section>
