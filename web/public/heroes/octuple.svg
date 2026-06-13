@@ -1,0 +1,253 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 380" width="100%" height="100%">
+  <defs>
+    <linearGradient id="brutalGrad" x1="0" y1="0" x2="1440" y2="0" gradientUnits="userSpaceOnUse">
+      <stop offset="0%" stop-color="#f8ba9d" />
+      <stop offset="25%" stop-color="#f08891" />
+      <stop offset="50%" stop-color="#b66db5" />
+      <stop offset="75%" stop-color="#8a53b5" />
+      <stop offset="100%" stop-color="#4e3582" />
+    </linearGradient>
+  </defs>
+
+  <rect width="1440" height="380" fill="#fcfbfc" />
+
+  <g stroke="#1c1228" stroke-width="1.5" stroke-linejoin="bevel">
+
+    <polygon points="-20,-20 300,-20 150,150 150,380 -20,380" fill="url(#brutalGrad)" />
+    <polygon points="-20,-20 300,-20 150,150 150,380 -20,380" fill="#000" opacity="0.4" />
+
+    <polygon points="200,-20 600,-20 450,220 500,380 150,380 150,150" fill="url(#brutalGrad)" />
+    <polygon points="200,-20 600,-20 450,220 500,380 150,380 150,150" fill="#fff" opacity="0.05" />
+
+    <polygon points="500,-20 900,-20 750,220 800,380 400,380 450,220" fill="url(#brutalGrad)" />
+    <polygon points="500,-20 900,-20 750,220 800,380 400,380 450,220" fill="#000" opacity="0.45" />
+
+    <polygon points="800,-20 1200,-20 1050,190 1100,380 700,380 750,220" fill="url(#brutalGrad)" />
+    <polygon points="800,-20 1200,-20 1050,190 1100,380 700,380 750,220" fill="#fff" opacity="0.1" />
+
+    <polygon points="1100,-20 1500,-20 1500,380 1000,380 1050,190" fill="url(#brutalGrad)" />
+    <polygon points="1100,-20 1500,-20 1500,380 1000,380 1050,190" fill="#000" opacity="0.35" />
+
+    <polygon points="-20,100 180,80 300,200 120,380 -20,380" fill="url(#brutalGrad)" />
+    <polygon points="-20,100 180,80 300,200 120,380 -20,380" fill="#fff" opacity="0.1" />
+
+    <polygon points="100,80 280,20 420,180 300,380 120,380 180,80" fill="url(#brutalGrad)" />
+    <polygon points="100,80 280,20 420,180 300,380 120,380 180,80" fill="#000" opacity="0.15" />
+
+    <polygon points="350,20 550,-10 650,200 480,380 300,380 420,180" fill="url(#brutalGrad)" />
+    <polygon points="350,20 550,-10 650,200 480,380 300,380 420,180" fill="#fff" opacity="0.1" />
+
+    <polygon points="580,20 780,40 850,250 700,380 480,380 650,200" fill="url(#brutalGrad)" />
+    <polygon points="580,20 780,40 850,250 700,380 480,380 650,200" fill="#000" opacity="0.2" />
+
+    <polygon points="800,40 1000,80 1100,280 950,380 700,380 850,250" fill="url(#brutalGrad)" />
+    <polygon points="800,40 1000,80 1100,280 950,380 700,380 850,250" fill="#fff" opacity="0.15" />
+
+    <polygon points="1050,80 1250,100 1350,300 1200,380 950,380 1100,280" fill="url(#brutalGrad)" />
+    <polygon points="1050,80 1250,100 1350,300 1200,380 950,380 1100,280" fill="#000" opacity="0.1" />
+
+    <polygon points="1280,100 1440,160 1460,380 1200,380 1350,300" fill="url(#brutalGrad)" />
+    <polygon points="1280,100 1440,160 1460,380 1200,380 1350,300" fill="#fff" opacity="0.1" />
+
+    <polygon points="50,380 280,280 380,380 180,380" fill="url(#brutalGrad)" />
+    <polygon points="50,380 280,280 380,380 180,380" fill="#fff" opacity="0.15" />
+
+    <polygon points="250,380 480,240 600,380 380,380" fill="url(#brutalGrad)" />
+    <polygon points="250,380 480,240 600,380 380,380" fill="#000" opacity="0.1" />
+
+    <polygon points="450,380 700,260 850,380 650,380" fill="url(#brutalGrad)" />
+    <polygon points="450,380 700,260 850,380 650,380" fill="#fff" opacity="0.1" />
+
+    <polygon points="700,380 950,280 1100,380 880,380" fill="url(#brutalGrad)" />
+    <polygon points="700,380 950,280 1100,380 880,380" fill="#000" opacity="0.15" />
+
+    <polygon points="900,380 1180,300 1320,380 1080,380" fill="url(#brutalGrad)" />
+    <polygon points="900,380 1180,300 1320,380 1080,380" fill="#fff" opacity="0.1" />
+
+    <polygon points="1150,380 1400,320 1460,380 1280,380" fill="url(#brutalGrad)" />
+    <polygon points="1150,380 1400,320 1460,380 1280,380" fill="#000" opacity="0.2" />
+
+    <polygon points="-20,380 120,280 200,320 300,380" fill="url(#brutalGrad)" />
+    <polygon points="-20,380 120,280 200,320 300,380" fill="#fff" opacity="0.25" />
+
+    <polygon points="120,380 250,250 320,280 420,380" fill="url(#brutalGrad)" />
+    <polygon points="120,380 250,250 320,280 420,380" fill="#fff" opacity="0.05" />
+
+    <polygon points="250,380 380,240 450,280 550,380" fill="url(#brutalGrad)" />
+    <polygon points="250,380 380,240 450,280 550,380" fill="#000" opacity="0.15" />
+
+    <polygon points="380,380 520,220 600,280 700,380" fill="url(#brutalGrad)" />
+    <polygon points="380,380 520,220 600,280 700,380" fill="#fff" opacity="0.1" />
+
+    <polygon points="520,380 650,200 750,260 850,380" fill="url(#brutalGrad)" />
+    <polygon points="520,380 650,200 750,260 850,380" fill="#fff" opacity="0.25" />
+
+    <polygon points="650,380 780,240 880,300 1000,380" fill="url(#brutalGrad)" />
+    <polygon points="650,380 780,240 880,300 1000,380" fill="#fff" opacity="0.05" />
+
+    <polygon points="800,380 950,260 1050,300 1150,380" fill="url(#brutalGrad)" />
+    <polygon points="800,380 950,260 1050,300 1150,380" fill="#000" opacity="0.15" />
+
+    <polygon points="950,380 1100,240 1200,280 1300,380" fill="url(#brutalGrad)" />
+    <polygon points="950,380 1100,240 1200,280 1300,380" fill="#fff" opacity="0.1" />
+
+    <polygon points="1100,380 1250,260 1350,320 1460,380" fill="url(#brutalGrad)" />
+    <polygon points="1100,380 1250,260 1350,320 1460,380" fill="#fff" opacity="0.25" />
+
+    <polygon points="1250,380 1380,280 1460,320 1460,380" fill="url(#brutalGrad)" />
+    <polygon points="1250,380 1380,280 1460,320 1460,380" fill="#fff" opacity="0.05" />
+
+    <polygon points="220,380 300,80 350,180 280,380" fill="url(#brutalGrad)" />
+    <polygon points="220,380 300,80 350,180 280,380" fill="#000" opacity="0.5" />
+
+    <polygon points="400,380 480,50 520,120 460,380" fill="url(#brutalGrad)" />
+    <polygon points="400,380 480,50 520,120 460,380" fill="#fff" opacity="0.3" />
+
+    <polygon points="580,380 650,-20 700,140 640,380" fill="url(#brutalGrad)" />
+    <polygon points="580,380 650,-20 700,140 640,380" fill="#fff" opacity="0.15" />
+
+    <polygon points="760,380 820,60 880,160 810,380" fill="url(#brutalGrad)" />
+    <polygon points="760,380 820,40 880,160 810,380" font-family="#000" opacity="0.4" />
+
+    <polygon points="940,380 1020,100 1080,200 1000,380" fill="url(#brutalGrad)" />
+    <polygon points="940,380 1020,100 1080,200 1000,380" fill="#fff" opacity="0.2" />
+
+    <polygon points="1120,380 1200,80 1250,180 1180,380" fill="url(#brutalGrad)" />
+    <polygon points="1120,380 1200,80 1250,180 1180,380" fill="#fff" opacity="0.1" />
+
+    <polygon points="1280,380 1350,120 1400,220 1340,380" fill="url(#brutalGrad)" />
+    <polygon points="1280,380 1350,120 1400,220 1340,380" fill="#000" opacity="0.3" />
+
+    <polygon points="1400,380 1440,160 1460,250 1460,380" fill="url(#brutalGrad)" />
+    <polygon points="1400,380 1440,160 1460,250 1460,380" fill="#fff" opacity="0.15" />
+
+    <polygon points="80,200 110,180 140,210 100,230" fill="url(#brutalGrad)" />
+    <polygon points="80,200 110,180 140,210 100,230" fill="#fff" opacity="0.25" />
+    <polygon points="150,160 170,130 200,160 170,190" fill="url(#brutalGrad)" />
+    <polygon points="150,160 170,130 200,160 170,190" fill="#fff" opacity="0.4" />
+    <polygon points="200,220 230,190 260,220 220,250" fill="url(#brutalGrad)" />
+    <polygon points="200,220 230,190 260,220 220,250" fill="#fff" opacity="0.2" />
+    <polygon points="100,120 120,90 150,120 120,150" fill="url(#brutalGrad)" />
+    <polygon points="100,120 120,90 150,120 120,150" fill="#fff" opacity="0.55" />
+    <polygon points="250,150 280,120 310,150 270,180" fill="url(#brutalGrad)" />
+    <polygon points="250,150 280,120 310,150 270,180" fill="#fff" opacity="0.35" />
+    <polygon points="300,200 330,170 360,200 320,230" fill="url(#brutalGrad)" />
+    <polygon points="300,200 330,170 360,200 320,230" fill="#fff" opacity="0.4" />
+    <polygon points="180,280 210,250 240,280 200,310" fill="url(#brutalGrad)" />
+    <polygon points="180,280 210,250 240,280 200,310" fill="#fff" opacity="0.2" />
+    <polygon points="280,350 300,320 330,350 290,380" fill="url(#brutalGrad)" />
+    <polygon points="280,350 300,320 330,350 290,380" fill="#fff" opacity="0.15" />
+    <polygon points="120,350 140,320 170,350 130,380" fill="url(#brutalGrad)" />
+    <polygon points="120,350 140,320 170,350 130,380" fill="#fff" opacity="0.3" />
+    <polygon points="60,360 80,330 110,360 70,390" fill="url(#brutalGrad)" />
+    <polygon points="60,360 80,330 110,360 70,390" fill="#fff" opacity="0.15" />
+    <polygon points="400,150 430,120 460,150 420,180" fill="url(#brutalGrad)" />
+    <polygon points="400,150 430,120 460,150 420,180" fill="#000" opacity="0.1" />
+    <polygon points="480,100 510,70 540,100 500,130" fill="url(#brutalGrad)" />
+    <polygon points="480,100 510,70 540,100 500,130" fill="#fff" opacity="0.25" />
+    <polygon points="560,160 590,130 620,160 580,190" fill="url(#brutalGrad)" />
+    <polygon points="560,160 590,130 620,160 580,190" fill="#fff" opacity="0.4" />
+    <polygon points="380,230 410,200 440,230 400,260" fill="url(#brutalGrad)" />
+    <polygon points="380,230 410,200 440,230 400,260" fill="#fff" opacity="0.2" />
+    <polygon points="490,270 520,240 550,270 510,300" fill="url(#brutalGrad)" />
+    <polygon points="490,270 520,240 550,270 510,300" fill="#fff" opacity="0.45" />
+    <polygon points="590,230 620,200 650,230 610,260" fill="url(#brutalGrad)" />
+    <polygon points="590,230 620,200 650,230 610,260" fill="#fff" opacity="0.3" />
+    <polygon points="520,310 550,280 580,310 540,340" fill="url(#brutalGrad)" />
+    <polygon points="520,310 550,280 580,310 540,340" fill="#fff" opacity="0.1" />
+    <polygon points="620,350 650,320 680,350 640,380" fill="url(#brutalGrad)" />
+    <polygon points="620,350 650,320 680,350 640,380" fill="#fff" opacity="0.2" />
+    <polygon points="450,360 480,330 510,360 470,390" fill="url(#brutalGrad)" />
+    <polygon points="450,360 480,330 510,360 470,390" fill="#fff" opacity="0.25" />
+    <polygon points="550,380 580,350 610,380 570,410" fill="url(#brutalGrad)" />
+    <polygon points="550,380 580,350 610,380 570,410" fill="#fff" opacity="0.15" />
+    <polygon points="350,330 370,300 400,330 370,360" fill="url(#brutalGrad)" />
+    <polygon points="350,330 370,300 400,330 370,360" fill="#fff" opacity="0.3" />
+    <polygon points="700,150 730,120 760,150 720,180" fill="url(#brutalGrad)" />
+    <polygon points="700,150 730,120 760,150 720,180" fill="#fff" opacity="0.3" />
+    <polygon points="780,100 810,70 840,100 800,130" fill="url(#brutalGrad)" />
+    <polygon points="780,100 810,70 840,100 800,130" fill="#fff" opacity="0.45" />
+    <polygon points="860,160 890,130 920,160 880,190" fill="url(#brutalGrad)" />
+    <polygon points="860,160 890,130 920,160 880,190" fill="#fff" opacity="0.2" />
+    <polygon points="680,230 710,200 740,230 700,260" fill="url(#brutalGrad)" />
+    <polygon points="680,230 710,200 740,230 700,260" fill="#fff" opacity="0.35" />
+    <polygon points="760,270 790,240 820,270 780,300" fill="url(#brutalGrad)" />
+    <polygon points="760,270 790,240 820,270 780,300" fill="#fff" opacity="0.15" />
+    <polygon points="860,230 890,200 920,230 880,260" fill="url(#brutalGrad)" />
+    <polygon points="860,230 890,200 920,230 880,260" fill="#fff" opacity="0.4" />
+    <polygon points="720,310 750,280 780,310 740,340" fill="url(#brutalGrad)" />
+    <polygon points="720,310 750,280 780,310 740,340" fill="#fff" opacity="0.2" />
+    <polygon points="820,350 850,320 880,350 840,380" fill="url(#brutalGrad)" />
+    <polygon points="820,350 850,320 880,350 840,380" fill="#fff" opacity="0.1" />
+    <polygon points="750,380 780,350 810,380 770,410" fill="url(#brutalGrad)" />
+    <polygon points="750,380 780,350 810,380 770,410" fill="#fff" opacity="0.3" />
+    <polygon points="850,400 880,370 910,400 870,430" fill="url(#brutalGrad)" />
+    <polygon points="850,400 880,370 910,400 870,430" fill="#fff" opacity="0.15" />
+    <polygon points="650,340 670,310 700,340 670,370" fill="url(#brutalGrad)" />
+    <polygon points="650,340 670,310 700,340 670,370" fill="#fff" opacity="0.25" />
+    <polygon points="900,170 930,140 960,170 920,200" fill="url(#brutalGrad)" />
+    <polygon points="900,170 930,140 960,170 920,200" fill="#fff" opacity="0.35" />
+    <polygon points="980,120 1010,90 1040,120 1000,150" fill="url(#brutalGrad)" />
+    <polygon points="980,120 1010,90 1040,120 1000,150" fill="#fff" opacity="0.5" />
+    <polygon points="1060,180 1090,150 1120,180 1080,210" fill="url(#brutalGrad)" />
+    <polygon points="1060,180 1090,150 1120,180 1080,210" fill="#fff" opacity="0.2" />
+    <polygon points="880,250 910,220 940,250 900,280" fill="url(#brutalGrad)" />
+    <polygon points="880,250 910,220 940,250 900,280" fill="#fff" opacity="0.3" />
+    <polygon points="960,290 990,260 1020,290 980,320" fill="url(#brutalGrad)" />
+    <polygon points="960,290 990,260 1020,290 980,320" fill="#fff" opacity="0.15" />
+    <polygon points="1060,250 1090,220 1120,250 1080,280" fill="url(#brutalGrad)" />
+    <polygon points="1060,250 1090,220 1120,250 1080,280" fill="#fff" opacity="0.4" />
+    <polygon points="920,330 950,300 980,330 940,360" fill="url(#brutalGrad)" />
+    <polygon points="920,330 950,300 980,330 940,360" fill="#fff" opacity="0.2" />
+    <polygon points="1020,370 1050,340 1080,370 1040,400" fill="url(#brutalGrad)" />
+    <polygon points="1020,370 1050,340 1080,370 1040,400" fill="#fff" opacity="0.1" />
+    <polygon points="950,400 980,370 1010,400 970,430" fill="url(#brutalGrad)" />
+    <polygon points="950,400 980,370 1010,400 970,430" fill="#fff" opacity="0.3" />
+    <polygon points="1050,420 1080,390 1110,420 1070,450" fill="url(#brutalGrad)" />
+    <polygon points="1050,420 1080,390 1110,420 1070,450" fill="url(#brutalGrad)" />
+    <polygon points="1100,230 1130,200 1160,230 1120,260" fill="url(#brutalGrad)" />
+    <polygon points="1100,230 1130,200 1160,230 1120,260" fill="#fff" opacity="0.3" />
+    <polygon points="1180,180 1210,150 1240,180 1200,210" fill="url(#brutalGrad)" />
+    <polygon points="1180,180 1210,150 1240,180 1200,210" fill="#fff" opacity="0.4" />
+    <polygon points="1260,230 1290,200 1320,230 1280,260" fill="url(#brutalGrad)" />
+    <polygon points="1260,230 1290,200 1320,230 1280,260" fill="#fff" opacity="0.25" />
+    <polygon points="1080,300 1110,270 1140,300 1100,330" fill="url(#brutalGrad)" />
+    <polygon points="1080,300 1110,270 1140,300 1100,330" fill="#fff" opacity="0.3" />
+    <polygon points="1160,340 1190,310 1220,340 1180,370" fill="url(#brutalGrad)" />
+    <polygon points="1160,340 1190,310 1220,340 1180,370" fill="#fff" opacity="0.15" />
+    <polygon points="1260,300 1290,270 1320,300 1280,330" fill="url(#brutalGrad)" />
+    <polygon points="1260,300 1290,270 1320,300 1280,330" fill="#fff" opacity="0.35" />
+    <polygon points="1120,380 1150,350 1180,380 1140,410" fill="url(#brutalGrad)" />
+    <polygon points="1120,380 1150,350 1180,380 1140,410" fill="#fff" opacity="0.2" />
+    <polygon points="1220,420 1250,390 1280,420 1240,450" fill="url(#brutalGrad)" />
+    <polygon points="1220,420 1250,390 1280,420 1240,450" fill="#fff" opacity="0.1" />
+    <polygon points="1150,400 1180,370 1210,400 1170,430" fill="url(#brutalGrad)" />
+    <polygon points="1150,400 1180,370 1210,400 1170,430" fill="#fff" opacity="0.3" />
+    <polygon points="1250,420 1280,390 1310,420 1270,450" fill="url(#brutalGrad)" />
+    <polygon points="1250,420 1280,390 1310,420 1270,450" fill="#fff" opacity="0.15" />
+    <polygon points="1050,360 1070,330 1100,360 1070,390" fill="url(#brutalGrad)" />
+    <polygon points="1050,360 1070,330 1100,360 1070,390" fill="#fff" opacity="0.2" />
+    <polygon points="1300,340 1330,310 1360,340 1320,370" fill="url(#brutalGrad)" />
+    <polygon points="1300,340 1330,310 1360,340 1320,370" fill="#fff" opacity="0.35" />
+    <polygon points="1380,380 1410,350 1440,380 1400,410" fill="url(#brutalGrad)" />
+    <polygon points="1380,380 1410,350 1440,380 1400,410" fill="#fff" opacity="0.1" />
+    <polygon points="1350,400 1380,370 1410,400 1370,430" fill="url(#brutalGrad)" />
+    <polygon points="1350,400 1380,370 1410,400 1370,430" fill="#fff" opacity="0.3" />
+    <polygon points="1420,420 1450,390 1460,420 1460,450 1440,450" fill="url(#brutalGrad)" />
+    <polygon points="1420,420 1450,390 1460,420 1460,450 1440,450" fill="#fff" opacity="0.1" />
+
+    <polygon points="150,220 170,200 190,220 160,240" fill="#fff" opacity="0.6" />
+    <polygon points="350,120 370,100 390,120 360,140" fill="#fff" opacity="0.65" />
+    <polygon points="550,170 570,150 590,170 560,190" fill="#fff" opacity="0.7" />
+    <polygon points="750,100 770,80 790,100 760,120" fill="#fff" opacity="0.6" />
+    <polygon points="950,140 970,120 990,140 960,160" fill="#fff" opacity="0.65" />
+    <polygon points="1150,80 1170,60 1190,80 1160,100" fill="#fff" opacity="0.7" />
+    <polygon points="1350,110 1370,90 1390,110 1360,130" fill="#fff" opacity="0.6" />
+    <polygon points="250,300 270,280 290,300 260,320" fill="#fff" opacity="0.65" />
+    <polygon points="450,260 470,240 490,260 460,280" fill="#fff" opacity="0.7" />
+    <polygon points="650,320 670,300 690,320 660,340" fill="#fff" opacity="0.6" />
+    <polygon points="850,220 870,200 890,220 860,240" fill="#fff" opacity="0.65" />
+    <polygon points="1050,270 1070,250 1090,270 1060,290" fill="#fff" opacity="0.7" />
+    <polygon points="1250,180 1270,160 1290,180 1260,200" fill="#fff" opacity="0.6" />
+    <polygon points="1450,120 1460,100 1460,140 1460,120" fill="#fff" opacity="0.65" /> </g>
+</svg>
