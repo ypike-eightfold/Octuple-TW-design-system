@@ -33,6 +33,8 @@ export default function HomePage() {
   return (
     <div>
       <PageHero src="/heroes/burning-lands.svg" flipY />
+      {/* Readable wrapper — same width as the home page (max-w-6xl + px-6). */}
+      <div className="mx-auto max-w-6xl px-6">
       <div className="mb-10">
         <h1 className="text-3xl font-semibold tracking-tight">Browse by product</h1>
         <p className="mt-2 text-sm text-[var(--muted-foreground)]">
@@ -88,6 +90,7 @@ export default function HomePage() {
             </Link>
           );
         })}
+      </div>
       </div>
     </div>
   );

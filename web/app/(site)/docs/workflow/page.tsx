@@ -83,10 +83,9 @@ export const metadata = {
 
 export default function WorkflowPage() {
   return (
-    // Constrain the article to a readable width (~896px). Text and screenshots
-    // stay aligned at this width on every viewport — no side-by-side squish,
-    // no images blowing up to fill 1152px on wide monitors.
-    <article className="mx-auto max-w-4xl">
+    // Matches the home + gallery width (max-w-6xl + px-6) so the three
+    // top-level surfaces share a consistent content column.
+    <article className="mx-auto max-w-6xl px-6">
       <PageHero src="/heroes/ocean-waves.svg" flipY />
       <header className="mb-10">
         <h1 className="text-4xl font-semibold tracking-tight">Designer workflow</h1>
