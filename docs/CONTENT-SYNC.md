@@ -276,6 +276,33 @@ function onOpen() {
 - `TARGET_PATH` — the exact repo path this doc should publish to (see the doc → file map above).
 - `COMMIT_PREFIX` — what shows up in `git log`. Keep it short.
 
+### 4.5. Declare the OAuth scopes in the manifest (`appsscript.json`)
+
+**Don't skip this — it's the step that bites on the first run.** `exportAsMarkdown_` calls the Drive REST export endpoint with `ScriptApp.getOAuthToken()`. That token only carries a Drive permission if a Drive scope is declared in the project manifest. Apps Script auto-detects scopes for recognized calls (`DocumentApp`, `UrlFetchApp`, the menu UI), but it does **not** infer a Drive scope from a raw `UrlFetchApp` call to `googleapis.com` — so without this, the first run fails with a 403 on export. (This was the original "why won't it sync" issue.)
+
+1. **Project Settings** (gear icon) → tick **"Show 'appsscript.json' manifest file in the editor."**
+2. Open `appsscript.json` and set its `oauthScopes`:
+
+```json
+{
+  "timeZone": "America/Los_Angeles",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/documents.currentonly",
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/drive.readonly"
+  ]
+}
+```
+
+Declaring `oauthScopes` **replaces** auto-detection, so all four must be present: documents (read the bound doc), container UI (the Eightfold menu + alerts), external request (`UrlFetchApp` → GitHub + Drive), and Drive (the markdown export). `drive.readonly` is enough — export is a read; the broader `.../auth/drive` scope also works.
+
+You do **not** need to enable the Drive **advanced service** (Services → Drive). That's only required when code calls `Drive.Files.export(...)` directly; this script uses the REST endpoint via `UrlFetchApp`, so the scope above is all it needs.
+
+> **Copying a working doc's setup?** Fastest path: open a working doc's Apps Script, reveal its `appsscript.json`, and paste it verbatim into the new doc. The manifest is part of "the same things" — `Code.gs` alone isn't enough.
+
 ### 5. Store the GitHub token in Script properties
 
 The token never goes in the code. Apps Script encrypts script properties at rest.
