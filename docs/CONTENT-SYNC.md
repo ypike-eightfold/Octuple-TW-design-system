@@ -27,6 +27,14 @@ This file documents:
 
 Docs 1+2 are shared content read by every design skill. Docs 3+4 are generic Gem instructions (used by any custom Gem). Docs 5+6 are specific to the OH Gem. When you add a new synced doc, update this table.
 
+> **Canonical doc IDs (record them when you know them).** Nothing in the *mechanism* pins a doc by ID — the Apps Script is bound to whatever doc it lives in (see "Swapping the source doc"). But recording the canonical ID here prevents binding the script to the wrong doc:
+>
+> | File | Canonical Google Doc ID |
+> |---|---|
+> | `content-design-standards.md` | `1iH3BWI1ocmjB269ahoelXilebuvJGX4BkuDutba8plE` — the doc `terms-list.md` cross-links to throughout |
+>
+> A retired earlier draft (`1WcFOgOOLiB7caOExcA8I_k6dCe-9uamzTaNAiA4gvI0`) was the original sync source for content design standards. If its Apps Script still has a trigger, remove it (see "Swapping the source doc") so it can't overwrite the file with stale content.
+
 > **Heads up on docs 3–6:** the placeholder files exist with the right frontmatter + AUTO-SYNCED banner. The first run of each doc's Apps Script will replace the "Awaiting first sync" body with the actual content. See [`gems/README.md`](../gems/README.md) for the gem-tree layout.
 
 ---
@@ -97,6 +105,22 @@ The Apps Script exports the doc as **Markdown** using Google Drive's native `tex
 | Footnotes | Page breaks, headers / footers |
 
 If a doc relies heavily on the "poorly handled" column, the synced `.md` will need a cleanup pass after the first sync. That's a one-time cost — the cleanup goes back into the doc as a structural improvement so future syncs come out clean.
+
+---
+
+## Swapping the source doc (re-pointing a file at a different doc)
+
+Use this when a file should start syncing from a **different** Google Doc — e.g. the original doc was a stale draft and the canonical doc is somewhere else.
+
+The thing to internalize: **the repo never names the source doc by ID.** The Apps Script is *bound to the doc* and exports whatever doc it lives in (`DocumentApp.getActiveDocument()`). The repo file only records the source URL in its `AUTO-SYNCED` banner, and that line is regenerated on every sync. So there is **no repo edit** that re-points a file — the swap happens entirely on the Google side, and the file self-heals (content **and** banner URL) the first time the new doc syncs.
+
+1. **Set up the sync on the new doc** — follow "Setting up the sync for a new doc" below, using the **same `TARGET_PATH`** as the file you're re-pointing (the PAT already exists — reuse it, don't make a new one).
+2. **Run `syncToRepo` once from the new doc.** The repo file's body and its banner `Source:` URL now point at the new doc. Confirm the commit landed.
+3. **Decommission the old doc's sync — this is the step that actually stops the swap from being undone.** Because both docs push to the same `TARGET_PATH`, *the last sync wins*; an old doc left running will clobber the new content on its next trigger.
+   - Open the **old** doc → Extensions → Apps Script → **Triggers** (clock icon) → delete every `syncToRepo` trigger.
+   - Then, to be foolproof, delete the bound script project too (Apps Script editor → Project Settings → or just remove the `onOpen`/`syncToRepo` code) so nobody can click **Eightfold → Sync to repo** on the old doc by accident.
+
+> If you skip step 3 and the old doc has a time-based trigger, the file will silently revert to stale content on the old doc's schedule — the single most confusing failure mode here.
 
 ---
 
