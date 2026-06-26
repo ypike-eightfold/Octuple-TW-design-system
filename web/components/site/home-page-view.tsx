@@ -6,7 +6,9 @@ import { useTheme } from "next-themes";
 import { Button, Pill, type PillVariant } from "@tonyh-2-eightfold/ef-design-system";
 import { useHero } from "@/components/site/hero-provider";
 import { srcFor } from "@/components/site/hero-registry";
-import type { ActivityEntry, CommitType } from "@/lib/github-activity";
+import type { ActivityEntry } from "@/lib/github-activity";
+import { AREA_LABELS, AREA_PILL_VARIANT, TYPE_PILL_VARIANT } from "./activity-format";
+import { ActivityPanel } from "./activity-panel";
 
 export interface LatestDesign {
   title: string;
@@ -23,36 +25,8 @@ interface Props {
   teamActivity: ActivityEntry[];
 }
 
-const AREA_LABELS: Record<ActivityEntry["area"], string> = {
-  octuple: "Octuple",
-  gallery: "Gallery",
-  docs: "Docs",
-  skills: "Skills",
-};
-
-/** Pill color per activity area — picked so the "Recent team activity"
- *  card scans by color: cool for design, warm for docs, red for skills.
- *  Each variant is one of the Octuple-supported set. */
-const AREA_PILL_VARIANT: Record<ActivityEntry["area"], PillVariant> = {
-  octuple: "blueGreen",
-  gallery: "blueGreen",
-  docs: "orange",
-  skills: "critical",
-};
-
-/** Pill color per conventional-commit type — picked so the eye can spot
- *  fixes vs. features at a glance: green for new work, red for fixes,
- *  neutral for housekeeping. */
-const TYPE_PILL_VARIANT: Record<CommitType, PillVariant> = {
-  feat: "blueGreen",
-  fix: "critical",
-  refactor: "orange",
-  perf: "orange",
-  chore: "neutral",
-  docs: "neutral",
-  style: "neutral",
-  test: "neutral",
-};
+/* AREA_LABELS / AREA_PILL_VARIANT / TYPE_PILL_VARIANT now live in
+   ./activity-format so the "See all" panel renders them identically. */
 
 /** Synced markdown documents shown as quick-link chips in the Octuple
  *  card. Ids match DOCUMENT_PAGES in the catalog so the hash routes
@@ -249,6 +223,7 @@ export function HomePageView({
             when the API is unreachable rather than disappearing. */}
         <section className="mt-14 mb-12 grid grid-cols-1 gap-6 lg:grid-cols-2">
           <ActivityCard
+            feed="octuple"
             title="What's new in Octuple"
             subtitle="Recent changes to the component library, plus the design documents the whole team writes against."
             entries={octupleUpdates}
@@ -259,6 +234,7 @@ export function HomePageView({
             docs={SYNCED_DOCS}
           />
           <ActivityCard
+            feed="team"
             title="Recent team activity"
             subtitle="Designs, docs, and skills — everyone's updates. A personal view arrives with sign-in."
             entries={teamActivity}
@@ -273,6 +249,7 @@ export function HomePageView({
 }
 
 function ActivityCard({
+  feed,
   title,
   subtitle,
   entries,
@@ -282,6 +259,7 @@ function ActivityCard({
   showCommitPills,
   docs,
 }: {
+  feed: "octuple" | "team";
   title: string;
   subtitle: string;
   entries: ActivityEntry[];
@@ -297,7 +275,12 @@ function ActivityCard({
 }) {
   return (
     <section className="flex flex-col rounded-2xl border border-[var(--border)] bg-[var(--card)] p-6">
-      <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="text-xl font-semibold tracking-tight">{title}</h2>
+        <div className="pt-0.5">
+          <ActivityPanel feed={feed} title={title} />
+        </div>
+      </div>
       <p className="mt-1 text-sm text-[var(--muted-foreground)]">{subtitle}</p>
       {entries.length === 0 ? (
         <p className="mt-6 flex-1 text-sm text-[var(--muted-foreground)]">
