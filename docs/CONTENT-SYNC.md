@@ -27,6 +27,14 @@ This file documents:
 
 Docs 1+2 are shared content read by every design skill. Docs 3+4 are generic Gem instructions (used by any custom Gem). Docs 5+6 are specific to the OH Gem. When you add a new synced doc, update this table.
 
+> **Canonical doc IDs (record them when you know them).** Nothing in the *mechanism* pins a doc by ID — the Apps Script is bound to whatever doc it lives in (see "Swapping the source doc"). But recording the canonical ID here prevents binding the script to the wrong doc:
+>
+> | File | Canonical Google Doc ID |
+> |---|---|
+> | `content-design-standards.md` | `1iH3BWI1ocmjB269ahoelXilebuvJGX4BkuDutba8plE` — the doc `terms-list.md` cross-links to throughout |
+>
+> A retired earlier draft (`1WcFOgOOLiB7caOExcA8I_k6dCe-9uamzTaNAiA4gvI0`) was the original sync source for content design standards. If its Apps Script still has a trigger, remove it (see "Swapping the source doc") so it can't overwrite the file with stale content.
+
 > **Heads up on docs 3–6:** the placeholder files exist with the right frontmatter + AUTO-SYNCED banner. The first run of each doc's Apps Script will replace the "Awaiting first sync" body with the actual content. See [`gems/README.md`](../gems/README.md) for the gem-tree layout.
 
 ---
@@ -97,6 +105,22 @@ The Apps Script exports the doc as **Markdown** using Google Drive's native `tex
 | Footnotes | Page breaks, headers / footers |
 
 If a doc relies heavily on the "poorly handled" column, the synced `.md` will need a cleanup pass after the first sync. That's a one-time cost — the cleanup goes back into the doc as a structural improvement so future syncs come out clean.
+
+---
+
+## Swapping the source doc (re-pointing a file at a different doc)
+
+Use this when a file should start syncing from a **different** Google Doc — e.g. the original doc was a stale draft and the canonical doc is somewhere else.
+
+The thing to internalize: **the repo never names the source doc by ID.** The Apps Script is *bound to the doc* and exports whatever doc it lives in (`DocumentApp.getActiveDocument()`). The repo file only records the source URL in its `AUTO-SYNCED` banner, and that line is regenerated on every sync. So there is **no repo edit** that re-points a file — the swap happens entirely on the Google side, and the file self-heals (content **and** banner URL) the first time the new doc syncs.
+
+1. **Set up the sync on the new doc** — follow "Setting up the sync for a new doc" below, using the **same `TARGET_PATH`** as the file you're re-pointing (the PAT already exists — reuse it, don't make a new one).
+2. **Run `syncToRepo` once from the new doc.** The repo file's body and its banner `Source:` URL now point at the new doc. Confirm the commit landed.
+3. **Decommission the old doc's sync — this is the step that actually stops the swap from being undone.** Because both docs push to the same `TARGET_PATH`, *the last sync wins*; an old doc left running will clobber the new content on its next trigger.
+   - Open the **old** doc → Extensions → Apps Script → **Triggers** (clock icon) → delete every `syncToRepo` trigger.
+   - Then, to be foolproof, delete the bound script project too (Apps Script editor → Project Settings → or just remove the `onOpen`/`syncToRepo` code) so nobody can click **Eightfold → Sync to repo** on the old doc by accident.
+
+> If you skip step 3 and the old doc has a time-based trigger, the file will silently revert to stale content on the old doc's schedule — the single most confusing failure mode here.
 
 ---
 
@@ -252,6 +276,35 @@ function onOpen() {
 - `TARGET_PATH` — the exact repo path this doc should publish to (see the doc → file map above).
 - `COMMIT_PREFIX` — what shows up in `git log`. Keep it short.
 
+> ⚠️ **If you pasted the script from another doc, change BOTH lines BEFORE you run it.** `TARGET_PATH` is the file this doc overwrites — and the sync gives **no warning** before it commits. Leaving another doc's `TARGET_PATH` in place silently replaces *that* file with this doc's content. (This actually happened: a Content Design Standards doc set up by copying the Terms List script kept `TARGET_PATH = …/terms-list.md`, and the first run overwrote the entire terms list. Recovery: fix `TARGET_PATH`, then re-run the clobbered file's *own* canonical doc to regenerate it.) Confirm `TARGET_PATH` matches the doc → file map row for **this** doc before running.
+
+### 4.5. Declare the OAuth scopes in the manifest (`appsscript.json`)
+
+**Don't skip this — it's the step that bites on the first run.** `exportAsMarkdown_` calls the Drive REST export endpoint with `ScriptApp.getOAuthToken()`. That token only carries a Drive permission if a Drive scope is declared in the project manifest. Apps Script auto-detects scopes for recognized calls (`DocumentApp`, `UrlFetchApp`, the menu UI), but it does **not** infer a Drive scope from a raw `UrlFetchApp` call to `googleapis.com` — so without this, the first run fails with a 403 on export. (This was the original "why won't it sync" issue.)
+
+1. **Project Settings** (gear icon) → tick **"Show 'appsscript.json' manifest file in the editor."**
+2. Open `appsscript.json` and set its `oauthScopes`:
+
+```json
+{
+  "timeZone": "America/Los_Angeles",
+  "exceptionLogging": "STACKDRIVER",
+  "runtimeVersion": "V8",
+  "oauthScopes": [
+    "https://www.googleapis.com/auth/documents.currentonly",
+    "https://www.googleapis.com/auth/script.container.ui",
+    "https://www.googleapis.com/auth/script.external_request",
+    "https://www.googleapis.com/auth/drive.readonly"
+  ]
+}
+```
+
+Declaring `oauthScopes` **replaces** auto-detection, so all four must be present: documents (read the bound doc), container UI (the Eightfold menu + alerts), external request (`UrlFetchApp` → GitHub + Drive), and Drive (the markdown export). `drive.readonly` is enough — export is a read; the broader `.../auth/drive` scope also works.
+
+You do **not** need to enable the Drive **advanced service** (Services → Drive). That's only required when code calls `Drive.Files.export(...)` directly; this script uses the REST endpoint via `UrlFetchApp`, so the scope above is all it needs.
+
+> **Copying a working doc's setup?** Fastest path: open a working doc's Apps Script, reveal its `appsscript.json`, and paste it verbatim into the new doc. The manifest is part of "the same things" — `Code.gs` alone isn't enough.
+
 ### 5. Store the GitHub token in Script properties
 
 The token never goes in the code. Apps Script encrypts script properties at rest.
@@ -323,3 +376,6 @@ If a doc and an `.md` disagree and you're not sure which is right, **trust the d
 | Apps Script alert: *"PUT failed: 422"* | Stale SHA — the file was edited between read and write | Run Sync again; it'll fetch the latest SHA |
 | Doc was edited but file in repo didn't update | Doc owner didn't click Sync | Click **Eightfold → Sync to repo** in the doc, or set up the hourly trigger |
 | File frontmatter (`name:`, `description:`) disappeared | The frontmatter-preservation block in the script was modified or removed | Restore the `extractFrontmatter_` function from the script template above |
+| **The wrong file changed / another doc's file got overwritten** | `TARGET_PATH` (and `COMMIT_PREFIX`) were copied from a different doc's script and never updated | Fix `TARGET_PATH` for this doc (step 4), then restore the clobbered file by re-running **its own** canonical doc's Sync — the doc is the source of truth, so this regenerates it cleanly |
+| Run button: *"Attempted to execute myFunction, but it was deleted"* | The editor's function picker still points at the default `myFunction` | In the function dropdown at the top of the editor, select `syncToRepo`, then Run |
+| *"403 … ACCESS_TOKEN_SCOPE_INSUFFICIENT"* on the Drive export, even after adding the manifest scopes | Apps Script reused an authorization granted **before** the Drive scope was added | Save `appsscript.json` (step 4.5), then revoke the project at [myaccount.google.com/connections](https://myaccount.google.com/connections) and run `syncToRepo` again to force a fresh consent that includes Drive |
