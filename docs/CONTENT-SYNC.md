@@ -276,6 +276,8 @@ function onOpen() {
 - `TARGET_PATH` — the exact repo path this doc should publish to (see the doc → file map above).
 - `COMMIT_PREFIX` — what shows up in `git log`. Keep it short.
 
+> ⚠️ **If you pasted the script from another doc, change BOTH lines BEFORE you run it.** `TARGET_PATH` is the file this doc overwrites — and the sync gives **no warning** before it commits. Leaving another doc's `TARGET_PATH` in place silently replaces *that* file with this doc's content. (This actually happened: a Content Design Standards doc set up by copying the Terms List script kept `TARGET_PATH = …/terms-list.md`, and the first run overwrote the entire terms list. Recovery: fix `TARGET_PATH`, then re-run the clobbered file's *own* canonical doc to regenerate it.) Confirm `TARGET_PATH` matches the doc → file map row for **this** doc before running.
+
 ### 4.5. Declare the OAuth scopes in the manifest (`appsscript.json`)
 
 **Don't skip this — it's the step that bites on the first run.** `exportAsMarkdown_` calls the Drive REST export endpoint with `ScriptApp.getOAuthToken()`. That token only carries a Drive permission if a Drive scope is declared in the project manifest. Apps Script auto-detects scopes for recognized calls (`DocumentApp`, `UrlFetchApp`, the menu UI), but it does **not** infer a Drive scope from a raw `UrlFetchApp` call to `googleapis.com` — so without this, the first run fails with a 403 on export. (This was the original "why won't it sync" issue.)
@@ -374,3 +376,6 @@ If a doc and an `.md` disagree and you're not sure which is right, **trust the d
 | Apps Script alert: *"PUT failed: 422"* | Stale SHA — the file was edited between read and write | Run Sync again; it'll fetch the latest SHA |
 | Doc was edited but file in repo didn't update | Doc owner didn't click Sync | Click **Eightfold → Sync to repo** in the doc, or set up the hourly trigger |
 | File frontmatter (`name:`, `description:`) disappeared | The frontmatter-preservation block in the script was modified or removed | Restore the `extractFrontmatter_` function from the script template above |
+| **The wrong file changed / another doc's file got overwritten** | `TARGET_PATH` (and `COMMIT_PREFIX`) were copied from a different doc's script and never updated | Fix `TARGET_PATH` for this doc (step 4), then restore the clobbered file by re-running **its own** canonical doc's Sync — the doc is the source of truth, so this regenerates it cleanly |
+| Run button: *"Attempted to execute myFunction, but it was deleted"* | The editor's function picker still points at the default `myFunction` | In the function dropdown at the top of the editor, select `syncToRepo`, then Run |
+| *"403 … ACCESS_TOKEN_SCOPE_INSUFFICIENT"* on the Drive export, even after adding the manifest scopes | Apps Script reused an authorization granted **before** the Drive scope was added | Save `appsscript.json` (step 4.5), then revoke the project at [myaccount.google.com/connections](https://myaccount.google.com/connections) and run `syncToRepo` again to force a fresh consent that includes Drive |
