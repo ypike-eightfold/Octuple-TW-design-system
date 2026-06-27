@@ -35,6 +35,16 @@ description: >
 >
 > Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Cite both files by name in your self-review before declaring a screen complete.**
 
+> ## 🚦 BEFORE DECLARING DONE — non-skippable gates
+>
+> Whenever the work could be the basis of a gallery PR — explicitly ("ready to upload", "publish this", "let's open a PR", "ship to the gallery") OR implicitly ("the prototype is done", "Phase N is complete", "all screens built", "wrapping up") — run **all three** gates before claiming done. The user may not ask for them. You run them anyway.
+>
+> 1. **Content check** — sentence case + terms list. Same grep set the [publish-design](../publish-design/SKILL.md) skill runs in step 3.55. The canonical violation is `uppercase tracking-wider` decorative eyebrows ("MY REVIEW", "DEMO AS", "FROM TALENT MANAGEMENT"). Brand wordmarks are the only exception (mark them `// brand-wordmark-ok`). Also spot-check capitalisation against [terms-list.md](../_content/terms-list.md) — Sign in / Sign up / Log in / résumé / User ID / Org chart are the usual traps.
+> 2. **Accessibility check across every screen** — walk each route in the prototype and run the four grep gates from [publish-design](../publish-design/SKILL.md) § 3.7: aria-current on nav, focus-visible on every hand-rolled button, alt on every img, aria-checked on every radio. Plus: no `text-orange-60` / `text-blue-60` for text (they fail AA on white).
+> 3. **Flow coverage** — when the prototype has ≥ 2 screens, walk the source (route ids, sidebar items, persona switcher, dynamic args) and **author flow.json yourself** covering every persona × screen combination. Don't ask the designer to enumerate. Compare flow.json's hrefs against grepped `#screen-id` literals; the diff must be empty.
+>
+> Failing any gate blocks "done". Report findings as a punch list and either fix or annotate the line.
+
 Designs complete, interactive React mock screens — **real components with the production tech stack** — for the entire system. All personas, all screens, all data states are built as working React code with mock data using ef-design-system components. Two dev-only toolbars (PersonaSwitcher and StateDebugBar) let reviewers flip between personas and app states instantly in the browser.
 
 ## Context Manifest
