@@ -1,0 +1,134 @@
+{
+  "lanes": [
+    {
+      "title": "IC — write reviews this cycle",
+      "sections": [
+        {
+          "title": "Land here",
+          "screens": [
+            {
+              "id": "home",
+              "caption": "Home — cycle progress + the four cards",
+              "href": "index.html#home"
+            }
+          ]
+        },
+        {
+          "title": "Flow A — about yourself",
+          "screens": [
+            {
+              "id": "self-review",
+              "caption": "Self-review form — accomplishments, goals, behaviors, growth",
+              "href": "index.html#self-review"
+            }
+          ]
+        },
+        {
+          "title": "Flow B — ask peers",
+          "screens": [
+            {
+              "id": "peer-requester",
+              "caption": "Peer requester — search org, shortlist, send",
+              "href": "index.html#peer-requester"
+            }
+          ]
+        },
+        {
+          "title": "Flow C — write peer reviews",
+          "screens": [
+            {
+              "id": "inbox",
+              "caption": "Inbox — colleagues asking for feedback",
+              "href": "index.html#inbox"
+            },
+            {
+              "id": "peer-review-diego",
+              "caption": "Peer review form — write feedback for Diego",
+              "href": "index.html#peer-review/r-yair-on-diego"
+            }
+          ]
+        },
+        {
+          "title": "Upward",
+          "screens": [
+            {
+              "id": "upward",
+              "caption": "Upward review of manager — anonymous by default",
+              "href": "index.html#upward"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Manager — review the team",
+      "sections": [
+        {
+          "title": "Triage",
+          "screens": [
+            {
+              "id": "my-team",
+              "caption": "My team — directs with stage completion",
+              "href": "index.html#my-team"
+            }
+          ]
+        },
+        {
+          "title": "Flow D — write the review",
+          "screens": [
+            {
+              "id": "direct-review-erin",
+              "caption": "Direct review form — Erin Cole (in progress)",
+              "href": "index.html#direct-review/p-erin"
+            },
+            {
+              "id": "direct-review-quinn",
+              "caption": "Direct review form — Quinn Ramos (submitted)",
+              "href": "index.html#direct-review/p-quinn"
+            }
+          ]
+        },
+        {
+          "title": "Calibrate",
+          "screens": [
+            {
+              "id": "calibration",
+              "caption": "Calibration board — side-by-side across directs",
+              "href": "index.html#calibration"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "Skip-level — read across 2-3 levels",
+      "sections": [
+        {
+          "title": "Flow E — browse the org",
+          "screens": [
+            {
+              "id": "org",
+              "caption": "Org tree + person summary — read-only, with Flag for follow-up",
+              "href": "index.html#org"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "title": "CHRO — the rollup",
+      "sections": [
+        {
+          "title": "Flow F — org-wide view",
+          "screens": [
+            {
+              "id": "dashboard",
+              "caption": "Dashboard — completion + trust rate, distribution, themes, outliers",
+              "href": "index.html#dashboard"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
