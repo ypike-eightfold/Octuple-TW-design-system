@@ -1,9 +1,9 @@
 {
   "title": "Perform 360",
-  "description": "Manager-side performance review and 360 feedback flow example.",
+  "description": "Multi-screen performance review app — IC end-to-end (Phase 1). Self-review, peer requester, incoming peer reviews, upward review.",
   "category": "other-example-screens",
   "version": "tailwind",
   "slug": "perform-360",
-  "author": "ef-design-system",
-  "createdAt": "2026-05-20T00:00:00Z"
+  "author": "Yair Pike",
+  "createdAt": "2026-06-16T00:00:00Z"
 }
