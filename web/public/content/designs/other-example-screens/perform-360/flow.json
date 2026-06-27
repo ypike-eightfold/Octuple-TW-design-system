@@ -139,6 +139,17 @@
               "href": "index.html?as=chro#dashboard"
             }
           ]
+        },
+        {
+          "title": "Admin",
+          "screens": [
+            {
+              "id": "admin",
+              "caption": "Cycle & templates — dates, anonymity, manager approval, behaviors",
+              "thumbnail": "flow/admin.png",
+              "href": "index.html?as=chro#admin"
+            }
+          ]
         }
       ]
     }
