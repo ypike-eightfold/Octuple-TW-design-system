@@ -9,7 +9,8 @@
             {
               "id": "home",
               "caption": "Home — cycle progress + the four cards",
-              "href": "index.html#home"
+              "thumbnail": "flow/home.png",
+              "href": "index.html?as=ic#home"
             }
           ]
         },
@@ -19,7 +20,8 @@
             {
               "id": "self-review",
               "caption": "Self-review form — accomplishments, goals, behaviors, growth",
-              "href": "index.html#self-review"
+              "thumbnail": "flow/self-review.png",
+              "href": "index.html?as=ic#self-review"
             }
           ]
         },
@@ -29,7 +31,8 @@
             {
               "id": "peer-requester",
               "caption": "Peer requester — search org, shortlist, send",
-              "href": "index.html#peer-requester"
+              "thumbnail": "flow/peer-requester.png",
+              "href": "index.html?as=ic#peer-requester"
             }
           ]
         },
@@ -39,12 +42,14 @@
             {
               "id": "inbox",
               "caption": "Inbox — colleagues asking for feedback",
-              "href": "index.html#inbox"
+              "thumbnail": "flow/inbox.png",
+              "href": "index.html?as=ic#inbox"
             },
             {
               "id": "peer-review-diego",
               "caption": "Peer review form — write feedback for Diego",
-              "href": "index.html#peer-review/r-yair-on-diego"
+              "thumbnail": "flow/peer-review-diego.png",
+              "href": "index.html?as=ic#peer-review/r-yair-on-diego"
             }
           ]
         },
@@ -54,7 +59,8 @@
             {
               "id": "upward",
               "caption": "Upward review of manager — anonymous by default",
-              "href": "index.html#upward"
+              "thumbnail": "flow/upward.png",
+              "href": "index.html?as=ic#upward"
             }
           ]
         }
@@ -69,7 +75,8 @@
             {
               "id": "my-team",
               "caption": "My team — directs with stage completion",
-              "href": "index.html#my-team"
+              "thumbnail": "flow/my-team.png",
+              "href": "index.html?as=manager#my-team"
             }
           ]
         },
@@ -79,12 +86,14 @@
             {
               "id": "direct-review-erin",
               "caption": "Direct review form — Erin Cole (in progress)",
-              "href": "index.html#direct-review/p-erin"
+              "thumbnail": "flow/direct-review-erin.png",
+              "href": "index.html?as=manager#direct-review/p-erin"
             },
             {
               "id": "direct-review-quinn",
               "caption": "Direct review form — Quinn Ramos (submitted)",
-              "href": "index.html#direct-review/p-quinn"
+              "thumbnail": "flow/direct-review-quinn.png",
+              "href": "index.html?as=manager#direct-review/p-quinn"
             }
           ]
         },
@@ -94,7 +103,8 @@
             {
               "id": "calibration",
               "caption": "Calibration board — side-by-side across directs",
-              "href": "index.html#calibration"
+              "thumbnail": "flow/calibration.png",
+              "href": "index.html?as=manager#calibration"
             }
           ]
         }
@@ -109,7 +119,8 @@
             {
               "id": "org",
               "caption": "Org tree + person summary — read-only, with Flag for follow-up",
-              "href": "index.html#org"
+              "thumbnail": "flow/org.png",
+              "href": "index.html?as=skip#org"
             }
           ]
         }
@@ -124,7 +135,19 @@
             {
               "id": "dashboard",
               "caption": "Dashboard — completion + trust rate, distribution, themes, outliers",
-              "href": "index.html#dashboard"
+              "thumbnail": "flow/dashboard.png",
+              "href": "index.html?as=chro#dashboard"
+            }
+          ]
+        },
+        {
+          "title": "Admin",
+          "screens": [
+            {
+              "id": "admin",
+              "caption": "Cycle & templates — dates, anonymity, manager approval, behaviors",
+              "thumbnail": "flow/admin.png",
+              "href": "index.html?as=chro#admin"
             }
           ]
         }
