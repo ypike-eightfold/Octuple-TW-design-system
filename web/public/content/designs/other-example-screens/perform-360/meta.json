@@ -1,6 +1,6 @@
 {
   "title": "Perform 360",
-  "description": "Multi-screen performance review app — IC end-to-end (Phase 1). Self-review, peer requester, incoming peer reviews, upward review.",
+  "description": "Multi-screen performance review app for every level — IC, Manager, Skip-level, CHRO. Self-review, peer requester, peer reviews, manager template with AI peer themes, calibration board, org tree, and CHRO dashboard.",
   "category": "other-example-screens",
   "version": "tailwind",
   "slug": "perform-360",
