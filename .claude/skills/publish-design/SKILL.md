@@ -132,47 +132,113 @@ For live React prototypes, point Chrome at the live `/<product>/<route>` URL (no
 
 Write `meta.json` last so any partial copy can be detected.
 
+### 3.55. Content check (MANDATORY — runs every publish)
+
+The user may not ask for this; you run it anyway. Two passes.
+
+**Pass A — capitalization.** Sentence case only ([content-design-standards](../_content/content-design-standards.md) § Capitalization). Decorative `uppercase tracking-wider` eyebrows ("MY REVIEW", "DEMO AS", "FROM TALENT MANAGEMENT") are the canonical violation. Brand wordmarks rendered as part of a logo are the only exception.
+
+```bash
+# Inside the prototype source dir, NOT inside the design folder.
+# Returns ALL violations. Each one must be fixed before publishing.
+grep -rEn "uppercase\b" --include="*.tsx" --include="*.jsx" \
+  --include="*.html" <prototype-src> | grep -v "// brand-wordmark-ok"
+```
+
+A non-empty result blocks publishing. Use the `// brand-wordmark-ok` suffix only on lines where uppercase IS the brand wordmark.
+
+**Pass B — terms list.** Spot-check against the [terms list](../_content/terms-list.md). Most common in-product violations:
+
+| Don't write | Write |
+|---|---|
+| Sign-Up / SignUp | Sign up (verb) / Signup (noun) |
+| Log-In / log in | Log in (verb) / Login (noun) — but prefer "Sign in" |
+| User ID / user-id | User ID |
+| Resume / resumé | Résumé (with the accent) |
+| Org chart / Organisation chart | Org chart |
+| AI agent / Agent | AI agent (lowercased except sentence start) |
+
+When a literal that's commonly mis-cased appears in JSX text — grep it and read [terms-list.md](../_content/terms-list.md) for the canonical form. Examples that flag:
+
+```bash
+grep -rEn "Sign[- ]?[Uu]p\b|Log[- ]?[Ii]n\b|user[ -]id\b" --include="*.tsx" <prototype-src>
+```
+
+Report findings as a punch list before continuing. Either fix or document the exception inline.
+
 ### 3.6. Flow coverage check (MANDATORY for multi-screen prototypes)
 
-Before continuing, answer for the user: **how many distinct screens does this prototype have?** A "screen" is a meaningfully different visual state — a new route, a new tab/panel that shows different content, a wizard step, a separate pipeline view. Loading states, hover states, and chrome-only changes do NOT count.
+The skill **authors `flow.json` from the prototype's source** — do not ask the user to enumerate screens. Walk the source and enumerate every visible state automatically:
+
+1. **Routes / hash IDs.** Grep the App entry for hash routes and the router's screen type union:
+   ```bash
+   grep -rEn "ScreenId\b|readRoute\(\)|window\.location\.hash" --include="*.tsx" <prototype-src> | head
+   ```
+2. **Persona / role surfaces.** If the app reads a `?as=` query param or has a persona switcher, enumerate every persona × landing screen combination. Each one belongs in flow.json.
+3. **Sidebar items.** Grep the sidebar's `itemsForRole` (or equivalent) — every distinct id is a screen the user can navigate to and must appear in flow.json.
+4. **Dynamic args.** Routes that take an arg (`#peer-review/<id>`, `#direct-review/<id>`) need at least one representative screen in flow.json per state class — e.g. one "in-progress" and one "submitted" if those render differently.
+
+Then build flow.json: one lane per persona, sections grouped by user intent (Triage / Write / Submit / Drill-in), each `href` deep-links with `?as=<role>` + `#<screen-id>`.
 
 | Screen count | What to do |
 |---|---|
 | 1 | Skip — the gallery synthesizes a one-tile flow from `meta.json`. |
-| 2+ | **STOP.** Author `flow.json` + `flow/*.png` thumbnails in the design folder before opening the PR. |
+| 2+ | **STOP.** Author `flow.json` + `flow/*.png` thumbnails. |
 
 `flow.json` schema, capture commands, and worked examples: [`../_shared/prototype-scaffolding.md`](../_shared/prototype-scaffolding.md) § "Flows view".
 
 Self-check before continuing past this step:
 
 ```bash
-# If the prototype has >1 screen, BOTH of these must be present.
 test -f web/public/content/designs/<category>/<slug>/flow.json && \
   ls web/public/content/designs/<category>/<slug>/flow/*.png >/dev/null 2>&1 && \
   echo "Flow coverage OK" || echo "MISSING flow.json or flow/ thumbnails — author them before continuing"
+
+# Did flow.json miss any screen?  Compare its hrefs against the source's route ids:
+jq -r '.lanes[].sections[].screens[].href' web/public/content/designs/<category>/<slug>/flow.json \
+  | sort -u  >  /tmp/p360-flow-screens.txt
+grep -rEoh "#[a-z][a-z0-9-]+" --include="*.tsx" <prototype-src>/screens <prototype-src>/lib \
+  | sort -u  >  /tmp/p360-source-screens.txt
+diff /tmp/p360-source-screens.txt /tmp/p360-flow-screens.txt
+# Empty diff = full coverage. Non-empty = unmapped screens; add them.
 ```
 
-If the prototype's screens are React state (not URLs), you also need a hash-based entry point so the canvas can deep-link — each `flow.json` `href` looks like `index.html#<screen-id>`. Make the prototype read `window.location.hash` on mount and respond to `hashchange`. See `mara-telekom` for the canonical pattern.
+If the prototype's screens are React state (not URLs), add hash routing first — each `flow.json` `href` looks like `index.html#<screen-id>`. Make the prototype read `window.location.hash` on mount and respond to `hashchange`. See `mara-telekom` for the canonical pattern.
 
-### 3.7. Accessibility self-check (WCAG 2.2 AA)
+### 3.7. Accessibility self-check (WCAG 2.2 AA — MANDATORY, runs every publish)
 
-Before committing, walk the design against the ten-category checklist in
-`.github/PULL_REQUEST_TEMPLATE/design.md` § Accessibility — it mirrors the
-Figma Include plugin checklist the design team uses, so Figma annotation
-and PR review check the same boxes: landmarks, headings, reading & focus
-order, alternative text, contrast, color, text resizing, responsive
-reflow, touch target, complex gestures.
+The user may not ask for this; you run it anyway. Walk the ten-category checklist in `.github/PULL_REQUEST_TEMPLATE/design.md` § Accessibility (landmarks, headings, reading & focus order, alternative text, contrast, color, text resizing, responsive reflow, touch target, complex gestures). Then run the four grep gates below — each MUST come back clean before commit.
 
-Two of them have one-click tooling in the gallery:
+```bash
+# 1. Sidebar / nav: active item carries aria-current="page"
+grep -rEn "active.*\?.*'page'|aria-current=" --include="*.tsx" <prototype-src>/shell
+# Expect ≥1 hit. If 0: sidebar is missing aria-current; add it.
 
-- **Responsive reflow** — open the design in the gallery and switch the
-  viewport to "Responsive reflow" (320px). No horizontal scroll allowed.
-- **Complex gestures** — if the prototype has any drag interaction,
-  verify a click or keyboard alternative exists before publishing.
+# 2. Hand-rolled buttons (not Octuple <Button>) have focus-visible outlines
+grep -rEn "<button\b" --include="*.tsx" <prototype-src> > /tmp/btns.txt
+grep -L "focus-visible" /tmp/btns.txt
+# Empty = OK. Any file listed = it has a hand-rolled button without a
+# focus ring; add focus-visible:outline-2 focus-visible:outline-offset-2.
 
-Tick the boxes honestly in the PR body. An unticked box with a one-line
-reason ("needs browser verification at 200% zoom") is acceptable; a
-silently ticked box that fails review is not.
+# 3. Every <img> has alt (decorative ones marked aria-hidden + alt="")
+grep -rEn "<img\b" --include="*.tsx" --include="*.html" <prototype-src> | grep -v "alt="
+# Expect 0 hits.
+
+# 4. Radios carry aria-checked
+grep -rEnB1 'role="radio"' --include="*.tsx" <prototype-src> | grep -v "aria-checked"
+# Each role="radio" must be paired with aria-checked={…} on the same element.
+
+# 5. Contrast traps — orange-60 / blue-60 used as TEXT color (they fail AA on white)
+grep -rEn "text-orange-60|text-blue-60|color:.*#D17313|color:.*#2C8CC9" --include="*.tsx" --include="*.css" <prototype-src>
+# Expect 0 hits. -80 step is the safe text color.
+```
+
+Two checks have one-click tooling in the gallery (run after deploy):
+
+- **Responsive reflow** — open the design in the gallery and switch the viewport to "Responsive reflow" (320px). No horizontal scroll allowed.
+- **Complex gestures** — if the prototype has any drag interaction, verify a click or keyboard alternative exists before publishing.
+
+Tick the boxes honestly in the PR body. An unticked box with a one-line reason ("needs browser verification at 200% zoom") is acceptable; a silently ticked box that fails review is not.
 
 ### 4. Commit
 

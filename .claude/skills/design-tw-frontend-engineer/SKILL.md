@@ -29,6 +29,16 @@ description: "Build production-quality React frontends in frontend/ using ef-des
 >
 > Full rule + the 6 specific past failures + a self-check grep: see [`../_shared/must-use-components.md`](../_shared/must-use-components.md). **Run the self-check greps from both files before declaring done.**
 
+> ## 🚦 BEFORE DECLARING DONE — non-skippable gates
+>
+> Whenever the work could be the basis of a gallery PR — explicitly ("ready to upload", "publish this", "let's open a PR", "ship to the gallery") OR implicitly ("Phase N done", "the app is complete", "I'm done", "wrapping up") — run **all three** gates before claiming done. The user may not ask for them. You run them anyway.
+>
+> 1. **Content check** — sentence case + terms list. Same grep set the [publish-design](../publish-design/SKILL.md) skill runs in step 3.55. The canonical violation is `uppercase tracking-wider` decorative eyebrows ("MY REVIEW", "DEMO AS"). Brand wordmarks are the only exception (mark them `// brand-wordmark-ok`). Also spot-check capitalisation against [terms-list.md](../_content/terms-list.md) — Sign in / Sign up / Log in / résumé / User ID / Org chart are the usual traps.
+> 2. **Accessibility check** — four grep gates from [publish-design](../publish-design/SKILL.md) § 3.7: aria-current on nav, focus-visible on every hand-rolled button, alt on every img, aria-checked on every radio. Plus: no `text-orange-60` / `text-blue-60` (they fail AA on white — use the `-80` step for text).
+> 3. **Flow coverage** — when the prototype has ≥ 2 screens, walk the source (route ids in ScreenId, sidebar `itemsForRole`, persona switcher) and **author flow.json yourself** covering every persona × screen combination. Don't ask the user to enumerate. Compare flow.json's hrefs against grepped `#screen-id` literals; the diff must be empty.
+>
+> Failing any gate blocks "done". Report findings as a punch list and either fix or annotate the line.
+
 ## Context Manifest
 
 This skill's forger-visible contract lives in **`SUBAGENT.md`** in this same directory. Read that file for the manifest YAML, `artifacts:` block, and MODE convention. The body of this file (`SKILL.md`) is inline documentation: patterns, examples, and building guidance for humans and for the subagent itself to read after being invoked.
