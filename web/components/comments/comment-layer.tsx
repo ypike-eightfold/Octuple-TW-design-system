@@ -1,10 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ClientSideSuspense, useThreads } from "@liveblocks/react/suspense";
 import { Composer, Thread } from "@liveblocks/react-ui";
 import type { ThreadData } from "@liveblocks/client";
 import "@liveblocks/react-ui/styles.css";
+
+/** Stable identity for the iframe's current screen — `pathname + search`
+ *  with no origin, no hash. We use this as a thread-metadata field so
+ *  pins stay attached to the screen they were left on, even when the
+ *  iframe gets retargeted via the flow canvas. Trade-offs:
+ *  - Drop origin: pins survive moving the gallery between hostnames
+ *    (local vs Vercel).
+ *  - Drop hash: pin position is already captured via scroll metadata;
+ *    a hash change isn't a different screen.
+ *  - Keep search: routes that differentiate by query are different
+ *    screens (e.g., ?role=manager). */
+export function screenKeyFromUrl(url: string): string {
+  try {
+    const u = new URL(url, "http://placeholder.invalid");
+    return u.pathname + u.search;
+  } catch {
+    return url;
+  }
+}
 
 /* Click-anywhere comment overlay for gallery prototypes.
  *
@@ -60,11 +79,47 @@ function PinBadge({
 function Pins({
   containerRef,
   iframeRef,
+  currentScreen,
 }: {
   containerRef: React.RefObject<HTMLDivElement | null>;
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  /** The screen the iframe is showing right now — key match for thread metadata. */
+  currentScreen: string;
 }) {
-  const { threads } = useThreads();
+  const { threads: allThreads } = useThreads();
+  /* Three eras of metadata, all must keep working:
+
+     1. NO `metadata.screen` — created before any per-screen filter
+        existed. Render on every screen so legacy pins don't disappear.
+
+     2. URL-ONLY string (no `#`) — created during the first iteration of
+        this PR, when the screen key was just `screenKeyFromUrl(iframeSrc)`.
+        Match against the URL portion of the current screen key so these
+        pins still appear on the route they were dropped on (across any
+        h1 within that route).
+
+     3. COMPOSITE `<url>#<h1>` (has `#`) — current schema. Strict
+        equality match against currentScreen, which is also composite.
+
+     Without era 2 handling, mid-rollout pins fall into a gap (their
+     URL-only string never equals a composite key with a `#` in it),
+     so they vanish from every screen. That's what happened to comment
+     8 earlier today; this filter restores it. */
+  /* currentScreen is `<urlKey>#<h1>` (or just `<urlKey>` if h1 is
+     unknown). Split on `#` to get the URL portion for era-2 matching;
+     URL parsing would also work but split is robust to any character
+     in the h1 (e.g., `?` or another `#`). */
+  const currentUrlKey = currentScreen.split("#")[0];
+  const threads = useMemo(
+    () =>
+      allThreads.filter((t) => {
+        const stored = t.metadata.screen;
+        if (typeof stored !== "string") return true; // era 1
+        if (!stored.includes("#")) return stored === currentUrlKey; // era 2
+        return stored === currentScreen; // era 3
+      }),
+    [allThreads, currentScreen, currentUrlKey],
+  );
   const [openThreadId, setOpenThreadId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftPin | null>(null);
 
@@ -202,7 +257,10 @@ function Pins({
           >
             <Composer
               autoFocus
-              metadata={{ ...draft, ...currentScroll() }}
+              /* `screen` ties this pin to the iframe's current route so
+                 it only re-appears on the same screen later. See
+                 screenKeyFromUrl for the normalization rule. */
+              metadata={{ ...draft, ...currentScroll(), screen: currentScreen }}
               onComposerSubmit={() => setDraft(null)}
             />
           </div>
@@ -214,8 +272,13 @@ function Pins({
 
 export function CommentLayer({
   iframeRef,
+  currentScreen,
 }: {
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  /** The screen the iframe is currently showing — used to filter which
+   *  pins render and to tag new threads with their screen. Pass the
+   *  output of `screenKeyFromUrl(iframeSrc)`. */
+  currentScreen: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   return (
@@ -227,7 +290,11 @@ export function CommentLayer({
           </div>
         }
       >
-        <Pins containerRef={containerRef} iframeRef={iframeRef} />
+        <Pins
+          containerRef={containerRef}
+          iframeRef={iframeRef}
+          currentScreen={currentScreen}
+        />
       </ClientSideSuspense>
     </div>
   );
@@ -256,4 +323,51 @@ function ThreadCountInner({
   // The badge is "things needing attention" — resolved threads drop out.
   const open = threads.filter((t) => !t.resolved).length;
   return <>{render(open)}</>;
+}
+
+/** Open-thread count grouped by screen key. Used by the flow canvas to
+ *  badge each screen card with how many comments live on it, so a
+ *  designer can see at a glance "screen X has discussion". The render
+ *  prop receives a Record<screenKey, number>; missing keys = 0.
+ *
+ *  Legacy threads (no `metadata.screen`) are intentionally NOT counted
+ *  per-screen — they render on every screen via the Pins filter, so
+ *  attributing them to one card would over-count. The global
+ *  `ThreadCount` badge still includes them, which is the right surface
+ *  for "this design has discussion overall." */
+export function ThreadCountsByScreen({
+  render,
+}: {
+  render: (countsByScreen: Record<string, number>) => React.ReactNode;
+}) {
+  return (
+    <ClientSideSuspense fallback={render({})}>
+      <ThreadCountsByScreenInner render={render} />
+    </ClientSideSuspense>
+  );
+}
+
+function ThreadCountsByScreenInner({
+  render,
+}: {
+  render: (countsByScreen: Record<string, number>) => React.ReactNode;
+}) {
+  const { threads } = useThreads();
+  const counts = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const t of threads) {
+      if (t.resolved) continue;
+      const stored = t.metadata.screen;
+      /* Skip era-1 (no key) and era-2 (URL-only) threads — both appear
+         on multiple screens via the Pins filter above, so attributing
+         them to a single flow card would mislead. The global
+         ThreadCount badge still includes them. Only composite-keyed
+         threads (era 3) get per-screen counts. */
+      if (typeof stored !== "string") continue;
+      if (!stored.includes("#")) continue;
+      out[stored] = (out[stored] ?? 0) + 1;
+    }
+    return out;
+  }, [threads]);
+  return <>{render(counts)}</>;
 }

@@ -5,7 +5,12 @@ import { toPng } from "html-to-image";
 import { useTheme } from "next-themes";
 import { Button } from "@tonyh-2-eightfold/ef-design-system";
 import { commentsEnabled } from "@/components/comments/comments-room";
-import { CommentLayer, ThreadCount } from "@/components/comments/comment-layer";
+import {
+  CommentLayer,
+  ThreadCount,
+  ThreadCountsByScreen,
+  screenKeyFromUrl,
+} from "@/components/comments/comment-layer";
 import { FlowCanvas } from "@/components/flows/flow-canvas";
 import type { Flow } from "@/lib/flows";
 
@@ -97,6 +102,73 @@ export function PrototypeFullscreen({
   }
 
   const active = VIEWPORTS.find((v) => v.id === viewport) ?? VIEWPORTS[0];
+
+  /* Per-screen key for comment scoping. Two sources, in priority order:
+     1. `screen-change` postMessage from the iframe — explicit opt-in
+        for prototypes that want full control over their key.
+     2. The iframe's first <h1> text — automatic detection for SPA-style
+        prototypes that don't post explicit screen-change events (e.g.,
+        Perform 360 changes content via in-iframe React state, so the
+        URL stays the same but the h1 always changes per screen).
+     3. Falls back to just the URL key if neither signal is present.
+     The composite key (`<url>#<h1>`) keeps screens distinct in both
+     multi-route prototypes (URL varies, h1 may not — e.g., Career Hub
+     Continuous Sync) and single-route SPA prototypes (URL constant,
+     h1 varies — e.g., Perform 360). */
+  const [explicitScreen, setExplicitScreen] = useState<string | null>(null);
+  const [observedH1, setObservedH1] = useState<string | null>(null);
+  const currentScreen = explicitScreen
+    ?? `${screenKeyFromUrl(iframeSrc)}#${observedH1 ?? ""}`;
+
+  /* Wire both sources. Reset on iframeSrc change so a flow-canvas jump
+     to a new screen doesn't carry the previous screen's key forward
+     before the new iframe content has signalled. */
+  useEffect(() => {
+    setExplicitScreen(null);
+    setObservedH1(null);
+
+    function onMessage(e: MessageEvent) {
+      if (
+        e?.data?.type === "screen-change" &&
+        typeof e.data.screen === "string" &&
+        e.data.screen.length > 0
+      ) {
+        setExplicitScreen(e.data.screen);
+      }
+    }
+    window.addEventListener("message", onMessage);
+
+    let observer: MutationObserver | null = null;
+    function updateFromH1(doc: Document) {
+      const h1 = doc.querySelector("h1");
+      const text = h1?.textContent?.trim();
+      setObservedH1(text && text.length > 0 ? text : null);
+    }
+    function attachObserver() {
+      const doc = iframeRef.current?.contentDocument;
+      if (!doc) return;
+      observer?.disconnect();
+      updateFromH1(doc);
+      observer = new MutationObserver(() => updateFromH1(doc));
+      observer.observe(doc.body ?? doc.documentElement, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+
+    const iframe = iframeRef.current;
+    iframe?.addEventListener("load", attachObserver);
+    /* Try once immediately for the case where the iframe has already
+       loaded before this effect attached (e.g., StrictMode double-run). */
+    attachObserver();
+
+    return () => {
+      window.removeEventListener("message", onMessage);
+      iframe?.removeEventListener("load", attachObserver);
+      observer?.disconnect();
+    };
+  }, [iframeSrc]);
 
   /* Track fullscreen state so we can update layout (button bar pinned
      to top + iframe fills the rest). The browser also auto-applies the
@@ -351,9 +423,23 @@ export function PrototypeFullscreen({
 
       {view === "flows" ? (
         /* Flows view — the zoomable canvas takes the iframe's box.
-           Same height + fullscreen behavior as the prototype frame. */
+           Same height + fullscreen behavior as the prototype frame.
+           Wrapped in ThreadCountsByScreen so each screen card can show
+           a comment-count badge — the "where are the comments?" map. */
         <div className="h-[900px] overflow-hidden rounded-lg border border-[var(--border)] [section:fullscreen_&]:h-auto [section:fullscreen_&]:flex-1 [section:fullscreen_&]:min-h-0">
-          <FlowCanvas flow={flow} onOpenScreen={openScreenFromFlow} />
+          {commentsEnabled() ? (
+            <ThreadCountsByScreen
+              render={(counts) => (
+                <FlowCanvas
+                  flow={flow}
+                  onOpenScreen={openScreenFromFlow}
+                  commentCounts={counts}
+                />
+              )}
+            />
+          ) : (
+            <FlowCanvas flow={flow} onOpenScreen={openScreenFromFlow} />
+          )}
         </div>
       ) : (
       /* Iframe wrapper. Default state: fixed 900px iframe (with min-w
@@ -393,7 +479,10 @@ export function PrototypeFullscreen({
               horizontal scroll at desktop width). While ON, the overlay
               captures clicks and the prototype underneath is inert. */}
           {commentsEnabled() && commentsOn && (
-            <CommentLayer iframeRef={iframeRef} />
+            <CommentLayer
+              iframeRef={iframeRef}
+              currentScreen={currentScreen}
+            />
           )}
         </div>
       </div>

@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Flow } from "@/lib/flows";
+import { screenKeyFromUrl } from "@/components/comments/comment-layer";
 
 /* Zoomable, pannable flow canvas for the gallery's Flows view —
  * InVision-board style. Lanes render as horizontal bands, sections as
@@ -33,9 +34,15 @@ const FIT_PADDING = 48;
 export function FlowCanvas({
   flow,
   onOpenScreen,
+  commentCounts,
 }: {
   flow: Flow;
   onOpenScreen: (href: string) => void;
+  /** Open-thread counts keyed by screen key (see screenKeyFromUrl).
+   *  When provided, each screen card gets a small pink badge with its
+   *  open-comment count so designers can see which screens have
+   *  discussion at a glance. Omitted or empty → no badges. */
+  commentCounts?: Record<string, number>;
 }) {
   const viewportRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
@@ -274,27 +281,54 @@ export function FlowCanvas({
                     {section.title}
                   </h3>
                   <div className="flex flex-wrap gap-6">
-                    {section.screens.map((screen) => (
-                      <figure key={screen.id} className="w-[240px]">
-                        <figcaption className="mb-1.5 truncate text-xs text-white/70">
-                          {screen.caption}
-                        </figcaption>
-                        <button
-                          type="button"
-                          onClick={() => openScreen(screen.href)}
-                          onFocus={(e) => ensureCardVisible(e.currentTarget)}
-                          aria-label={`Open "${screen.caption}" in the prototype`}
-                          className="block w-full cursor-pointer overflow-hidden rounded-md border border-white/15 bg-white shadow-lg transition hover:border-[#B0F3FE] hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B0F3FE]"
-                        >
-                          <img
-                            src={screen.thumbnailUrl}
-                            alt=""
-                            draggable={false}
-                            className="block aspect-[16/10] w-full object-cover object-top"
-                          />
-                        </button>
-                      </figure>
-                    ))}
+                    {section.screens.map((screen) => {
+                      /* Match the same normalization used when threads
+                         are tagged with their screen key — drop origin
+                         and hash so the lookup works locally and on
+                         Vercel. */
+                      const screenKey = screenKeyFromUrl(screen.href);
+                      const openComments = commentCounts?.[screenKey] ?? 0;
+                      const ariaLabel =
+                        openComments > 0
+                          ? `Open "${screen.caption}" in the prototype (${openComments} open ${openComments === 1 ? "comment" : "comments"})`
+                          : `Open "${screen.caption}" in the prototype`;
+                      return (
+                        <figure key={screen.id} className="w-[240px]">
+                          <figcaption className="mb-1.5 truncate text-xs text-white/70">
+                            {screen.caption}
+                          </figcaption>
+                          <div className="relative">
+                            <button
+                              type="button"
+                              onClick={() => openScreen(screen.href)}
+                              onFocus={(e) => ensureCardVisible(e.currentTarget)}
+                              aria-label={ariaLabel}
+                              className="block w-full cursor-pointer overflow-hidden rounded-md border border-white/15 bg-white shadow-lg transition hover:border-[#B0F3FE] hover:shadow-xl focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#B0F3FE]"
+                            >
+                              <img
+                                src={screen.thumbnailUrl}
+                                alt=""
+                                draggable={false}
+                                className="block aspect-[16/10] w-full object-cover object-top"
+                              />
+                            </button>
+                            {/* Comment-count badge — pinned top-right
+                                of the card, same pink as the in-frame
+                                pins (InVision pink #FF3366) so the
+                                visual language carries between the flow
+                                canvas and the prototype itself. */}
+                            {openComments > 0 && (
+                              <span
+                                aria-hidden
+                                className="pointer-events-none absolute right-2 top-2 inline-flex h-6 min-w-6 items-center justify-center rounded-full rounded-bl-none border-2 border-white bg-[#FF3366] px-1.5 text-xs font-semibold text-white shadow"
+                              >
+                                {openComments > 99 ? "99+" : openComments}
+                              </span>
+                            )}
+                          </div>
+                        </figure>
+                      );
+                    })}
                   </div>
                 </div>
               ))}
