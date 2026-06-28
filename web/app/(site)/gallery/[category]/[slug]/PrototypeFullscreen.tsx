@@ -5,7 +5,12 @@ import { toPng } from "html-to-image";
 import { useTheme } from "next-themes";
 import { Button } from "@tonyh-2-eightfold/ef-design-system";
 import { commentsEnabled } from "@/components/comments/comments-room";
-import { CommentLayer, ThreadCount } from "@/components/comments/comment-layer";
+import {
+  CommentLayer,
+  ThreadCount,
+  ThreadCountsByScreen,
+  screenKeyFromUrl,
+} from "@/components/comments/comment-layer";
 import { FlowCanvas } from "@/components/flows/flow-canvas";
 import type { Flow } from "@/lib/flows";
 
@@ -97,6 +102,13 @@ export function PrototypeFullscreen({
   }
 
   const active = VIEWPORTS.find((v) => v.id === viewport) ?? VIEWPORTS[0];
+
+  /* Stable per-screen keys for comment scoping. `currentScreen` is what
+     the iframe is showing right now — pins are filtered + tagged by it.
+     `entryScreen` is the design's default route, used as the legacy
+     fallback for pre-fix threads that have no `metadata.screen` field. */
+  const currentScreen = screenKeyFromUrl(iframeSrc);
+  const entryScreen = screenKeyFromUrl(previewUrl);
 
   /* Track fullscreen state so we can update layout (button bar pinned
      to top + iframe fills the rest). The browser also auto-applies the
@@ -351,9 +363,24 @@ export function PrototypeFullscreen({
 
       {view === "flows" ? (
         /* Flows view — the zoomable canvas takes the iframe's box.
-           Same height + fullscreen behavior as the prototype frame. */
+           Same height + fullscreen behavior as the prototype frame.
+           Wrapped in ThreadCountsByScreen so each screen card can show
+           a comment-count badge — the "where are the comments?" map. */
         <div className="h-[900px] overflow-hidden rounded-lg border border-[var(--border)] [section:fullscreen_&]:h-auto [section:fullscreen_&]:flex-1 [section:fullscreen_&]:min-h-0">
-          <FlowCanvas flow={flow} onOpenScreen={openScreenFromFlow} />
+          {commentsEnabled() ? (
+            <ThreadCountsByScreen
+              entryScreen={entryScreen}
+              render={(counts) => (
+                <FlowCanvas
+                  flow={flow}
+                  onOpenScreen={openScreenFromFlow}
+                  commentCounts={counts}
+                />
+              )}
+            />
+          ) : (
+            <FlowCanvas flow={flow} onOpenScreen={openScreenFromFlow} />
+          )}
         </div>
       ) : (
       /* Iframe wrapper. Default state: fixed 900px iframe (with min-w
@@ -393,7 +420,11 @@ export function PrototypeFullscreen({
               horizontal scroll at desktop width). While ON, the overlay
               captures clicks and the prototype underneath is inert. */}
           {commentsEnabled() && commentsOn && (
-            <CommentLayer iframeRef={iframeRef} />
+            <CommentLayer
+              iframeRef={iframeRef}
+              currentScreen={currentScreen}
+              entryScreen={entryScreen}
+            />
           )}
         </div>
       </div>

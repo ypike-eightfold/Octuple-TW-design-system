@@ -1,10 +1,29 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ClientSideSuspense, useThreads } from "@liveblocks/react/suspense";
 import { Composer, Thread } from "@liveblocks/react-ui";
 import type { ThreadData } from "@liveblocks/client";
 import "@liveblocks/react-ui/styles.css";
+
+/** Stable identity for the iframe's current screen — `pathname + search`
+ *  with no origin, no hash. We use this as a thread-metadata field so
+ *  pins stay attached to the screen they were left on, even when the
+ *  iframe gets retargeted via the flow canvas. Trade-offs:
+ *  - Drop origin: pins survive moving the gallery between hostnames
+ *    (local vs Vercel).
+ *  - Drop hash: pin position is already captured via scroll metadata;
+ *    a hash change isn't a different screen.
+ *  - Keep search: routes that differentiate by query are different
+ *    screens (e.g., ?role=manager). */
+export function screenKeyFromUrl(url: string): string {
+  try {
+    const u = new URL(url, "http://placeholder.invalid");
+    return u.pathname + u.search;
+  } catch {
+    return url;
+  }
+}
 
 /* Click-anywhere comment overlay for gallery prototypes.
  *
@@ -60,11 +79,31 @@ function PinBadge({
 function Pins({
   containerRef,
   iframeRef,
+  currentScreen,
+  entryScreen,
 }: {
   containerRef: React.RefObject<HTMLDivElement | null>;
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  /** The screen the iframe is showing right now — key match for thread metadata. */
+  currentScreen: string;
+  /** Legacy threads (no `metadata.screen` written) fall back to this
+   *  screen — the design's entry point — so old pins don't get orphaned. */
+  entryScreen: string;
 }) {
-  const { threads } = useThreads();
+  const { threads: allThreads } = useThreads();
+  /* Only render pins for the screen the iframe is currently on.
+     Threads written before this fix have no `metadata.screen`; treat
+     them as belonging to the design's entry point so they don't
+     disappear silently. */
+  const threads = useMemo(
+    () =>
+      allThreads.filter((t) => {
+        const screen =
+          typeof t.metadata.screen === "string" ? t.metadata.screen : entryScreen;
+        return screen === currentScreen;
+      }),
+    [allThreads, currentScreen, entryScreen],
+  );
   const [openThreadId, setOpenThreadId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftPin | null>(null);
 
@@ -202,7 +241,10 @@ function Pins({
           >
             <Composer
               autoFocus
-              metadata={{ ...draft, ...currentScroll() }}
+              /* `screen` ties this pin to the iframe's current route so
+                 it only re-appears on the same screen later. See
+                 screenKeyFromUrl for the normalization rule. */
+              metadata={{ ...draft, ...currentScroll(), screen: currentScreen }}
               onComposerSubmit={() => setDraft(null)}
             />
           </div>
@@ -214,8 +256,17 @@ function Pins({
 
 export function CommentLayer({
   iframeRef,
+  currentScreen,
+  entryScreen,
 }: {
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
+  /** The screen the iframe is currently showing — used to filter which
+   *  pins render and to tag new threads with their screen. Pass the
+   *  output of `screenKeyFromUrl(iframeSrc)`. */
+  currentScreen: string;
+  /** Design's entry screen — used as the legacy fallback for threads
+   *  that pre-date this metadata field. Pass `screenKeyFromUrl(previewUrl)`. */
+  entryScreen: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   return (
@@ -227,7 +278,12 @@ export function CommentLayer({
           </div>
         }
       >
-        <Pins containerRef={containerRef} iframeRef={iframeRef} />
+        <Pins
+          containerRef={containerRef}
+          iframeRef={iframeRef}
+          currentScreen={currentScreen}
+          entryScreen={entryScreen}
+        />
       </ClientSideSuspense>
     </div>
   );
@@ -256,4 +312,46 @@ function ThreadCountInner({
   // The badge is "things needing attention" — resolved threads drop out.
   const open = threads.filter((t) => !t.resolved).length;
   return <>{render(open)}</>;
+}
+
+/** Open-thread count grouped by screen key. Used by the flow canvas to
+ *  badge each screen card with how many comments live on it, so a
+ *  designer can see at a glance "screen X has discussion". The render
+ *  prop receives a Record<screenKey, number>; missing keys = 0. Keys
+ *  use the same normalization as the threads themselves
+ *  (screenKeyFromUrl) — pass thread `metadata.screen` and the design's
+ *  entry-point key for fallback. */
+export function ThreadCountsByScreen({
+  entryScreen,
+  render,
+}: {
+  entryScreen: string;
+  render: (countsByScreen: Record<string, number>) => React.ReactNode;
+}) {
+  return (
+    <ClientSideSuspense fallback={render({})}>
+      <ThreadCountsByScreenInner entryScreen={entryScreen} render={render} />
+    </ClientSideSuspense>
+  );
+}
+
+function ThreadCountsByScreenInner({
+  entryScreen,
+  render,
+}: {
+  entryScreen: string;
+  render: (countsByScreen: Record<string, number>) => React.ReactNode;
+}) {
+  const { threads } = useThreads();
+  const counts = useMemo(() => {
+    const out: Record<string, number> = {};
+    for (const t of threads) {
+      if (t.resolved) continue;
+      const screen =
+        typeof t.metadata.screen === "string" ? t.metadata.screen : entryScreen;
+      out[screen] = (out[screen] ?? 0) + 1;
+    }
+    return out;
+  }, [threads, entryScreen]);
+  return <>{render(counts)}</>;
 }
