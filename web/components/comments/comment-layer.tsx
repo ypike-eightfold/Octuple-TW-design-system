@@ -87,23 +87,38 @@ function Pins({
   currentScreen: string;
 }) {
   const { threads: allThreads } = useThreads();
-  /* Gradual-rollout filter:
-     - NEW threads carry `metadata.screen` (written below in the
-       Composer's metadata prop) and render only on their screen.
-     - LEGACY threads (created before this metadata existed) have no
-       `metadata.screen`; we keep their pre-fix behavior of rendering
-       on every screen, so commenters with existing pins don't see
-       their work appear to "move" overnight.
-     Once enough time has passed that legacy threads are negligible,
-     the `screen == null` branch can be tightened to a stricter rule. */
+  /* Three eras of metadata, all must keep working:
+
+     1. NO `metadata.screen` — created before any per-screen filter
+        existed. Render on every screen so legacy pins don't disappear.
+
+     2. URL-ONLY string (no `#`) — created during the first iteration of
+        this PR, when the screen key was just `screenKeyFromUrl(iframeSrc)`.
+        Match against the URL portion of the current screen key so these
+        pins still appear on the route they were dropped on (across any
+        h1 within that route).
+
+     3. COMPOSITE `<url>#<h1>` (has `#`) — current schema. Strict
+        equality match against currentScreen, which is also composite.
+
+     Without era 2 handling, mid-rollout pins fall into a gap (their
+     URL-only string never equals a composite key with a `#` in it),
+     so they vanish from every screen. That's what happened to comment
+     8 earlier today; this filter restores it. */
+  /* currentScreen is `<urlKey>#<h1>` (or just `<urlKey>` if h1 is
+     unknown). Split on `#` to get the URL portion for era-2 matching;
+     URL parsing would also work but split is robust to any character
+     in the h1 (e.g., `?` or another `#`). */
+  const currentUrlKey = currentScreen.split("#")[0];
   const threads = useMemo(
     () =>
       allThreads.filter((t) => {
-        const screen =
-          typeof t.metadata.screen === "string" ? t.metadata.screen : null;
-        return screen === null || screen === currentScreen;
+        const stored = t.metadata.screen;
+        if (typeof stored !== "string") return true; // era 1
+        if (!stored.includes("#")) return stored === currentUrlKey; // era 2
+        return stored === currentScreen; // era 3
       }),
-    [allThreads, currentScreen],
+    [allThreads, currentScreen, currentUrlKey],
   );
   const [openThreadId, setOpenThreadId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftPin | null>(null);
@@ -342,10 +357,15 @@ function ThreadCountsByScreenInner({
     const out: Record<string, number> = {};
     for (const t of threads) {
       if (t.resolved) continue;
-      const screen =
-        typeof t.metadata.screen === "string" ? t.metadata.screen : null;
-      if (!screen) continue; // legacy thread — counted globally, not per-screen
-      out[screen] = (out[screen] ?? 0) + 1;
+      const stored = t.metadata.screen;
+      /* Skip era-1 (no key) and era-2 (URL-only) threads — both appear
+         on multiple screens via the Pins filter above, so attributing
+         them to a single flow card would mislead. The global
+         ThreadCount badge still includes them. Only composite-keyed
+         threads (era 3) get per-screen counts. */
+      if (typeof stored !== "string") continue;
+      if (!stored.includes("#")) continue;
+      out[stored] = (out[stored] ?? 0) + 1;
     }
     return out;
   }, [threads]);
