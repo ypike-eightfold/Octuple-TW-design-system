@@ -103,12 +103,72 @@ export function PrototypeFullscreen({
 
   const active = VIEWPORTS.find((v) => v.id === viewport) ?? VIEWPORTS[0];
 
-  /* Stable per-screen key for comment scoping. `currentScreen` is what
-     the iframe is showing right now — new pins are tagged with it and
-     Pins filters by it. Threads created before this metadata existed
-     (no `metadata.screen`) keep showing on every screen — see the
-     gradual-rollout note in comment-layer.tsx. */
-  const currentScreen = screenKeyFromUrl(iframeSrc);
+  /* Per-screen key for comment scoping. Two sources, in priority order:
+     1. `screen-change` postMessage from the iframe — explicit opt-in
+        for prototypes that want full control over their key.
+     2. The iframe's first <h1> text — automatic detection for SPA-style
+        prototypes that don't post explicit screen-change events (e.g.,
+        Perform 360 changes content via in-iframe React state, so the
+        URL stays the same but the h1 always changes per screen).
+     3. Falls back to just the URL key if neither signal is present.
+     The composite key (`<url>#<h1>`) keeps screens distinct in both
+     multi-route prototypes (URL varies, h1 may not — e.g., Career Hub
+     Continuous Sync) and single-route SPA prototypes (URL constant,
+     h1 varies — e.g., Perform 360). */
+  const [explicitScreen, setExplicitScreen] = useState<string | null>(null);
+  const [observedH1, setObservedH1] = useState<string | null>(null);
+  const currentScreen = explicitScreen
+    ?? `${screenKeyFromUrl(iframeSrc)}#${observedH1 ?? ""}`;
+
+  /* Wire both sources. Reset on iframeSrc change so a flow-canvas jump
+     to a new screen doesn't carry the previous screen's key forward
+     before the new iframe content has signalled. */
+  useEffect(() => {
+    setExplicitScreen(null);
+    setObservedH1(null);
+
+    function onMessage(e: MessageEvent) {
+      if (
+        e?.data?.type === "screen-change" &&
+        typeof e.data.screen === "string" &&
+        e.data.screen.length > 0
+      ) {
+        setExplicitScreen(e.data.screen);
+      }
+    }
+    window.addEventListener("message", onMessage);
+
+    let observer: MutationObserver | null = null;
+    function updateFromH1(doc: Document) {
+      const h1 = doc.querySelector("h1");
+      const text = h1?.textContent?.trim();
+      setObservedH1(text && text.length > 0 ? text : null);
+    }
+    function attachObserver() {
+      const doc = iframeRef.current?.contentDocument;
+      if (!doc) return;
+      observer?.disconnect();
+      updateFromH1(doc);
+      observer = new MutationObserver(() => updateFromH1(doc));
+      observer.observe(doc.body ?? doc.documentElement, {
+        childList: true,
+        subtree: true,
+        characterData: true,
+      });
+    }
+
+    const iframe = iframeRef.current;
+    iframe?.addEventListener("load", attachObserver);
+    /* Try once immediately for the case where the iframe has already
+       loaded before this effect attached (e.g., StrictMode double-run). */
+    attachObserver();
+
+    return () => {
+      window.removeEventListener("message", onMessage);
+      iframe?.removeEventListener("load", attachObserver);
+      observer?.disconnect();
+    };
+  }, [iframeSrc]);
 
   /* Track fullscreen state so we can update layout (button bar pinned
      to top + iframe fills the rest). The browser also auto-applies the

@@ -207,6 +207,28 @@ The gallery's detail page (`web/app/(site)/gallery/[category]/[slug]/page.tsx`) 
 
 **You inherit all of this for free.** Don't try to reimplement viewport switching, fullscreen, or screenshot at the prototype level.
 
+### Per-screen comment scoping — the `screen-change` contract
+
+Comments (Liveblocks-backed pins on the prototype) are scoped per-screen so a pin left on `/sync` doesn't follow the user to `/meeting`. The gallery derives the "current screen" key two ways, in priority order:
+
+1. **Explicit `postMessage` from the iframe** — the prototype calls
+   ```js
+   window.parent.postMessage(
+     { type: "screen-change", screen: "<stable-key>" },
+     "*"
+   );
+   ```
+   on every screen transition. The `screen` string is up to the prototype — anything stable and unique per visible screen (`"home"`, `"chro-org-dashboard"`, etc.). This is the recommended path for SPA prototypes that don't change URL between screens.
+
+2. **Automatic `<h1>` observer** — if no `screen-change` arrives, the gallery watches the iframe's first `<h1>` text via `MutationObserver` and uses it as the screen key. Works for free if your screens have distinct h1 titles (Perform 360, for example, uses this with no instrumentation — its headings like "Where the cycle stands" vs "Browse the org down to your reports' reports" are already distinct).
+
+The composite key the gallery actually stores is `"<urlKey>#<h1OrExplicit>"` — so multi-route prototypes (URL varies, h1 doesn't — e.g., Career Hub Continuous Sync) and single-route SPA prototypes (URL constant, h1 varies — e.g., Perform 360) both get correct per-screen pinning without any prototype-specific gallery code.
+
+**When to opt into the explicit postMessage** instead of relying on the h1 fallback:
+- Two visible screens share the same h1 but should be treated as separate (e.g., the same heading shown to two different personas with different data underneath).
+- The screen has no h1 at all.
+- You want stability against h1 copy edits (the h1 is content; the screen key is identity).
+
 ### Gallery container width
 
 The gallery layout is `max-w-screen-2xl` (1536px) — wide enough that prototype iframes with `min-w-[1440px]` render their desktop layout without triggering the navbar's hamburger collapse. Don't shrink the gallery container; don't widen the prototype's `min-w-[1440px]` floor (anything wider means the iframe horizontally scrolls on common laptop screens).
