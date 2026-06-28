@@ -80,29 +80,30 @@ function Pins({
   containerRef,
   iframeRef,
   currentScreen,
-  entryScreen,
 }: {
   containerRef: React.RefObject<HTMLDivElement | null>;
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
   /** The screen the iframe is showing right now — key match for thread metadata. */
   currentScreen: string;
-  /** Legacy threads (no `metadata.screen` written) fall back to this
-   *  screen — the design's entry point — so old pins don't get orphaned. */
-  entryScreen: string;
 }) {
   const { threads: allThreads } = useThreads();
-  /* Only render pins for the screen the iframe is currently on.
-     Threads written before this fix have no `metadata.screen`; treat
-     them as belonging to the design's entry point so they don't
-     disappear silently. */
+  /* Gradual-rollout filter:
+     - NEW threads carry `metadata.screen` (written below in the
+       Composer's metadata prop) and render only on their screen.
+     - LEGACY threads (created before this metadata existed) have no
+       `metadata.screen`; we keep their pre-fix behavior of rendering
+       on every screen, so commenters with existing pins don't see
+       their work appear to "move" overnight.
+     Once enough time has passed that legacy threads are negligible,
+     the `screen == null` branch can be tightened to a stricter rule. */
   const threads = useMemo(
     () =>
       allThreads.filter((t) => {
         const screen =
-          typeof t.metadata.screen === "string" ? t.metadata.screen : entryScreen;
-        return screen === currentScreen;
+          typeof t.metadata.screen === "string" ? t.metadata.screen : null;
+        return screen === null || screen === currentScreen;
       }),
-    [allThreads, currentScreen, entryScreen],
+    [allThreads, currentScreen],
   );
   const [openThreadId, setOpenThreadId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftPin | null>(null);
@@ -257,16 +258,12 @@ function Pins({
 export function CommentLayer({
   iframeRef,
   currentScreen,
-  entryScreen,
 }: {
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
   /** The screen the iframe is currently showing — used to filter which
    *  pins render and to tag new threads with their screen. Pass the
    *  output of `screenKeyFromUrl(iframeSrc)`. */
   currentScreen: string;
-  /** Design's entry screen — used as the legacy fallback for threads
-   *  that pre-date this metadata field. Pass `screenKeyFromUrl(previewUrl)`. */
-  entryScreen: string;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   return (
@@ -282,7 +279,6 @@ export function CommentLayer({
           containerRef={containerRef}
           iframeRef={iframeRef}
           currentScreen={currentScreen}
-          entryScreen={entryScreen}
         />
       </ClientSideSuspense>
     </div>
@@ -317,29 +313,28 @@ function ThreadCountInner({
 /** Open-thread count grouped by screen key. Used by the flow canvas to
  *  badge each screen card with how many comments live on it, so a
  *  designer can see at a glance "screen X has discussion". The render
- *  prop receives a Record<screenKey, number>; missing keys = 0. Keys
- *  use the same normalization as the threads themselves
- *  (screenKeyFromUrl) — pass thread `metadata.screen` and the design's
- *  entry-point key for fallback. */
+ *  prop receives a Record<screenKey, number>; missing keys = 0.
+ *
+ *  Legacy threads (no `metadata.screen`) are intentionally NOT counted
+ *  per-screen — they render on every screen via the Pins filter, so
+ *  attributing them to one card would over-count. The global
+ *  `ThreadCount` badge still includes them, which is the right surface
+ *  for "this design has discussion overall." */
 export function ThreadCountsByScreen({
-  entryScreen,
   render,
 }: {
-  entryScreen: string;
   render: (countsByScreen: Record<string, number>) => React.ReactNode;
 }) {
   return (
     <ClientSideSuspense fallback={render({})}>
-      <ThreadCountsByScreenInner entryScreen={entryScreen} render={render} />
+      <ThreadCountsByScreenInner render={render} />
     </ClientSideSuspense>
   );
 }
 
 function ThreadCountsByScreenInner({
-  entryScreen,
   render,
 }: {
-  entryScreen: string;
   render: (countsByScreen: Record<string, number>) => React.ReactNode;
 }) {
   const { threads } = useThreads();
@@ -348,10 +343,11 @@ function ThreadCountsByScreenInner({
     for (const t of threads) {
       if (t.resolved) continue;
       const screen =
-        typeof t.metadata.screen === "string" ? t.metadata.screen : entryScreen;
+        typeof t.metadata.screen === "string" ? t.metadata.screen : null;
+      if (!screen) continue; // legacy thread — counted globally, not per-screen
       out[screen] = (out[screen] ?? 0) + 1;
     }
     return out;
-  }, [threads, entryScreen]);
+  }, [threads]);
   return <>{render(counts)}</>;
 }

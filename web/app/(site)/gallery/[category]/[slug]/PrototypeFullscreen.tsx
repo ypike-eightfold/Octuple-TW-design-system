@@ -103,12 +103,12 @@ export function PrototypeFullscreen({
 
   const active = VIEWPORTS.find((v) => v.id === viewport) ?? VIEWPORTS[0];
 
-  /* Stable per-screen keys for comment scoping. `currentScreen` is what
-     the iframe is showing right now — pins are filtered + tagged by it.
-     `entryScreen` is the design's default route, used as the legacy
-     fallback for pre-fix threads that have no `metadata.screen` field. */
+  /* Stable per-screen key for comment scoping. `currentScreen` is what
+     the iframe is showing right now — new pins are tagged with it and
+     Pins filters by it. Threads created before this metadata existed
+     (no `metadata.screen`) keep showing on every screen — see the
+     gradual-rollout note in comment-layer.tsx. */
   const currentScreen = screenKeyFromUrl(iframeSrc);
-  const entryScreen = screenKeyFromUrl(previewUrl);
 
   /* Track fullscreen state so we can update layout (button bar pinned
      to top + iframe fills the rest). The browser also auto-applies the
@@ -369,7 +369,6 @@ export function PrototypeFullscreen({
         <div className="h-[900px] overflow-hidden rounded-lg border border-[var(--border)] [section:fullscreen_&]:h-auto [section:fullscreen_&]:flex-1 [section:fullscreen_&]:min-h-0">
           {commentsEnabled() ? (
             <ThreadCountsByScreen
-              entryScreen={entryScreen}
               render={(counts) => (
                 <FlowCanvas
                   flow={flow}
@@ -423,7 +422,6 @@ export function PrototypeFullscreen({
             <CommentLayer
               iframeRef={iframeRef}
               currentScreen={currentScreen}
-              entryScreen={entryScreen}
             />
           )}
         </div>
