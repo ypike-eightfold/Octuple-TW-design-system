@@ -99,6 +99,34 @@ export function PrototypeProvider({ children }: { children: ReactNode }) {
     setDataStateInternal(s)
     savePersisted({ ...loadPersisted(), dataState: s })
   }, [])
+
+  /* Gallery comment bridge — opt into the generic prototype↔gallery state
+     protocol (web/components/comments/proto-state.ts). Announce
+     {persona, dataState} to the gallery host so a comment captures the
+     flow it was left in, and restore that flow when the host asks. Also
+     replies to a state request (the host's readiness ping after a jump).
+     No-op when not embedded (window.parent === window). */
+  useEffect(() => {
+    if (!hydrated) return
+    const announce = () =>
+      window.parent?.postMessage(
+        { type: 'proto-state', state: { persona, dataState } },
+        '*',
+      )
+    announce()
+    function onMessage(e: MessageEvent) {
+      const d = e?.data
+      if (!d || typeof d !== 'object') return
+      if (d.type === 'proto-state-request') announce()
+      if (d.type === 'proto-state-restore' && d.state && typeof d.state === 'object') {
+        if (d.state.persona) setPersona(d.state.persona as PersonaId)
+        if (d.state.dataState) setDataState(d.state.dataState as DataState)
+      }
+    }
+    window.addEventListener('message', onMessage)
+    return () => window.removeEventListener('message', onMessage)
+  }, [hydrated, persona, dataState, setPersona, setDataState])
+
   const [agendaItems, setAgendaItems] = useState<string[]>([])
   const [checkedActionItems, setCheckedActionItems] = useState<Set<string>>(new Set())
   const [generatedActionItems, setGeneratedActionItems] = useState<ActionItem[]>([])
