@@ -111,7 +111,17 @@ function parseFlow(
           thumbnailUrl: s.thumbnail.startsWith("/")
             ? s.thumbnail
             : publicUrlFor(category, slug, s.thumbnail),
-          href: s.href,
+          /* Same relative→absolute resolution as the thumbnail. Absolute
+             routes (`/careerhub/team`, interactive prototypes) and full
+             URLs pass through; a RELATIVE href (`index.html?as=ic#home`,
+             self-contained static prototypes) resolves against the design
+             folder. Without this a relative href is resolved by the
+             browser against the GALLERY page URL when set as the iframe
+             src — loading a non-existent site route (nested nav + 404).
+             query + hash are preserved (publicUrlFor only prefixes). */
+          href: /^(\/|https?:\/\/)/.test(s.href)
+            ? s.href
+            : publicUrlFor(category, slug, s.href),
         });
       }
       if (screens.length > 0) {

@@ -309,8 +309,17 @@ web/public/content/designs/<category>/<slug>/
 - **sections** — columns within a lane, dash-divided (group by area of the
   product: "Team tab", "Member detail", …).
 - **screens** — `caption` in sentence case (terms-list-checked), `thumbnail`
-  relative to the design folder, `href` = the live route the gallery iframe
-  loads when the screen is clicked.
+  relative to the design folder, `href` = what the gallery iframe loads when
+  the screen is clicked. Two valid forms:
+  - **Absolute route** (`/careerhub/team`) — for live React prototypes under
+    `web/app/(prototype)/…`.
+  - **Relative path** (`index.html?as=ic#home`) — for self-contained static
+    prototypes. Resolved against the design folder, so it must be relative
+    (NOT `/index.html…`). Query + hash are preserved, so `?param#screen`
+    works for SPA-style prototypes that route on them.
+
+  A relative href beginning with `/` is treated as a site route and will
+  404 inside the frame — use a bare relative path for static prototypes.
 
 ### How to produce it
 
