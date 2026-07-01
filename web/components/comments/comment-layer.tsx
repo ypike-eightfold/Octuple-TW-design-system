@@ -80,11 +80,22 @@ function Pins({
   containerRef,
   iframeRef,
   currentScreen,
+  protoStateJson,
+  focusThreadId,
+  onFocusHandled,
 }: {
   containerRef: React.RefObject<HTMLDivElement | null>;
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
   /** The screen the iframe is showing right now — key match for thread metadata. */
   currentScreen: string;
+  /** JSON descriptor of the prototype's current state, captured into new
+   *  threads so the list can restore the flow later. Undefined for
+   *  prototypes that don't opt into the state bridge. */
+  protoStateJson?: string;
+  /** When set (from the comments list), open this thread's popover once
+   *  it's present on the current screen, and restore its scroll. */
+  focusThreadId?: string | null;
+  onFocusHandled?: () => void;
 }) {
   const { threads: allThreads } = useThreads();
   /* Three eras of metadata, all must keep working:
@@ -122,6 +133,27 @@ function Pins({
   );
   const [openThreadId, setOpenThreadId] = useState<string | null>(null);
   const [draft, setDraft] = useState<DraftPin | null>(null);
+
+  /* Focus-from-list: when the comments list asks to open a thread, wait
+     until that thread is actually present on the current screen (the
+     iframe may still be navigating), then open its popover + restore
+     scroll. Depending on `threads` re-runs this as screens settle. */
+  useEffect(() => {
+    if (!focusThreadId) return;
+    const target = threads.find((t) => t.id === focusThreadId);
+    if (!target) return;
+    setDraft(null);
+    setOpenThreadId(focusThreadId);
+    try {
+      iframeRef.current?.contentWindow?.scrollTo(
+        target.metadata.scrollX ?? 0,
+        target.metadata.scrollY ?? 0,
+      );
+    } catch {
+      /* cross-origin/detached — pin stays frame-anchored */
+    }
+    onFocusHandled?.();
+  }, [focusThreadId, threads, iframeRef, onFocusHandled]);
 
   // Escape closes whichever popover is open.
   useEffect(() => {
@@ -260,7 +292,16 @@ function Pins({
               /* `screen` ties this pin to the iframe's current route so
                  it only re-appears on the same screen later. See
                  screenKeyFromUrl for the normalization rule. */
-              metadata={{ ...draft, ...currentScroll(), screen: currentScreen }}
+              metadata={{
+                ...draft,
+                ...currentScroll(),
+                screen: currentScreen,
+                /* Capture the prototype's current state so the list can
+                   restore the exact flow. Only set when the prototype
+                   opted into the bridge (otherwise omit — metadata values
+                   can't be undefined). */
+                ...(protoStateJson ? { state: protoStateJson } : {}),
+              }}
               onComposerSubmit={() => setDraft(null)}
             />
           </div>
@@ -273,12 +314,20 @@ function Pins({
 export function CommentLayer({
   iframeRef,
   currentScreen,
+  protoStateJson,
+  focusThreadId,
+  onFocusHandled,
 }: {
   iframeRef: React.RefObject<HTMLIFrameElement | null>;
   /** The screen the iframe is currently showing — used to filter which
    *  pins render and to tag new threads with their screen. Pass the
    *  output of `screenKeyFromUrl(iframeSrc)`. */
   currentScreen: string;
+  /** JSON of the prototype's current state, captured into new threads. */
+  protoStateJson?: string;
+  /** Thread to open programmatically (from the comments list). */
+  focusThreadId?: string | null;
+  onFocusHandled?: () => void;
 }) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   return (
@@ -294,10 +343,38 @@ export function CommentLayer({
           containerRef={containerRef}
           iframeRef={iframeRef}
           currentScreen={currentScreen}
+          protoStateJson={protoStateJson}
+          focusThreadId={focusThreadId}
+          onFocusHandled={onFocusHandled}
         />
       </ClientSideSuspense>
     </div>
   );
+}
+
+/** Plain-text snippet of a thread's first comment, for the list. Walks
+ *  the Liveblocks comment body (paragraphs → inline nodes) collecting
+ *  text; mentions/links contribute their visible text where present. */
+export function firstCommentText(thread: ThreadData): string {
+  const body = thread.comments?.[0]?.body as
+    | { content?: Array<{ children?: Array<Record<string, unknown>> }> }
+    | undefined;
+  if (!body?.content) return "";
+  const parts: string[] = [];
+  for (const block of body.content) {
+    for (const node of block.children ?? []) {
+      if (typeof node.text === "string") parts.push(node.text);
+      else if (typeof node.id === "string") parts.push(`@${node.id}`);
+    }
+  }
+  return parts.join("").trim();
+}
+
+/** The navigable URL portion of a thread's screen key (drops the `#h1`
+ *  suffix). Empty for legacy threads with no screen. */
+export function threadScreenUrl(thread: ThreadData): string {
+  const screen = thread.metadata.screen;
+  return typeof screen === "string" ? screen.split("#")[0] : "";
 }
 
 /** Thread-count badge for the Comments toggle button. Rendered inside

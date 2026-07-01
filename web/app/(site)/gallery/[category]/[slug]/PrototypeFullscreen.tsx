@@ -1,16 +1,25 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toPng } from "html-to-image";
 import { useTheme } from "next-themes";
 import { Button } from "@tonyh-2-eightfold/ef-design-system";
 import { commentsEnabled } from "@/components/comments/comments-room";
 import {
   CommentLayer,
-  ThreadCount,
   ThreadCountsByScreen,
   screenKeyFromUrl,
+  threadScreenUrl,
 } from "@/components/comments/comment-layer";
+import { CommentsControl } from "@/components/comments/comments-list";
+import {
+  PROTO_STATE,
+  PROTO_STATE_RESTORE,
+  PROTO_STATE_REQUEST,
+  parseState,
+  stringifyState,
+} from "@/components/comments/proto-state";
+import type { ThreadData } from "@liveblocks/client";
 import { FlowCanvas } from "@/components/flows/flow-canvas";
 import type { Flow } from "@/lib/flows";
 
@@ -100,6 +109,81 @@ export function PrototypeFullscreen({
     setIframeSrc(href);
     setView("prototype");
   }
+
+  /* ── Comments: prototype state bridge + jump-to-comment ──────────────
+     Comments capture the prototype's state (persona/flow) via a generic
+     postMessage bridge, and the comments list can jump back to a
+     comment's screen + state. See components/comments/proto-state.ts. */
+
+  // Latest state descriptor the prototype has announced, as JSON — stamped
+  // into new comments so the list can restore the flow later.
+  const [protoStateJson, setProtoStateJson] = useState<string | undefined>(undefined);
+  // Thread the list asked to open; handed to CommentLayer, cleared once opened.
+  const [focusThreadId, setFocusThreadId] = useState<string | null>(null);
+  // A jump awaiting the target screen to be ready (set during navigation).
+  const pendingJumpRef = useRef<{ threadId: string; state: Record<string, unknown> | null } | null>(null);
+
+  function postToIframe(message: unknown) {
+    iframeRef.current?.contentWindow?.postMessage(message, "*");
+  }
+
+  const applyPendingJump = useCallback(() => {
+    const j = pendingJumpRef.current;
+    if (!j) return;
+    if (j.state) postToIframe({ type: PROTO_STATE_RESTORE, state: j.state });
+    setFocusThreadId(j.threadId);
+    pendingJumpRef.current = null;
+  }, []);
+
+  function jumpToThread(thread: ThreadData) {
+    setView("prototype");
+    setCommentsOn(true);
+    const url = threadScreenUrl(thread);
+    const needNav = !!url && screenKeyFromUrl(iframeSrc) !== url;
+    pendingJumpRef.current = {
+      threadId: thread.id,
+      state: parseState(thread.metadata.state),
+    };
+    if (needNav) {
+      // Reload the iframe at the comment's screen; the bridge/load effect
+      // applies the jump once the new screen is ready.
+      setIframeSrc(url);
+    } else {
+      // Same screen — the prototype is already mounted and listening.
+      applyPendingJump();
+    }
+  }
+
+  /* State bridge: keep the latest descriptor for capture, and complete a
+     pending jump once the (possibly just-navigated) prototype is ready. */
+  useEffect(() => {
+    function onMessage(e: MessageEvent) {
+      const d = e?.data;
+      if (!d || typeof d !== "object") return;
+      if (d.type === PROTO_STATE) {
+        setProtoStateJson(stringifyState(d.state));
+        // A prototype announcing its state = it's mounted + listening, so
+        // now is the safe moment to push a pending restore.
+        if (pendingJumpRef.current) applyPendingJump();
+      }
+    }
+    function onLoad() {
+      // Ask the (new) prototype for its state — doubles as readiness ping.
+      postToIframe({ type: PROTO_STATE_REQUEST });
+      // Fallback for prototypes that don't opt into the bridge: still open
+      // the thread + restore scroll shortly after load.
+      window.setTimeout(() => {
+        if (pendingJumpRef.current) applyPendingJump();
+      }, 500);
+    }
+    const iframe = iframeRef.current;
+    window.addEventListener("message", onMessage);
+    iframe?.addEventListener("load", onLoad);
+    return () => {
+      window.removeEventListener("message", onMessage);
+      iframe?.removeEventListener("load", onLoad);
+    };
+  }, [iframeSrc, applyPendingJump]);
 
   const active = VIEWPORTS.find((v) => v.id === viewport) ?? VIEWPORTS[0];
 
@@ -341,27 +425,10 @@ export function PrototypeFullscreen({
           )}
 
           {view === "prototype" && commentsEnabled() && (
-            <ThreadCount
-              render={(count) => (
-                <Button
-                  variant={commentsOn ? "primary" : "secondary"}
-                  size="sm"
-                  onClick={() => setCommentsOn((on) => !on)}
-                  aria-pressed={commentsOn}
-                  {...(count > 0 ? { badge: count } : {})}
-                  leadingIcon={
-                    <span
-                      className="material-symbols-outlined"
-                      style={{ fontSize: 14 }}
-                      aria-hidden
-                    >
-                      comment
-                    </span>
-                  }
-                >
-                  Comments
-                </Button>
-              )}
+            <CommentsControl
+              commentsOn={commentsOn}
+              onCommentsOnChange={setCommentsOn}
+              onJump={jumpToThread}
             />
           )}
 
@@ -482,6 +549,9 @@ export function PrototypeFullscreen({
             <CommentLayer
               iframeRef={iframeRef}
               currentScreen={currentScreen}
+              protoStateJson={protoStateJson}
+              focusThreadId={focusThreadId}
+              onFocusHandled={() => setFocusThreadId(null)}
             />
           )}
         </div>

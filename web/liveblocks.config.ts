@@ -15,6 +15,16 @@ declare global {
       y: number;
       scrollX: number;
       scrollY: number;
+      /** Screen the comment was left on: `<pathname+search>#<h1>` (see
+       *  screenKeyFromUrl). Scopes which pins render per screen and lets
+       *  the comments list jump back to the right screen. Optional —
+       *  legacy threads predate it. */
+      screen?: string;
+      /** Opaque, prototype-defined state descriptor (JSON string) captured
+       *  when the comment was made — e.g. `{"persona":"sam"}`. Posted back
+       *  into the prototype on jump so it restores the exact flow. The
+       *  gallery never interprets it; see components/comments/proto-state.ts. */
+      state?: string;
     };
   }
 }
